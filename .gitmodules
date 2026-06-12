@@ -1,0 +1,9 @@
+[submodule "kernel/linux"]
+	path = kernel/linux
+	url = https://github.com/torvalds/linux.git
+[submodule "gentoo/gentoo-ebuilds"]
+	path = gentoo/gentoo-ebuilds
+	url = https://github.com/gentoo/gentoo.git
+[submodule "gentoo/portage"]
+	path = gentoo/portage
+	url = https://github.com/gentoo/portage.git
