@@ -1,0 +1,32 @@
+{
+  "$schema": "https://schema.tauri.app/config/2.json",
+  "productName": "osaima-shell",
+  "version": "0.1.0",
+  "identifier": "org.interstellaros.shell",
+  "build": {
+    "frontendDist": "../"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Interstellar OS Shell",
+        "fullscreen": true,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": false,
+        "skipTaskbar": true,
+        "resizable": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/icon.png"
+    ]
+  }
+}

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interstellar OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="src/style.css" />
+</head>
+<body>
+
+  <!-- AMBIENT DESKTOP LAYER (always visible) -->
+  <div id="desktop">
+
+    <!-- Starfield canvas background -->
+    <canvas id="starfield"></canvas>
+
+    <!-- Floating nebula orbs -->
+    <div class="nebula nebula-1"></div>
+    <div class="nebula nebula-2"></div>
+    <div class="nebula nebula-3"></div>
+
+    <!-- Top status bar -->
+    <header id="status-bar">
+      <div class="status-left">
+        <div id="os-logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="rgba(120,180,255,0.8)" stroke-width="1.5"/>
+            <circle cx="12" cy="12" r="4" fill="rgba(120,180,255,0.6)"/>
+            <line x1="12" y1="2" x2="12" y2="6" stroke="rgba(120,180,255,0.6)" stroke-width="1.5"/>
+            <line x1="12" y1="18" x2="12" y2="22" stroke="rgba(120,180,255,0.6)" stroke-width="1.5"/>
+            <line x1="2" y1="12" x2="6" y2="12" stroke="rgba(120,180,255,0.6)" stroke-width="1.5"/>
+            <line x1="18" y1="12" x2="22" y2="12" stroke="rgba(120,180,255,0.6)" stroke-width="1.5"/>
+          </svg>
+          <span>Interstellar OS</span>
+        </div>
+      </div>
+      <div class="status-center">
+        <div id="clock">
+          <span id="clock-time">00:00</span>
+          <span id="clock-date">Mon, Jan 1</span>
+        </div>
+      </div>
+      <div class="status-right">
+        <div id="daemon-indicator" class="indicator offline" title="MCP Daemon Status">
+          <span class="dot"></span>
+          <span class="label">AI Core</span>
+        </div>
+        <div class="status-pill" id="cpu-pill">CPU <span id="cpu-val">—</span></div>
+        <div class="status-pill" id="mem-pill">MEM <span id="mem-val">—</span></div>
+      </div>
+    </header>
+
+    <!-- Center ambient message -->
+    <div id="ambient-center">
+      <p id="ambient-hint">Press <kbd>Space</kbd> to talk to your OS</p>
+    </div>
+
+    <!-- Context panel (bottom-right) -->
+    <aside id="context-panel">
+      <div class="context-label">SYSTEM CONTEXT</div>
+      <div class="context-row">
+        <span class="ctx-key">HOST</span>
+        <span class="ctx-val" id="ctx-host">—</span>
+      </div>
+      <div class="context-row">
+        <span class="ctx-key">KERNEL</span>
+        <span class="ctx-val" id="ctx-kernel">—</span>
+      </div>
+      <div class="context-row">
+        <span class="ctx-key">CPU CORES</span>
+        <span class="ctx-val" id="ctx-cores">—</span>
+      </div>
+      <div class="context-row">
+        <span class="ctx-key">MEMORY</span>
+        <span class="ctx-val" id="ctx-mem-bar">—</span>
+      </div>
+      <div class="mem-bar-track"><div class="mem-bar-fill" id="mem-bar-fill"></div></div>
+    </aside>
+
+  </div>
+
+  <!-- AI COMMAND HUB (activated by Space) -->
+  <div id="launcher" class="hidden">
+    <div id="launcher-backdrop" onclick="closeLauncher()"></div>
+    <div id="launcher-panel">
+      <div id="launcher-header">
+        <div id="launcher-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                  stroke="rgba(120,200,255,0.9)" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <input
+          id="launcher-input"
+          type="text"
+          placeholder="Ask your OS anything…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <div id="launcher-close" onclick="closeLauncher()">ESC</div>
+      </div>
+
+      <div id="launcher-suggestions">
+        <div class="suggestion-group-label">QUICK ACTIONS</div>
+        <div class="suggestions-grid">
+          <button class="suggestion-chip" onclick="runSuggestion(this)">Show system stats</button>
+          <button class="suggestion-chip" onclick="runSuggestion(this)">Open terminal</button>
+          <button class="suggestion-chip" onclick="runSuggestion(this)">Check AI core status</button>
+          <button class="suggestion-chip" onclick="runSuggestion(this)">List running processes</button>
+          <button class="suggestion-chip" onclick="runSuggestion(this)">Adjust display brightness</button>
+          <button class="suggestion-chip" onclick="runSuggestion(this)">Network diagnostics</button>
+        </div>
+      </div>
+
+      <div id="launcher-response" class="hidden">
+        <div class="response-label">AI RESPONSE</div>
+        <div id="response-content"></div>
+      </div>
+
+      <div id="launcher-footer">
+        <span class="footer-hint"><kbd>↵</kbd> Execute &nbsp;·&nbsp; <kbd>Esc</kbd> Close &nbsp;·&nbsp; <kbd>Space</kbd> Open</span>
+        <span id="daemon-status-text">Connecting to AI Core…</span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "osaima-shell",
+  "version": "0.1.0",
+  "description": "Interstellar OS — Agentic UI Shell",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.0.0"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.0.0"
+  }
+}
