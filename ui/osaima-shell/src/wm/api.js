@@ -96,6 +96,7 @@ export function createWmApi(engine) {
   api.set('set_layout', (name) => engine.setLayout(String(name)));
   api.set('toggle_floating', () => engine.toggleFloating());
   api.set('workspace', (n) => engine.switchWorkspace(Math.floor(num(n, 1)) - 1));
+  api.set('notify', (msg, kind) => engine.notify(String(msg), kind ? String(kind) : 'info'));
   api.set('log', (...a) => console.log('[wm.lua]', ...a.map(String)));
 
   return api;

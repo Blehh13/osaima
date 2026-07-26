@@ -19,7 +19,7 @@ local mod = "Alt"
 wm.modkey(mod)
 
 -- ── Appearance ──────────────────────────────────────────────────────────
-wm.layout("tile")          -- "tile" | "monocle" | "float"
+wm.layout("tile")          -- "tile" | "monocle" | "grid" | "spiral" | "float"
 wm.gaps(12)                -- pixels between tiled windows
 wm.master_ratio(0.58)      -- master column takes 58% of the width
 wm.master_count(1)         -- windows in the master area
@@ -45,8 +45,12 @@ wm.bind(mod .. "+h",        "decrease_master")
 
 -- Launch applications
 wm.bind(mod .. "+Return",   "spawn:terminal")
+wm.bind(mod .. "+a",        "spawn:assistant")
 wm.bind(mod .. "+e",        "spawn:files")
 wm.bind(mod .. "+p",        "spawn:monitor")
+wm.bind(mod .. "+z",        "spawn:taskmanager")
+wm.bind(mod .. "+r",        "spawn:knowledge")
+wm.bind(mod .. "+b",        "spawn:behavior")
 wm.bind(mod .. "+c",        "spawn:config")
 wm.bind(mod .. "+slash",    "open_launcher")
 
@@ -67,9 +71,16 @@ end)
 -- Float utility windows; pin the monitor to the "sys" workspace.
 wm.rule({ match = "config", floating = true })
 wm.rule({ match = "about",  floating = true })
+wm.rule({ match = "assistant", floating = true })
+wm.rule({ match = "knowledge", floating = true })
+wm.rule({ match = "behavior", floating = true })
 wm.rule({ match = "monitor", workspace = 5 })
 
 -- ── Autostart ───────────────────────────────────────────────────────────
 wm.autostart("terminal")
+wm.autostart("assistant")
 wm.autostart("monitor")
+
+-- Greet the user once the desktop is ready.
+wm.notify("Interstellar OS ready — press Alt+a to talk to your agent", "ok")
 `;

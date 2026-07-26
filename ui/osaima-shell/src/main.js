@@ -10,6 +10,11 @@
  *  5. System stats display
  */
 
+import { initWindowManager } from './wm/boot.js';
+import { AgentCore } from './wm/agent-core.js';
+import { RagEngine, SEED_KNOWLEDGE } from './wm/rag.js';
+import { BehaviorStore } from './wm/behavior.js';
+
 // ── Tauri invoke (safe import for non-Tauri dev environments) ──────────────
 let tauriInvoke = null;
 try {
@@ -151,14 +156,24 @@ MEMORY  : ${memPct}% used (${formatBytes(stats.memory.used_bytes)} / ${formatByt
     contentEl.textContent = alive
       ? '✓ MCP Daemon is online and responding.'
       : '✗ MCP Daemon is offline. Start it with: systemctl start mcp-daemon';
-  } else if (lower.includes('terminal')) {
-    contentEl.textContent = '→ Launching terminal emulator…\n(Integration with compositor in Phase 4)';
+  } else if (lower.includes('assistant') || lower.includes('agent') || lower.includes('ai ')) {
+    spawnFromLauncher('assistant', contentEl, 'the AI Assistant');
+  } else if (lower.includes('terminal') || lower.includes('shell')) {
+    spawnFromLauncher('terminal', contentEl, 'Terminal');
+  } else if (lower.includes('file') || lower.includes('explorer')) {
+    spawnFromLauncher('files', contentEl, 'Files');
+  } else if (lower.includes('config') || lower.includes('window manager') || lower.includes('lua')) {
+    spawnFromLauncher('config', contentEl, 'the Lua window-manager config');
+  } else if (lower.includes('task') || lower.includes('process')) {
+    spawnFromLauncher('taskmanager', contentEl, 'Task Manager');
+  } else if (lower.includes('monitor')) {
+    spawnFromLauncher('monitor', contentEl, 'System Monitor');
+  } else if (lower.includes('about') || lower.includes('keybind') || lower.includes('help')) {
+    spawnFromLauncher('about', contentEl, 'About / keybindings');
   } else if (lower.includes('brightness')) {
     contentEl.textContent = '→ Display brightness control:\n(Direct hardware control via udev — planned for Phase 4)';
   } else if (lower.includes('network') || lower.includes('diagnostic')) {
     contentEl.textContent = '→ Network diagnostics:\n(NetworkManager IPC integration — planned for Phase 4)';
-  } else if (lower.includes('process')) {
-    contentEl.textContent = '→ Process list available via MCP:\nsend {"method":"system.get_processes"} to /tmp/interstellar_mcp.sock\n(Full process table — planned MCP method in Phase 2 extension)';
   } else {
     contentEl.textContent = `→ "${query}"\n\nAI routing is active. Full LLM integration via\nagentic-services and MCP planned in Phase 4.`;
   }
@@ -218,3 +233,172 @@ function formatBytes(bytes) {
   if (bytes >= 1048576)    return (bytes / 1048576).toFixed(0) + 'MB';
   return (bytes / 1024).toFixed(0) + 'KB';
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 6. Lua-driven Window Manager + Desktop Dock
+// ═══════════════════════════════════════════════════════════════════════════
+
+let WM = null;
+
+const dockApps = document.getElementById('dock-apps');
+const dockWindows = document.getElementById('dock-windows');
+const dockWorkspaces = document.getElementById('dock-workspaces');
+const dockLayout = document.getElementById('dock-layout');
+const ambientCenter = document.getElementById('ambient-center');
+
+const APP_LAUNCHERS = [
+  { id: 'assistant', icon: '✦', label: 'AI Assistant' },
+  { id: 'terminal', icon: '❯', label: 'Terminal' },
+  { id: 'files', icon: '🗂', label: 'Files' },
+  { id: 'monitor', icon: '📊', label: 'Monitor' },
+  { id: 'taskmanager', icon: '⚡', label: 'Task Manager' },
+  { id: 'knowledge', icon: '📚', label: 'Knowledge (RAG)' },
+  { id: 'behavior', icon: '🧠', label: 'Behavior Profile' },
+  { id: 'config', icon: '⚙', label: 'wm.lua' },
+  { id: 'about', icon: '✧', label: 'About' },
+];
+
+// ── Desktop notifications ─────────────────────────────────────────────────
+const notificationsEl = document.getElementById('notifications');
+// opts: { actionLabel, onAction, timeout }
+function pushNotification(message, kind = 'info', opts = {}) {
+  if (!notificationsEl) return;
+  const toast = document.createElement('div');
+  toast.className = 'toast toast-' + kind;
+
+  const text = document.createElement('div');
+  text.className = 'toast-text';
+  text.textContent = message;
+  toast.appendChild(text);
+
+  const dismiss = () => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  };
+
+  if (opts.actionLabel && opts.onAction) {
+    const btn = document.createElement('button');
+    btn.className = 'toast-action';
+    btn.textContent = opts.actionLabel;
+    btn.addEventListener('click', () => { opts.onAction(); dismiss(); });
+    toast.appendChild(btn);
+  }
+
+  notificationsEl.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('show'));
+  setTimeout(dismiss, opts.timeout || (opts.actionLabel ? 7000 : 3200));
+}
+
+function renderDockApps() {
+  dockApps.innerHTML = '';
+  for (const app of APP_LAUNCHERS) {
+    const btn = document.createElement('button');
+    btn.className = 'dock-app';
+    btn.title = app.label;
+    btn.innerHTML = `<span class="dock-app-icon">${app.icon}</span>`;
+    btn.addEventListener('click', () => WM && WM.spawn(app.id));
+    dockApps.appendChild(btn);
+  }
+}
+
+function renderDockWindows() {
+  if (!WM) return;
+  dockWindows.innerHTML = '';
+  const wins = WM.windows.filter((w) => w.workspace === WM.currentWs);
+  for (const w of wins) {
+    const pill = document.createElement('button');
+    pill.className = 'dock-win' +
+      (w.id === WM.focusedId ? ' active' : '') +
+      (w.minimized ? ' minimized' : '');
+    pill.textContent = w.title;
+    pill.addEventListener('click', () => {
+      if (w.minimized) WM.restore(w.id);
+      else if (w.id === WM.focusedId) WM.minimize(w.id);
+      else WM.focus(w.id);
+      renderDockWindows();
+    });
+    dockWindows.appendChild(pill);
+  }
+  // Hide the ambient hint once there's something on screen.
+  const anyVisible = wins.some((w) => !w.minimized);
+  ambientCenter.style.opacity = anyVisible ? '0' : '';
+}
+
+function renderDockWorkspaces(current, workspaces) {
+  dockWorkspaces.innerHTML = '';
+  workspaces.forEach((ws, i) => {
+    const pill = document.createElement('button');
+    const occupied = WM && WM.windowsOn(i).length > 0;
+    pill.className = 'dock-ws' +
+      (i === current ? ' active' : '') +
+      (occupied ? ' occupied' : '');
+    pill.textContent = ws.name;
+    pill.addEventListener('click', () => WM && WM.switchWorkspace(i));
+    dockWorkspaces.appendChild(pill);
+  });
+}
+
+// Spawn a window from the AI launcher, then close the launcher.
+function spawnFromLauncher(appId, contentEl, label) {
+  if (WM) {
+    WM.spawn(appId);
+    contentEl.textContent = `→ Opened ${label}.`;
+    setTimeout(closeLauncher, 250);
+  } else {
+    contentEl.textContent = 'Window manager still starting…';
+  }
+}
+
+// Behavior-learning store + RAG knowledge engine (PDR subsystems §3.5 / §3.7).
+const behavior = new BehaviorStore();
+const rag = new RagEngine();
+for (const doc of SEED_KNOWLEDGE) rag.ingest(doc);
+rag.buildIndex();
+
+(async function bootWM() {
+  const surface = document.getElementById('wm-surface');
+  const { engine, reload } = await initWindowManager({
+    surface,
+    invoke: tauriInvoke,
+    rag,
+    behavior,
+    hooks: {
+      onFocusChange: () => renderDockWindows(),
+      onWindowsChange: () => {
+        if (!WM) return; // hooks can fire during boot before WM is assigned
+        renderDockWindows();
+        renderDockWorkspaces(WM.currentWs, WM.workspaces);
+      },
+      onSpawn: (win) => behavior.recordAppLaunch(win.appId),
+      onLayoutChange: (name) => { dockLayout.textContent = name; behavior.recordLayout(name); },
+      onWorkspaceChange: (cur, wss) => { renderDockWorkspaces(cur, wss); renderDockWindows(); behavior.recordWorkspace(cur); },
+      onNotify: (msg, kind) => pushNotification(msg, kind),
+    },
+  });
+  WM = engine;
+  window.WM = engine;       // handy for debugging/demo from the console
+  window.reloadWM = reload; // reload the Lua config programmatically
+  renderDockApps();
+  renderDockWindows();
+  renderDockWorkspaces(engine.currentWs, engine.workspaces);
+  dockLayout.textContent = engine.config.layout;
+  dockLayout.addEventListener('click', () => engine.cycleLayout());
+
+  // Proactive AI Core — watches the system + learned behavior, offers suggestions.
+  const agent = new AgentCore({
+    engine,
+    invoke: tauriInvoke,
+    behavior,
+    suggest: (msg, opts) => {
+      behavior.recordSuggestionShown();
+      pushNotification(msg, 'agent', {
+        ...opts,
+        onAction: () => { behavior.recordSuggestionAccepted(); if (opts.onAction) opts.onAction(); },
+      });
+    },
+  });
+  agent.start();
+  window.AGENT = agent;
+  window.RAG = rag;
+  window.BEHAVIOR = behavior;
+})();

@@ -16,8 +16,21 @@ import { DEFAULT_WM_LUA } from './default-config.js';
 // Candidate locations for the Lua config, tried in order. Works whether the
 // shell is served from the project root (tauri/static server) or elsewhere.
 const CONFIG_URLS = ['./src/config/wm.lua', './config/wm.lua', 'src/config/wm.lua'];
+const STORAGE_KEY = 'osaima.wm.lua';
 
-async function loadConfigSource() {
+// User edits made in the config editor are persisted to localStorage and take
+// precedence over the shipped file, so tweaks survive a reload.
+function loadSavedConfig() {
+  try { return localStorage.getItem(STORAGE_KEY) || null; } catch { return null; }
+}
+function saveConfig(source) {
+  try { localStorage.setItem(STORAGE_KEY, source); return true; } catch { return false; }
+}
+function clearSavedConfig() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch {}
+}
+
+async function fetchShippedConfig() {
   for (const url of CONFIG_URLS) {
     try {
       const res = await fetch(url, { cache: 'no-store' });
@@ -39,16 +52,32 @@ async function loadConfigSource() {
  * @param {object} [opts.hooks]       engine hooks (focus/layout/workspace/windows)
  * @returns {Promise<{ engine: WindowManager, reload: Function }>}
  */
-export async function initWindowManager({ surface, invoke, hooks = {} }) {
+export async function initWindowManager({ surface, invoke, hooks = {}, rag = null, behavior = null }) {
   const engine = new WindowManager(surface, hooks);
 
-  let currentSource = await loadConfigSource();
+  const shippedSource = await fetchShippedConfig();
+  let currentSource = loadSavedConfig() || shippedSource;
 
   const services = {
     invoke,
+    rag,        // RagEngine (retrieval-augmented knowledge)
+    behavior,   // BehaviorStore (learned user profile)
     getConfigSource: () => currentSource,
     setConfigSource: (s) => { currentSource = s; },
+    // Apply without persisting (live preview).
     reloadConfig: async (source) => applyLua(source, { boot: false }),
+    // Apply and persist to localStorage.
+    saveConfig: async (source) => {
+      const res = applyLua(source, { boot: false });
+      if (res.ok) saveConfig(source);
+      return res;
+    },
+    // Discard saved edits and restore the shipped config.
+    resetConfig: async () => {
+      clearSavedConfig();
+      currentSource = shippedSource;
+      return applyLua(shippedSource, { boot: false });
+    },
   };
 
   registerApps(engine, services);

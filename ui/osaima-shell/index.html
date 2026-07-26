@@ -52,10 +52,27 @@
       </div>
     </header>
 
-    <!-- Center ambient message -->
+    <!-- Window manager surface — windows are tiled/floated here -->
+    <div id="wm-surface"></div>
+
+    <!-- Notification stack (top-right) -->
+    <div id="notifications"></div>
+
+    <!-- Center ambient message (hidden once windows are open) -->
     <div id="ambient-center">
-      <p id="ambient-hint">Press <kbd>Space</kbd> to talk to your OS</p>
+      <p id="ambient-hint">Press <kbd>Space</kbd> to talk to your OS &nbsp;·&nbsp; <kbd>Alt</kbd>+<kbd>↵</kbd> for a terminal</p>
     </div>
+
+    <!-- Bottom dock: app launchers · open windows · workspaces · layout -->
+    <footer id="dock">
+      <div class="dock-section dock-apps" id="dock-apps"></div>
+      <div class="dock-divider"></div>
+      <div class="dock-section dock-windows" id="dock-windows"></div>
+      <div class="dock-spacer"></div>
+      <div class="dock-section dock-workspaces" id="dock-workspaces"></div>
+      <div class="dock-divider"></div>
+      <div class="dock-section dock-layout" id="dock-layout" title="Current layout (Alt+Tab to cycle)">tile</div>
+    </footer>
 
     <!-- Context panel (bottom-right) -->
     <aside id="context-panel">

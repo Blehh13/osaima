@@ -54,6 +54,46 @@ export class WindowManager {
     this._keyHandler = null;
     this._resizeHandler = () => this.layout();
     window.addEventListener('resize', this._resizeHandler);
+
+    this._snapPreview = null;
+  }
+
+  // Lazily create the snap-preview overlay used during edge snapping.
+  snapPreviewEl() {
+    if (!this._snapPreview) {
+      const el = document.createElement('div');
+      el.id = 'snap-preview';
+      document.body.appendChild(el);
+      this._snapPreview = el;
+    }
+    return this._snapPreview;
+  }
+
+  // Given a pointer position, return the snap geometry (surface-local) or null.
+  computeSnapZone(px, py) {
+    const rect = this.surface.getBoundingClientRect();
+    const T = 40;               // edge sensitivity
+    const gap = this.config.gaps;
+    const top = this.config.barReserve + gap;
+    const area = { x: gap, y: top, w: rect.width - gap * 2, h: rect.height - top - gap };
+    const halfW = (area.w - gap) / 2;
+    const halfH = (area.h - gap) / 2;
+
+    const nearLeft = px < T;
+    const nearRight = px > rect.width - T;
+    const nearTop = py < rect.top + this.config.barReserve + T;
+    const nearBottom = py > rect.height - T;
+
+    // Corners → quarters
+    if (nearTop && nearLeft) return { x: area.x, y: area.y, w: halfW, h: halfH, zone: 'tl' };
+    if (nearTop && nearRight) return { x: area.x + halfW + gap, y: area.y, w: halfW, h: halfH, zone: 'tr' };
+    if (nearBottom && nearLeft) return { x: area.x, y: area.y + halfH + gap, w: halfW, h: halfH, zone: 'bl' };
+    if (nearBottom && nearRight) return { x: area.x + halfW + gap, y: area.y + halfH + gap, w: halfW, h: halfH, zone: 'br' };
+    // Edges → halves / maximize
+    if (nearLeft) return { x: area.x, y: area.y, w: halfW, h: area.h, zone: 'left' };
+    if (nearRight) return { x: area.x + halfW + gap, y: area.y, w: halfW, h: area.h, zone: 'right' };
+    if (nearTop) return { x: area.x, y: area.y, w: area.w, h: area.h, zone: 'max' };
+    return null;
   }
 
   registerApp(app) {
@@ -267,6 +307,7 @@ export class WindowManager {
 
     this.focus(id);
     this.layout();
+    if (this.hooks.onSpawn) this.hooks.onSpawn(win);
     if (this.hooks.onWindowsChange) this.hooks.onWindowsChange();
     return win;
   }
@@ -339,14 +380,14 @@ export class WindowManager {
 
   // ── Layout / workspace ─────────────────────────────────────────────────────
   setLayout(name) {
-    if (!['tile', 'float', 'monocle'].includes(name)) return;
+    if (!WindowManager.LAYOUTS.includes(name)) return;
     this.config.layout = name;
     this.layout();
     if (this.hooks.onLayoutChange) this.hooks.onLayoutChange(name);
   }
 
   cycleLayout() {
-    const order = ['tile', 'monocle', 'float'];
+    const order = WindowManager.LAYOUTS;
     const next = order[(order.indexOf(this.config.layout) + 1) % order.length];
     this.setLayout(next);
   }
@@ -380,6 +421,7 @@ export class WindowManager {
     win.workspace = idx;
     this.focusedId = null;
     this.layout();
+    this.notify(`${win.title} → workspace ${this.workspaces[idx].name}`, 'info');
     if (this.hooks.onWindowsChange) this.hooks.onWindowsChange();
   }
 
@@ -422,11 +464,67 @@ export class WindowManager {
         w.el.classList.remove('floating');
         this.place(w, area.x, area.y, area.w, area.h);
       }
+    } else if (this.config.layout === 'grid') {
+      for (const w of tiled) w.el.classList.remove('floating');
+      this.tileGrid(tiled, area, gap);
+    } else if (this.config.layout === 'spiral') {
+      for (const w of tiled) w.el.classList.remove('floating');
+      this.tileSpiral(tiled, area, gap);
     } else {
       // tile: master + stack
       for (const w of tiled) w.el.classList.remove('floating');
       this.tileMasterStack(tiled, area, gap);
     }
+  }
+
+  // Even grid — columns = ceil(sqrt(n)).
+  tileGrid(wins, area, gap) {
+    const n = wins.length;
+    if (n === 0) return;
+    const cols = Math.ceil(Math.sqrt(n));
+    const rows = Math.ceil(n / cols);
+    const cellW = (area.w - gap * (cols - 1)) / cols;
+    wins.forEach((w, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      // Last row may have fewer items — stretch them across the width.
+      const itemsInRow = row === rows - 1 ? (n - row * cols) : cols;
+      const rowCellW = (area.w - gap * (itemsInRow - 1)) / itemsInRow;
+      const cellH = (area.h - gap * (rows - 1)) / rows;
+      this.place(
+        w,
+        area.x + col * (rowCellW + gap),
+        area.y + row * (cellH + gap),
+        rowCellW,
+        cellH,
+      );
+    });
+  }
+
+  // Fibonacci spiral — each window splits the remaining space, alternating
+  // horizontal/vertical, the classic dwm "spiral" / bspwm feel.
+  tileSpiral(wins, area, gap) {
+    const n = wins.length;
+    if (n === 0) return;
+    let region = { ...area };
+    wins.forEach((w, i) => {
+      const last = i === n - 1;
+      if (last) {
+        this.place(w, region.x, region.y, region.w, region.h);
+        return;
+      }
+      if (i % 2 === 0) {
+        // split vertically (side by side)
+        const half = (region.w - gap) / 2;
+        this.place(w, region.x, region.y, half, region.h);
+        region = { x: region.x + half + gap, y: region.y, w: region.w - half - gap, h: region.h };
+      } else {
+        // split horizontally (stacked)
+        const half = (region.h - gap) / 2;
+        this.place(w, region.x, region.y, region.w, half);
+        region = { x: region.x, y: region.y + half + gap, w: region.w, h: region.h - half - gap };
+      }
+    });
   }
 
   tileMasterStack(wins, area, gap) {
@@ -477,17 +575,40 @@ export class WindowManager {
   // ── Drag & resize (floating windows) ───────────────────────────────────────
   makeDraggable(win) {
     const bar = win.el.querySelector('.wm-titlebar');
-    let sx, sy, ox, oy, dragging = false;
+    let sx, sy, ox, oy, dragging = false, pendingSnap = null;
     const onMove = (e) => {
       if (!dragging) return;
       win.x = ox + (e.clientX - sx);
       win.y = oy + (e.clientY - sy);
       this.place(win, win.x, win.y, win.w, win.h);
+
+      // Edge snapping preview
+      pendingSnap = this.computeSnapZone(e.clientX, e.clientY);
+      const preview = this.snapPreviewEl();
+      if (pendingSnap) {
+        preview.style.left = pendingSnap.x + 'px';
+        preview.style.top = pendingSnap.y + 'px';
+        preview.style.width = pendingSnap.w + 'px';
+        preview.style.height = pendingSnap.h + 'px';
+        preview.classList.add('active');
+      } else {
+        preview.classList.remove('active');
+      }
     };
     const onUp = () => {
       dragging = false;
       document.removeEventListener('mousemove', onMove);
       document.removeEventListener('mouseup', onUp);
+      if (this._snapPreview) this._snapPreview.classList.remove('active');
+      if (pendingSnap) {
+        // Snap the (floating) window into the previewed region.
+        win.floating = true;
+        win.x = pendingSnap.x; win.y = pendingSnap.y;
+        win.w = pendingSnap.w; win.h = pendingSnap.h;
+        this.place(win, win.x, win.y, win.w, win.h);
+        this.notify('Snapped ' + win.title, 'info');
+        pendingSnap = null;
+      }
     };
     bar.addEventListener('mousedown', (e) => {
       if (e.target.closest('.wm-btn')) return;
@@ -542,6 +663,11 @@ export class WindowManager {
     return {};
   }
 
+  // Emit a desktop notification (rendered by the shell via the onNotify hook).
+  notify(message, kind = 'info') {
+    if (this.hooks.onNotify) this.hooks.onNotify(message, kind);
+  }
+
   // ── Queries ────────────────────────────────────────────────────────────────
   getWindow(id) { return this.windows.find((w) => w.id === id) || null; }
 
@@ -558,6 +684,9 @@ export class WindowManager {
     window.removeEventListener('resize', this._resizeHandler);
   }
 }
+
+// Available layouts, in the order Alt+Tab cycles through them.
+WindowManager.LAYOUTS = ['tile', 'monocle', 'grid', 'spiral', 'float'];
 
 function capitalize(s) {
   return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
