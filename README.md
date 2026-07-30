@@ -15,7 +15,7 @@ Interstellar OS is designed to completely rethink the traditional computer inter
 - `kernel/`: Contains the Linux kernel submodule and custom eBPF schedulers.
 - `gentoo/`: The core Gentoo ebuild recipes and Portage package manager submodules.
 - `ai-core/`: System daemons handling MCP (`mcp-daemon`) and background agentic tasks (`agentic-services`).
-- `ui/`: The modern shell environment and compositing interface (`osaima-shell`).
+- `ui/`: The modern shell environment and compositing interface (`osaima-shell`), including a **Lua-driven tiling window manager** (see [`ui/osaima-shell/README.md`](ui/osaima-shell/README.md)).
 - `build-tools/`: Scripts for bootstrapping and generating the distribution ISO.
 
 ## Getting Started
