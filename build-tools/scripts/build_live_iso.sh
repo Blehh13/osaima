@@ -29,8 +29,8 @@ dd if=/dev/zero of="$SQUASH"/LiveOS/rootfs.img bs=1M count=6144 status=progress
 mkfs.ext4 -F -L "${VOLID}_ROOT" "$SQUASH"/LiveOS/rootfs.img
 mount -o loop "$SQUASH"/LiveOS/rootfs.img /mnt/rootfs
 
-log "Copying the live system into the image"
-rsync -aHAX --info=progress2 \
+log "Copying the live system into the image (this runs quietly for a minute or two)"
+rsync -aHAX \
 	--exclude='/proc/*' --exclude='/sys/*' --exclude='/dev/*' --exclude='/run/*' \
 	--exclude='/tmp/*' --exclude='/mnt/*' --exclude='/media/*' \
 	--exclude="$WORK" --exclude="$SQUASH" --exclude="$ISO" \
@@ -43,7 +43,8 @@ rsync -aHAX --info=progress2 \
 umount /mnt/rootfs
 
 log "Squashing the root image (xz)"
-mksquashfs "$SQUASH" "$WORK"/LiveOS/squashfs.img -comp xz -noappend
+# gzip is always available; xz needs squashfs-tools built with USE="lzma".
+mksquashfs "$SQUASH" "$WORK"/LiveOS/squashfs.img -comp gzip -noappend -no-progress
 
 log "Building the live initramfs"
 dracut --force --no-hostonly --nolvmconf --nomdadmconf \
