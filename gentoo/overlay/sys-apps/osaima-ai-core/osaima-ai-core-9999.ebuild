@@ -9,6 +9,8 @@ DESCRIPTION="OSAIMA AI core — MCP daemon exposing system context over a Unix s
 HOMEPAGE="https://github.com/akashmanjunath2505/osaima"
 EGIT_REPO_URI="https://github.com/akashmanjunath2505/osaima.git"
 EGIT_CLONE_TYPE="shallow"
+# Only our code is needed — never fetch the kernel / portage submodules.
+EGIT_SUBMODULES=()
 
 LICENSE="GPL-3"
 SLOT="0"
@@ -17,7 +19,8 @@ IUSE=""
 
 RDEPEND=""
 DEPEND="${RDEPEND}"
-BDEPEND="virtual/rust"
+# A Rust toolchain providing cargo (source or binary).
+BDEPEND="|| ( dev-lang/rust-bin dev-lang/rust )"
 
 S="${WORKDIR}/${P}/ai-core/mcp-daemon"
 

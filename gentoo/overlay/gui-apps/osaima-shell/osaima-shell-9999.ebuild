@@ -9,6 +9,8 @@ DESCRIPTION="OSAIMA agentic desktop shell — Tauri UI with a Lua-driven tiling 
 HOMEPAGE="https://github.com/akashmanjunath2505/osaima"
 EGIT_REPO_URI="https://github.com/akashmanjunath2505/osaima.git"
 EGIT_CLONE_TYPE="shallow"
+# Only our code is needed — never fetch the kernel / portage submodules.
+EGIT_SUBMODULES=()
 
 LICENSE="GPL-3"
 SLOT="0"
@@ -25,7 +27,7 @@ RDEPEND="
 DEPEND="${RDEPEND}"
 # Build: Rust/Cargo for the Tauri host, Node for the frontend assets.
 BDEPEND="
-	virtual/rust
+	|| ( dev-lang/rust-bin dev-lang/rust )
 	net-libs/nodejs[npm]
 "
 
