@@ -11,20 +11,22 @@ SLOT="0"
 KEYWORDS="~amd64"
 IUSE=""
 
-# This package owns /etc/os-release for the distro, so it must replace the
-# baselayout-provided one.
-RDEPEND="!!sys-apps/baselayout[-build]"
-
 S="${WORKDIR}"
 
 src_install() {
-	# Distro identity — what `cat /etc/os-release` reports.
+	# Distro identity. /etc/os-release is the real file; /usr/lib/os-release is a
+	# relative symlink to it (matches the os-release(5) search order).
 	insinto /etc
 	doins "${FILESDIR}"/os-release
-	dosym ../etc/os-release /usr/lib/os-release
+	dosym ../../etc/os-release /usr/lib/os-release
 
-	# Legacy identity + login banner.
-	newins "${FILESDIR}"/os-release interstellar-release
-	insinto /etc
+	# Console login banner.
 	doins "${FILESDIR}"/issue
+}
+
+pkg_postinst() {
+	elog "Interstellar OS branding installed."
+	elog "This package ships /etc/os-release, which sys-apps/baselayout also owns."
+	elog "If the merge is blocked by a file collision, allow it once with:"
+	elog "  COLLISION_IGNORE=\"/etc/os-release /usr/lib/os-release\" emerge app-misc/interstellar-release"
 }

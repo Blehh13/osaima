@@ -32,6 +32,10 @@ BDEPEND="
 S="${WORKDIR}/${P}/ui/osaima-shell"
 
 src_compile() {
+	# NOTE: npm/cargo fetch dependencies at build time, so this package needs
+	# Gentoo's build-time network sandbox disabled. Enable it per-package via:
+	#   /etc/portage/env/allow-net.conf:  FEATURES="-network-sandbox"
+	#   /etc/portage/package.env:         gui-apps/osaima-shell allow-net.conf
 	# Frontend is bundler-less static ES modules — no npm build step required,
 	# but install JS deps so `tauri build` can bundle the webview.
 	npm ci --no-audit --no-fund || npm install

@@ -23,3 +23,5 @@ Interstellar OS is designed to completely rethink the traditional computer inter
 - **Build the OS as a Gentoo fork (Linux/VM):** see [BUILD-DISTRO.md](BUILD-DISTRO.md) — enable the overlay, select the `interstellar/agentic` profile, `emerge interstellar-meta`, then build an ISO.
 
 Interstellar keeps upstream **Gentoo as its upstream** and maintains only its own overlay (`gentoo/overlay/`): profile, branding, and packages. It is a Gentoo-family derivative (`ID_LIKE=gentoo`), not a from-scratch OS.
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for a one-page diagram tying the distribution and the agentic shell together.
