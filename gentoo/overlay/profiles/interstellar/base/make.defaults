@@ -1,0 +1,22 @@
+# Interstellar OS — base profile defaults.
+# These USE flags ship out of the box so users don't spend hours on make.conf.
+
+# System identity
+# (Branding + /etc/os-release come from app-misc/interstellar-release.)
+
+# Sensible base USE flags for a modern desktop-capable system.
+USE="${USE} dbus policykit elogind udev networkmanager
+     -systemd -consolekit
+     wayland X
+     pipewire pulseaudio alsa
+     jpeg png svg truetype"
+
+# Toolchains commonly needed by the AI core and shell.
+USE="${USE} rust"
+
+# Default video/input (override in make.conf per machine).
+VIDEO_CARDS="intel amdgpu radeonsi nouveau"
+INPUT_DEVICES="libinput"
+
+# Accept the modern PipeWire audio stack.
+GENTOO_MIRRORS="https://distfiles.gentoo.org"

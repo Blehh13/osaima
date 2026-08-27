@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="project">
+		<email>osaima@jyothyit.ac.in</email>
+		<name>Interstellar OS / OSAIMA Team</name>
+	</maintainer>
+	<longdescription lang="en">
+		The Interstellar OS desktop shell: a Tauri application whose tiling window
+		manager, layouts, workspaces and keybindings are driven by a live Lua
+		configuration, with a built-in AI assistant, RAG knowledge engine and
+		behavior-learning store.
+	</longdescription>
+</pkgmetadata>

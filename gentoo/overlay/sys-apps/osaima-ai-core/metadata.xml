@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="project">
+		<email>osaima@jyothyit.ac.in</email>
+		<name>Interstellar OS / OSAIMA Team</name>
+	</maintainer>
+	<longdescription lang="en">
+		The OSAIMA AI core daemon. Exposes system context (stats, process info) over
+		a Unix-domain socket using a JSON-RPC / MCP protocol, consumed by the shell
+		and the agentic services.
+	</longdescription>
+</pkgmetadata>

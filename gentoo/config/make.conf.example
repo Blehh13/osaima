@@ -1,0 +1,27 @@
+# Example /etc/portage/make.conf for building Interstellar OS.
+# Most defaults come from the interstellar/agentic profile; override per machine.
+
+COMMON_FLAGS="-O2 -pipe -march=native"
+CFLAGS="${COMMON_FLAGS}"
+CXXFLAGS="${COMMON_FLAGS}"
+FCFLAGS="${COMMON_FLAGS}"
+FFLAGS="${COMMON_FLAGS}"
+
+# Parallelism — tune to your CPU.
+MAKEOPTS="-j$(nproc)"
+EMERGE_DEFAULT_OPTS="--jobs=2 --load-average=$(nproc)"
+
+# Distro identity for portage.
+PORTAGE_NICENESS="10"
+ACCEPT_LICENSE="*"
+
+# Accept live (9999) ebuilds for the OSAIMA components.
+ACCEPT_KEYWORDS="~amd64"
+
+# Language targets used by the AI core.
+PYTHON_TARGETS="python3_12"
+PYTHON_SINGLE_TARGET="python3_12"
+
+VIDEO_CARDS="intel amdgpu radeonsi"
+INPUT_DEVICES="libinput"
+GRUB_PLATFORMS="efi-64"

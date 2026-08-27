@@ -13,10 +13,13 @@ Interstellar OS is designed to completely rethink the traditional computer inter
 
 ## Directory Structure
 - `kernel/`: Contains the Linux kernel submodule and custom eBPF schedulers.
-- `gentoo/`: The core Gentoo ebuild recipes and Portage package manager submodules.
+- `gentoo/`: The core Gentoo ebuild recipes and Portage submodules, plus our own **fork overlay** (`gentoo/overlay/`) — the Interstellar profile, branding/release package, and ebuilds for the shell and AI core. See [BUILD-DISTRO.md](BUILD-DISTRO.md).
 - `ai-core/`: System daemons handling MCP (`mcp-daemon`) and background agentic tasks (`agentic-services`).
 - `ui/`: The modern shell environment and compositing interface (`osaima-shell`), including a **Lua-driven tiling window manager** (see [`ui/osaima-shell/README.md`](ui/osaima-shell/README.md)).
 - `build-tools/`: Scripts for bootstrapping and generating the distribution ISO.
 
 ## Getting Started
-*(Instructions for compiling the system and bootstrapping the environment will be added here as the build tools are developed.)*
+- **Try the desktop shell now (Windows/Mac/Linux):** run `run-osaima.bat` (Windows) or serve `ui/osaima-shell/` — see [ui/osaima-shell/README.md](ui/osaima-shell/README.md).
+- **Build the OS as a Gentoo fork (Linux/VM):** see [BUILD-DISTRO.md](BUILD-DISTRO.md) — enable the overlay, select the `interstellar/agentic` profile, `emerge interstellar-meta`, then build an ISO.
+
+Interstellar keeps upstream **Gentoo as its upstream** and maintains only its own overlay (`gentoo/overlay/`): profile, branding, and packages. It is a Gentoo-family derivative (`ID_LIKE=gentoo`), not a from-scratch OS.

@@ -1,0 +1,4 @@
+# Interstellar OS selectable profiles.
+# <arch>    <profile path>            <stability>
+amd64    interstellar/base       stable
+amd64    interstellar/agentic    stable

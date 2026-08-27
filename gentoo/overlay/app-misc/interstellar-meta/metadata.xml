@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="project">
+		<email>osaima@jyothyit.ac.in</email>
+		<name>Interstellar OS / OSAIMA Team</name>
+	</maintainer>
+	<use>
+		<flag name="shell">Install the OSAIMA agentic desktop shell</flag>
+		<flag name="ai">Install the OSAIMA AI core daemon</flag>
+		<flag name="desktop">Install a Wayland desktop (sway + foot + portal)</flag>
+		<flag name="devtools">Install the developer toolchain (gcc, rust, python, node, git)</flag>
+	</use>
+	<longdescription lang="en">
+		Convenience meta package. `emerge interstellar-meta` installs the whole
+		Interstellar OS agentic desktop in one step.
+	</longdescription>
+</pkgmetadata>

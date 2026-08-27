@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Interstellar OS Shell
+Comment=OSAIMA agentic desktop shell (Lua window manager)
+Exec=/usr/bin/osaima-shell
+Type=Application
+DesktopNames=Interstellar

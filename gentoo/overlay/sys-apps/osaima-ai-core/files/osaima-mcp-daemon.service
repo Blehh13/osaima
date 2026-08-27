@@ -1,0 +1,13 @@
+[Unit]
+Description=OSAIMA MCP daemon (system context provider)
+Documentation=https://github.com/akashmanjunath2505/osaima
+
+[Service]
+ExecStart=/usr/bin/osaima-mcp-daemon
+Restart=on-failure
+# Sandbox per the OSAIMA PDR security model (§4).
+NoNewPrivileges=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=default.target

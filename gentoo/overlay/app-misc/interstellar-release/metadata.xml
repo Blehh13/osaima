@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="project">
+		<email>osaima@jyothyit.ac.in</email>
+		<name>Interstellar OS / OSAIMA Team</name>
+	</maintainer>
+	<longdescription lang="en">
+		Provides the Interstellar OS identity: /etc/os-release, /usr/lib/os-release
+		and the console issue banner. Installed as part of the base system on every
+		Interstellar install.
+	</longdescription>
+</pkgmetadata>
