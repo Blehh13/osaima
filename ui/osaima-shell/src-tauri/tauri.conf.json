@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "identifier": "org.interstellaros.shell",
   "build": {
-    "frontendDist": "../"
+    "frontendDist": "../frontend"
   },
   "app": {
     "windows": [

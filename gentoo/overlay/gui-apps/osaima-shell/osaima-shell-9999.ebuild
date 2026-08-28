@@ -41,15 +41,19 @@ src_compile() {
 	# Frontend is bundler-less static ES modules — no npm build step required,
 	# but install JS deps so `tauri build` can bundle the webview.
 	npm ci --no-audit --no-fund || npm install
-	# Build the release Tauri binary.
-	npx --yes @tauri-apps/cli build || die "tauri build failed"
+	# Build the release Tauri binary only. --no-bundle skips .deb/.AppImage
+	# packaging (which would need extra host tooling and network access);
+	# the ebuild installs the raw release binary directly.
+	npx --yes @tauri-apps/cli build --no-bundle || die "tauri build failed"
 }
 
 src_install() {
 	dobin src-tauri/target/release/osaima-shell
 	# Ship the frontend assets + the Lua window-manager config.
+	# (Web assets live in their own folder so `tauri build` won't try to
+	# bundle node_modules / src-tauri into the app.)
 	insinto /usr/share/osaima-shell
-	doins -r src index.html
+	doins -r frontend/src frontend/index.html
 	# A desktop session entry so a display manager can launch the shell.
 	insinto /usr/share/wayland-sessions
 	newins "${FILESDIR}"/osaima-shell.desktop osaima-shell.desktop
