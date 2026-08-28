@@ -18,7 +18,7 @@ export function registerApps(engine, services) {
   engine.registerApp(makeTerminal(services));
   engine.registerApp(makeBrowser());
   engine.registerApp(makeMonitor(services));
-  engine.registerApp(makeFiles());
+  engine.registerApp(makeFiles(services));
   engine.registerApp(makeConfigEditor(engine, services));
   engine.registerApp(makeAbout(engine));
   engine.registerApp(makeAssistant(engine, services));
@@ -57,11 +57,13 @@ function makeTerminal(services) {
       };
 
       print('Interstellar OS — agentic shell v0.1', 'term-dim');
-      print("Type 'help' for commands.", 'term-dim');
+      print("Real shell: try ls, ps aux, uname -a, cat /etc/os-release.  'help' for built-ins.", 'term-dim');
 
       const commands = {
-        help: () => print(
-          'help  stats  ping  ws  layout  spawn <app>  apps  clear  echo <x>  date  neofetch'),
+        help: () => {
+          print('built-ins: help  stats  ping  ws  layout  spawn <app>  apps  clear  echo <x>  date  neofetch');
+          print('anything else runs as a REAL command on Interstellar OS (ls, ps, uname, emerge, …)', 'term-dim');
+        },
         clear: () => { output.innerHTML = ''; },
         echo: (args) => print(args.join(' ')),
         date: () => print(new Date().toString()),
@@ -111,8 +113,16 @@ function makeTerminal(services) {
         history.push(line); hIdx = history.length;
         const [cmd, ...args] = line.split(/\s+/);
         const fn = commands[cmd];
-        if (fn) await fn(args);
-        else print(`command not found: ${cmd}`, 'term-err');
+        if (fn) { await fn(args); return; }
+        // Not a built-in — run it as a REAL command on the OS.
+        try {
+          const out = await services.invoke('run_command', { cmd: line });
+          if (out && out.length) {
+            out.replace(/\n$/, '').split('\n').forEach((l) => print(l));
+          }
+        } catch (e) {
+          print('error: ' + e, 'term-err');
+        }
       };
 
       input.addEventListener('keydown', async (e) => {
@@ -299,46 +309,50 @@ function makeMonitor(services) {
   };
 }
 
-// ── Files (mock explorer) ────────────────────────────────────────────────────
-function makeFiles() {
-  const tree = {
-    '/': ['bin/', 'etc/', 'home/', 'usr/', 'var/', 'interstellar.conf'],
-    '/home/': ['user/'],
-    '/home/user/': ['Documents/', 'Projects/', 'wm.lua', 'notes.md', '.bashrc'],
-    '/home/user/Projects/': ['osaima-shell/', 'kernel-sched/', 'mcp-daemon/'],
-    '/etc/': ['portage/', 'interstellar/', 'fstab', 'hostname'],
-  };
+// ── Files (real filesystem explorer) ─────────────────────────────────────────
+function makeFiles(services) {
   return {
     id: 'files',
     title: 'Files',
     icon: '🗂',
-    width: 480, height: 340,
+    width: 520, height: 380,
     mount(root) {
       root.classList.add('app-files');
       const path = el('div', 'files-path');
       const list = el('div', 'files-list');
       root.append(path, list);
       let cwd = '/';
-      const render = () => {
+
+      const goInto = (name) => { cwd = cwd === '/' ? '/' + name : cwd + '/' + name; render(); };
+      const goUp = () => {
+        if (cwd === '/') return;
+        cwd = cwd.slice(0, cwd.lastIndexOf('/')) || '/';
+        render();
+      };
+
+      const render = async () => {
         path.textContent = cwd;
         list.innerHTML = '';
+        list.appendChild(el('div', 'files-empty', 'reading…'));
+        let data;
+        try {
+          data = await services.invoke('read_dir', { path: cwd });
+        } catch (e) {
+          list.innerHTML = '';
+          list.appendChild(el('div', 'files-empty', 'cannot read ' + cwd + ': ' + e));
+          return;
+        }
+        list.innerHTML = '';
         if (cwd !== '/') {
-          const up = el('div', 'files-item files-dir', '.. ');
-          up.addEventListener('click', () => {
-            const parts = cwd.replace(/\/$/, '').split('/');
-            parts.pop();
-            cwd = (parts.join('/') || '') + '/';
-            if (cwd === '/') cwd = '/';
-            render();
-          });
+          const up = el('div', 'files-item files-dir', '📁 ..');
+          up.addEventListener('click', goUp);
           list.appendChild(up);
         }
-        const entries = tree[cwd] || [];
-        for (const name of entries) {
-          const isDir = name.endsWith('/');
-          const item = el('div', 'files-item ' + (isDir ? 'files-dir' : 'files-file'),
-            (isDir ? '📁 ' : '📄 ') + name);
-          if (isDir) item.addEventListener('click', () => { cwd = cwd + name; render(); });
+        const entries = data.entries || [];
+        for (const ent of entries) {
+          const item = el('div', 'files-item ' + (ent.is_dir ? 'files-dir' : 'files-file'),
+            (ent.is_dir ? '📁 ' : '📄 ') + ent.name);
+          if (ent.is_dir) item.addEventListener('click', () => goInto(ent.name));
           list.appendChild(item);
         }
         if (entries.length === 0) list.appendChild(el('div', 'files-empty', '(empty)'));
@@ -593,32 +607,28 @@ function makeAssistant(engine, services) {
 // Nods to the kernel's ML-based scheduling vision: each process shows an
 // ML-assigned priority the "scheduler" adjusts over time.
 function makeTaskManager(services) {
-  const NAMES = [
-    'osaima-shell', 'mcp-daemon', 'agentic-svc', 'compositor', 'pipewire',
-    'portage', 'kthreadd', 'systemd', 'llm-router', 'ebpf-sched', 'NetworkManager',
-  ];
   return {
     id: 'taskmanager',
     title: 'Task Manager',
     icon: '⚡',
-    width: 560, height: 400,
+    width: 580, height: 420,
     mount(root, ctx) {
       root.classList.add('app-tasks');
       root.innerHTML = `
         <div class="tk-toolbar">
-          <span class="tk-title">Processes — ML-scheduled</span>
-          <span class="tk-hint">click a row · Boost / Kill</span>
+          <span class="tk-title">Processes — live from /proc</span>
+          <span class="tk-hint">click a row · Renice / Kill</span>
         </div>
         <div class="tk-head">
           <span class="tk-c-pid">PID</span>
           <span class="tk-c-name">NAME</span>
           <span class="tk-c-cpu">CPU%</span>
           <span class="tk-c-mem">MEM</span>
-          <span class="tk-c-pri">ML PRIORITY</span>
+          <span class="tk-c-pri">LOAD</span>
         </div>
         <div class="tk-rows"></div>
         <div class="tk-actions">
-          <button class="tk-btn tk-boost" disabled>⬆ Boost priority</button>
+          <button class="tk-btn tk-boost" disabled>⬆ Renice (boost)</button>
           <button class="tk-btn tk-kill" disabled>✕ Kill</button>
         </div>`;
 
@@ -626,28 +636,22 @@ function makeTaskManager(services) {
       const boostBtn = root.querySelector('.tk-boost');
       const killBtn = root.querySelector('.tk-kill');
 
-      let procs = NAMES.map((name, i) => ({
-        pid: 100 + i * 7 + Math.floor(Math.random() * 6),
-        name,
-        cpu: Math.random() * (name === 'osaima-shell' ? 18 : 8),
-        mem: 20 + Math.random() * 400,
-        priority: Math.random(),        // ML-assigned 0..1
-      }));
+      let procs = [];
       let selectedPid = null;
 
       const render = () => {
-        procs.sort((a, b) => b.priority - a.priority);
         rowsEl.innerHTML = '';
         for (const p of procs) {
+          const load = Math.max(0.02, Math.min(1, p.cpu / 40 + p.mem / 4000));
+          const pct = Math.round(load * 100);
+          const cls = load > 0.66 ? 'hi' : load > 0.33 ? 'mid' : 'lo';
           const row = el('div', 'tk-row' + (p.pid === selectedPid ? ' selected' : ''));
-          const priPct = Math.round(p.priority * 100);
-          const priClass = p.priority > 0.66 ? 'hi' : p.priority > 0.33 ? 'mid' : 'lo';
           row.innerHTML = `
             <span class="tk-c-pid">${p.pid}</span>
             <span class="tk-c-name">${escapeHtml(p.name)}</span>
             <span class="tk-c-cpu">${p.cpu.toFixed(1)}</span>
             <span class="tk-c-mem">${p.mem.toFixed(0)}M</span>
-            <span class="tk-c-pri"><span class="tk-prbar ${priClass}" style="width:${priPct}%"></span><b>${priPct}</b></span>`;
+            <span class="tk-c-pri"><span class="tk-prbar ${cls}" style="width:${pct}%"></span><b>${pct}</b></span>`;
           row.addEventListener('click', () => {
             selectedPid = p.pid;
             boostBtn.disabled = killBtn.disabled = false;
@@ -657,26 +661,29 @@ function makeTaskManager(services) {
         }
       };
 
-      boostBtn.addEventListener('click', () => {
-        const p = procs.find((x) => x.pid === selectedPid);
-        if (p) { p.priority = Math.min(1, p.priority + 0.2); render(); }
+      const load = async () => {
+        try {
+          const data = await services.invoke('list_processes');
+          procs = data.processes || [];
+        } catch { return; }
+        render();
+      };
+
+      boostBtn.addEventListener('click', async () => {
+        if (!selectedPid) return;
+        try { await services.invoke('run_command', { cmd: 'renice -n -5 -p ' + selectedPid }); } catch {}
+        load();
       });
-      killBtn.addEventListener('click', () => {
-        procs = procs.filter((x) => x.pid !== selectedPid);
+      killBtn.addEventListener('click', async () => {
+        if (!selectedPid) return;
+        try { await services.invoke('kill_process', { pid: selectedPid }); } catch {}
         selectedPid = null;
         boostBtn.disabled = killBtn.disabled = true;
-        render();
+        load();
       });
 
-      render();
-      // Simulate the ML scheduler nudging priorities and CPU over time.
-      const timer = setInterval(() => {
-        for (const p of procs) {
-          p.cpu = Math.max(0, Math.min(100, p.cpu + (Math.random() - 0.5) * 4));
-          p.priority = Math.max(0.02, Math.min(1, p.priority + (Math.random() - 0.5) * 0.06));
-        }
-        render();
-      }, 1800);
+      load();
+      const timer = setInterval(load, 2000);
       ctx.win._tkTimer = timer;
     },
     unmount(win) { if (win._tkTimer) clearInterval(win._tkTimer); },
