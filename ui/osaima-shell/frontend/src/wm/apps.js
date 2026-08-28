@@ -16,6 +16,7 @@
  */
 export function registerApps(engine, services) {
   engine.registerApp(makeTerminal(services));
+  engine.registerApp(makeBrowser());
   engine.registerApp(makeMonitor(services));
   engine.registerApp(makeFiles());
   engine.registerApp(makeConfigEditor(engine, services));
@@ -122,6 +123,98 @@ function makeTerminal(services) {
       // Focus the input when the terminal window is clicked.
       root.addEventListener('mousedown', () => setTimeout(() => input.focus(), 0));
       setTimeout(() => input.focus(), 30);
+    },
+  };
+}
+
+// ── Web Browser ───────────────────────────────────────────────────────────────
+// A real web browser inside the shell: address bar + iframe view + a start page
+// with bookmarks. It's a WebKit webview, so this is genuine web browsing.
+function makeBrowser() {
+  const HOME = 'about:home';
+  const BOOKMARKS = [
+    { name: 'Wikipedia', url: 'https://en.wikipedia.org/wiki/Linux' },
+    { name: 'Gentoo', url: 'https://www.gentoo.org' },
+    { name: 'OSAIMA · GitHub', url: 'https://github.com/akashmanjunath2505/osaima' },
+    { name: 'MDN Web Docs', url: 'https://developer.mozilla.org' },
+    { name: 'Hacker News', url: 'https://news.ycombinator.com' },
+    { name: 'archive.org', url: 'https://archive.org' },
+  ];
+  return {
+    id: 'browser',
+    title: 'Browser',
+    icon: '🌐',
+    width: 760, height: 540,
+    mount(root) {
+      root.classList.add('app-browser');
+      const bar = el('div', 'br-bar');
+      const back = el('button', 'br-nav', '‹');
+      const fwd = el('button', 'br-nav', '›');
+      const reload = el('button', 'br-nav', '⟳');
+      const homeBtn = el('button', 'br-nav', '⌂');
+      const url = document.createElement('input');
+      url.className = 'br-url';
+      url.spellcheck = false;
+      url.autocomplete = 'off';
+      url.placeholder = 'Search or enter address';
+      const go = el('button', 'br-go', 'Go');
+      bar.append(back, fwd, reload, homeBtn, url, go);
+
+      const view = el('div', 'br-view');
+      const frame = document.createElement('iframe');
+      frame.className = 'br-frame';
+      frame.setAttribute('sandbox', 'allow-scripts allow-forms allow-same-origin allow-popups');
+      const startPage = el('div', 'br-home');
+      view.append(startPage, frame);
+      root.append(bar, view);
+
+      const renderHome = () => {
+        frame.style.display = 'none';
+        frame.removeAttribute('src');
+        startPage.style.display = '';
+        startPage.innerHTML = `
+          <div class="br-logo">✦ Interstellar Browser</div>
+          <input class="br-search" placeholder="Search the web…" spellcheck="false" autocomplete="off" />
+          <div class="br-tiles"></div>
+          <div class="br-note">Tip: some large sites (Google, YouTube) refuse to be embedded — that's their own security policy, not a shell bug. The bookmarks above load fine, and any address you type works.</div>`;
+        const tiles = startPage.querySelector('.br-tiles');
+        for (const b of BOOKMARKS) {
+          const t = el('button', 'br-tile', b.name);
+          t.addEventListener('click', () => navigate(b.url));
+          tiles.append(t);
+        }
+        const search = startPage.querySelector('.br-search');
+        search.addEventListener('keydown', (e) => { if (e.key === 'Enter') navigate(e.target.value); });
+        setTimeout(() => search.focus(), 30);
+      };
+
+      const normalize = (raw) => {
+        const s = (raw || '').trim();
+        if (!s) return null;
+        if (s === HOME) return HOME;
+        if (/^https?:\/\//i.test(s)) return s;
+        if (/^[\w-]+(\.[\w-]+)+(\/.*)?$/.test(s)) return 'https://' + s;
+        return 'https://en.wikipedia.org/w/index.php?search=' + encodeURIComponent(s);
+      };
+
+      const navigate = (raw) => {
+        const target = normalize(raw);
+        if (!target) return;
+        if (target === HOME) { url.value = ''; renderHome(); return; }
+        url.value = target;
+        startPage.style.display = 'none';
+        frame.style.display = '';
+        frame.src = target;
+      };
+
+      back.addEventListener('click', () => { try { frame.contentWindow.history.back(); } catch {} });
+      fwd.addEventListener('click', () => { try { frame.contentWindow.history.forward(); } catch {} });
+      reload.addEventListener('click', () => { if (frame.getAttribute('src')) frame.src = frame.src; });
+      homeBtn.addEventListener('click', () => navigate(HOME));
+      go.addEventListener('click', () => navigate(url.value));
+      url.addEventListener('keydown', (e) => { if (e.key === 'Enter') navigate(url.value); });
+
+      renderHome();
     },
   };
 }
@@ -421,6 +514,7 @@ function makeAssistant(engine, services) {
 
         // ── intent: launch app ──
         const appAliases = {
+          browser: ['browser', 'web', 'internet', 'chrome', 'website'],
           terminal: ['terminal', 'shell', 'console', 'command'],
           files: ['files', 'file', 'explorer', 'folder'],
           monitor: ['monitor', 'system monitor', 'usage', 'graph'],

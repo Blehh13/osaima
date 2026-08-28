@@ -158,6 +158,8 @@ MEMORY  : ${memPct}% used (${formatBytes(stats.memory.used_bytes)} / ${formatByt
       : '✗ MCP Daemon is offline. Start it with: systemctl start mcp-daemon';
   } else if (lower.includes('assistant') || lower.includes('agent') || lower.includes('ai ')) {
     spawnFromLauncher('assistant', contentEl, 'the AI Assistant');
+  } else if (lower.includes('browser') || lower.includes('web') || lower.includes('internet') || lower.includes('chrome')) {
+    spawnFromLauncher('browser', contentEl, 'the Browser');
   } else if (lower.includes('terminal') || lower.includes('shell')) {
     spawnFromLauncher('terminal', contentEl, 'Terminal');
   } else if (lower.includes('file') || lower.includes('explorer')) {
@@ -248,6 +250,7 @@ const ambientCenter = document.getElementById('ambient-center');
 
 const APP_LAUNCHERS = [
   { id: 'assistant', icon: '✦', label: 'AI Assistant' },
+  { id: 'browser', icon: '🌐', label: 'Browser' },
   { id: 'terminal', icon: '❯', label: 'Terminal' },
   { id: 'files', icon: '🗂', label: 'Files' },
   { id: 'monitor', icon: '📊', label: 'Monitor' },
