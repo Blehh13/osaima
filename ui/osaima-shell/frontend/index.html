@@ -49,8 +49,54 @@
         </div>
         <div class="status-pill" id="cpu-pill">CPU <span id="cpu-val">—</span></div>
         <div class="status-pill" id="mem-pill">MEM <span id="mem-val">—</span></div>
+        <button id="control-toggle" title="Control Center">
+          <span class="ctl-ico" id="ctl-net">🌐</span>
+          <span class="ctl-ico" id="ctl-vol">🔊</span>
+          <span class="ctl-ico" id="ctl-bat">🔋</span>
+        </button>
       </div>
     </header>
+
+    <!-- Control Center flyout (Windows-style quick settings) -->
+    <div id="control-center" class="cc-hidden">
+      <div class="cc-tiles">
+        <button class="cc-tile active" id="cc-wifi">
+          <span class="cc-tile-ico">🌐</span>
+          <span class="cc-tile-label">Network</span>
+          <span class="cc-tile-sub" id="cc-net-sub">Connected</span>
+        </button>
+        <button class="cc-tile" id="cc-airplane">
+          <span class="cc-tile-ico">✈</span>
+          <span class="cc-tile-label">Airplane</span>
+          <span class="cc-tile-sub">Off</span>
+        </button>
+        <button class="cc-tile" id="cc-night">
+          <span class="cc-tile-ico">🌙</span>
+          <span class="cc-tile-label">Night light</span>
+          <span class="cc-tile-sub">Off</span>
+        </button>
+        <button class="cc-tile active" id="cc-ai">
+          <span class="cc-tile-ico">✦</span>
+          <span class="cc-tile-label">AI Core</span>
+          <span class="cc-tile-sub" id="cc-ai-sub">—</span>
+        </button>
+      </div>
+      <div class="cc-slider-row">
+        <span class="cc-slider-ico">☀</span>
+        <input type="range" id="cc-brightness" min="20" max="100" value="100" />
+      </div>
+      <div class="cc-slider-row">
+        <span class="cc-slider-ico">🔊</span>
+        <input type="range" id="cc-volume" min="0" max="100" value="65" />
+      </div>
+      <div class="cc-footer">
+        <span id="cc-battery">🔋 AC Power</span>
+        <span id="cc-clock2">—</span>
+      </div>
+    </div>
+    <!-- Screen dimming / night-light overlays (real, controlled by the sliders) -->
+    <div id="brightness-overlay"></div>
+    <div id="night-overlay"></div>
 
     <!-- Window manager surface — windows are tiled/floated here -->
     <div id="wm-surface"></div>

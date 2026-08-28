@@ -220,6 +220,12 @@ async function pollStats() {
       statusText.textContent = 'AI Core offline';
       statusText.className = '';
     }
+
+    // Mirror live status into the Control Center flyout.
+    const ccAiSub = document.getElementById('cc-ai-sub');
+    const ccAiTile = document.getElementById('cc-ai');
+    if (ccAiSub) ccAiSub.textContent = alive ? 'Online' : 'Offline';
+    if (ccAiTile) ccAiTile.classList.toggle('active', !!alive);
   } catch (err) {
     console.warn('Stats poll failed:', err);
   }
@@ -228,6 +234,69 @@ async function pollStats() {
 // Poll immediately, then every 3 seconds
 pollStats();
 setInterval(pollStats, 3000);
+
+// ── 5b. Control Center (quick settings flyout) ────────────────────────────
+const controlToggle = document.getElementById('control-toggle');
+const controlCenter = document.getElementById('control-center');
+const brightnessOverlay = document.getElementById('brightness-overlay');
+const nightOverlay = document.getElementById('night-overlay');
+
+function toggleControlCenter(force) {
+  const show = force !== undefined ? force : controlCenter.classList.contains('cc-hidden');
+  controlCenter.classList.toggle('cc-hidden', !show);
+}
+if (controlToggle) {
+  controlToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleControlCenter(); });
+  // Close when clicking outside the panel.
+  document.addEventListener('click', (e) => {
+    if (!controlCenter.classList.contains('cc-hidden') &&
+        !controlCenter.contains(e.target) && e.target !== controlToggle) {
+      toggleControlCenter(false);
+    }
+  });
+  window.addEventListener('keydown', (e) => { if (e.code === 'Escape') toggleControlCenter(false); });
+
+  // Brightness — genuinely dims the screen via a black overlay.
+  const brightness = document.getElementById('cc-brightness');
+  const applyBrightness = () => {
+    const v = parseInt(brightness.value, 10);
+    brightnessOverlay.style.opacity = ((100 - v) / 100 * 0.72).toFixed(3);
+  };
+  brightness.addEventListener('input', applyBrightness);
+  applyBrightness();
+
+  // Volume — cosmetic in a VM (no audio device); still updates the icon.
+  const volume = document.getElementById('cc-volume');
+  const volIco = document.getElementById('ctl-vol');
+  volume.addEventListener('input', () => {
+    const v = parseInt(volume.value, 10);
+    volIco.textContent = v === 0 ? '🔇' : v < 50 ? '🔉' : '🔊';
+  });
+
+  // Night light — warm overlay.
+  const nightTile = document.getElementById('cc-night');
+  nightTile.addEventListener('click', () => {
+    const on = nightTile.classList.toggle('active');
+    nightOverlay.classList.toggle('on', on);
+    nightTile.querySelector('.cc-tile-sub').textContent = on ? 'On' : 'Off';
+  });
+
+  // Airplane / Wi-Fi tiles — cosmetic (VM uses wired NAT).
+  const airplane = document.getElementById('cc-airplane');
+  const wifi = document.getElementById('cc-wifi');
+  airplane.addEventListener('click', () => {
+    const on = airplane.classList.toggle('active');
+    airplane.querySelector('.cc-tile-sub').textContent = on ? 'On' : 'Off';
+    wifi.classList.toggle('active', !on);
+    document.getElementById('cc-net-sub').textContent = on ? 'Off' : 'Connected';
+    document.getElementById('ctl-net').textContent = on ? '✈' : '🌐';
+  });
+
+  // Clock in the footer.
+  const cc2 = document.getElementById('cc-clock2');
+  const tickCC = () => { cc2.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); };
+  tickCC(); setInterval(tickCC, 1000);
+}
 
 // ── Utility ───────────────────────────────────────────────────────────────
 function formatBytes(bytes) {
