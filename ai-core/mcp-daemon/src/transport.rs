@@ -33,7 +33,10 @@ impl SocketListener {
     pub fn bind(path: &Path) -> io::Result<Self> {
         if let Some(parent) = path.parent().filter(|p| !p.as_os_str().is_empty()) {
             if !parent.exists() {
-                DirBuilder::new().recursive(true).mode(0o700).create(parent)?;
+                DirBuilder::new()
+                    .recursive(true)
+                    .mode(0o700)
+                    .create(parent)?;
             }
         }
         if path.exists() {
@@ -123,7 +126,12 @@ where
     loop {
         buf.clear();
         let limit = MAX_MESSAGE_BYTES as u64 + 1;
-        if (&mut reader).take(limit).read_until(b'\n', &mut buf).await? == 0 {
+        if (&mut reader)
+            .take(limit)
+            .read_until(b'\n', &mut buf)
+            .await?
+            == 0
+        {
             return Ok(());
         }
         if buf.len() > MAX_MESSAGE_BYTES {

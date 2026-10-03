@@ -81,7 +81,12 @@ async fn full_mcp_session_over_socket() {
             "params": { "name": "get_system_stats", "arguments": {} }
         }))
         .await;
-    assert!(stats["result"]["structuredContent"]["memory"]["total_bytes"].as_u64().unwrap() > 0);
+    assert!(
+        stats["result"]["structuredContent"]["memory"]["total_bytes"]
+            .as_u64()
+            .unwrap()
+            > 0
+    );
 
     // A second concurrent client is served independently.
     let mut other = Client::connect(&path).await;
@@ -119,7 +124,9 @@ async fn refuses_to_steal_a_live_socket_but_replaces_stale_ones() {
     let path = dir.path().join("mcp.sock");
 
     let first = SocketListener::bind(&path).unwrap();
-    let err = SocketListener::bind(&path).err().expect("second bind must fail");
+    let err = SocketListener::bind(&path)
+        .err()
+        .expect("second bind must fail");
     assert_eq!(err.kind(), std::io::ErrorKind::AddrInUse);
 
     drop(first);

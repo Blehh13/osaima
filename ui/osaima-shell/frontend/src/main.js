@@ -15,26 +15,11 @@ import { AgentCore } from './wm/agent-core.js';
 import { RagEngine, SEED_KNOWLEDGE } from './wm/rag.js';
 import { BehaviorStore } from './wm/behavior.js';
 
-// ── Tauri invoke (safe import for non-Tauri dev environments) ──────────────
-let tauriInvoke = null;
-try {
-  const tauri = await import('@tauri-apps/api/core');
-  tauriInvoke = tauri.invoke;
-} catch {
-  // Running in browser dev mode — use mock data
-  tauriInvoke = async (cmd) => {
-    if (cmd === 'get_system_stats') {
-      return {
-        os: 'Interstellar OS',
-        kernel: '6.x.x-interstellar',
-        host: 'interstellar-dev',
-        memory: { total_bytes: 17179869184, used_bytes: 5368709120 },
-        cpu: { usage_percent: 12.5, cores: 8 },
-      };
-    }
-    if (cmd === 'ping_daemon') return false;
-  };
-}
+// ── Backend IPC ───────────────────────────────────────────────────────────
+// Inside Tauri (`withGlobalTauri`), calls go to the Rust host and the AI Core.
+// In a plain browser the shell runs in clearly-labelled demo mode on mock data.
+const tauriInvoke = window.__TAURI__?.core?.invoke ?? createDemoBackend();
+if (!window.__TAURI__) document.body.classList.add('demo-mode');
 
 // ── 1. Starfield Canvas ───────────────────────────────────────────────────
 const canvas = document.getElementById('starfield');
@@ -155,7 +140,7 @@ MEMORY  : ${memPct}% used (${formatBytes(stats.memory.used_bytes)} / ${formatByt
     const alive = await tauriInvoke('ping_daemon');
     contentEl.textContent = alive
       ? '✓ MCP Daemon is online and responding.'
-      : '✗ MCP Daemon is offline. Start it with: systemctl start mcp-daemon';
+      : '✗ AI Core is offline. Start it with: osaima-mcp-daemon &';
   } else if (lower.includes('assistant') || lower.includes('agent') || lower.includes('ai ')) {
     spawnFromLauncher('assistant', contentEl, 'the AI Assistant');
   } else if (lower.includes('browser') || lower.includes('web') || lower.includes('internet') || lower.includes('chrome')) {
@@ -181,10 +166,15 @@ MEMORY  : ${memPct}% used (${formatBytes(stats.memory.used_bytes)} / ${formatByt
   }
 }
 
-window.runSuggestion = function(btn) {
+function runSuggestion(btn) {
   launcherInput.value = btn.textContent;
   handleQuery(btn.textContent);
-};
+}
+document.getElementById('launcher-backdrop').addEventListener('click', closeLauncher);
+document.getElementById('launcher-close').addEventListener('click', closeLauncher);
+for (const chip of document.querySelectorAll('.suggestion-chip')) {
+  chip.addEventListener('click', () => runSuggestion(chip));
+}
 
 // ── 5. MCP System Stats Polling ───────────────────────────────────────────
 async function pollStats() {
@@ -299,6 +289,40 @@ if (controlToggle) {
 }
 
 // ── Utility ───────────────────────────────────────────────────────────────
+/** Mock backend for browser previews. Nothing here touches a real system. */
+function createDemoBackend() {
+  const DEMO_PROCS = ['osaima-shell', 'mcp-daemon', 'firefox', 'foot', 'pipewire', 'sway', 'ollama', 'python3'];
+  return async (cmd, args = {}) => {
+    switch (cmd) {
+      case 'get_system_stats': {
+        const total = 16 * 1024 ** 3;
+        return {
+          os: 'Interstellar OS (demo)', os_version: '0.2', kernel: '6.x-demo', host: 'demo',
+          uptime_secs: Math.floor(performance.now() / 1000), load_average: [0.4, 0.3, 0.2],
+          cpu: { usage_percent: 8 + Math.random() * 20, cores: 8, brand: 'Demo CPU' },
+          memory: { total_bytes: total, used_bytes: total * (0.3 + Math.random() * 0.05),
+            available_bytes: total * 0.65, swap_total_bytes: 0, swap_used_bytes: 0 },
+        };
+      }
+      case 'ping_daemon': return false;
+      case 'list_processes':
+        return { processes: DEMO_PROCS.map((name, i) => ({
+          pid: 1000 + i * 37, name, cpu_percent: Math.random() * 30 / (i + 1),
+          memory_bytes: (400 - i * 40) * 1024 ** 2, uid: 1000, status: 'Sleep',
+        })) };
+      case 'home_dir': return '/home/demo';
+      case 'read_dir':
+        return { path: args.path || '/home/demo', entries: [
+          { name: 'Documents', is_dir: true }, { name: 'Downloads', is_dir: true }, { name: 'notes.txt', is_dir: false },
+        ] };
+      case 'run_command':
+        return { output: 'Demo mode: commands only run inside Interstellar OS.\n', exit_code: 1, timed_out: false, truncated: false };
+      default:
+        throw new Error(`'${cmd}' is unavailable in demo mode`);
+    }
+  };
+}
+
 function formatBytes(bytes) {
   if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(1) + 'GB';
   if (bytes >= 1048576)    return (bytes / 1048576).toFixed(0) + 'MB';

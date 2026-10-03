@@ -16,9 +16,13 @@ permissions:
 env:
   CARGO_TERM_COLOR: always
 
+# Every check step runs even when an earlier one fails, so one push reports
+# everything. When formatting fails, a `rustfmt-patch-*` artifact holds the
+# fix: download it and run `git apply rustfmt.patch` (no local Rust needed).
+
 jobs:
   daemon:
-    name: AI Core daemon (Rust)
+    name: AI Core daemon
     runs-on: ubuntu-24.04
     defaults:
       run:
@@ -31,16 +35,15 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: ai-core/mcp-daemon
-      # Every check runs even if an earlier one fails, so one push reports everything.
       - name: Test
-        run: cargo test
+        run: cargo test --locked
       - name: Clippy
         if: success() || failure()
-        run: cargo clippy --all-targets -- -D warnings
+        run: cargo clippy --locked --all-targets -- -D warnings
       - name: Format
         if: success() || failure()
         run: cargo fmt --check || { cargo fmt && git diff > "$RUNNER_TEMP/rustfmt.patch"; exit 1; }
-      - name: Upload rustfmt fix (apply with git apply)
+      - name: Upload rustfmt fix
         if: failure()
         uses: actions/upload-artifact@v4
         with:
@@ -49,15 +52,72 @@ jobs:
           if-no-files-found: ignore
       - name: Release build
         if: success() || failure()
-        run: cargo build --release
+        run: cargo build --locked --release
       - uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
           name: mcp-daemon
           path: ai-core/mcp-daemon/target/release/mcp-daemon
           if-no-files-found: ignore
+
+  shell-backend:
+    name: Shell backend (Tauri)
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ui/osaima-shell/src-tauri
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install WebKitGTK and build dependencies
+        working-directory: .
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev libgtk-3-dev librsvg2-dev \
+            libayatana-appindicator3-dev libsoup-3.0-dev libjavascriptcoregtk-4.1-dev
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ui/osaima-shell/src-tauri
+      - name: Test
+        run: cargo test
+      - name: Clippy
+        if: success() || failure()
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Format
+        if: success() || failure()
+        run: cargo fmt --check || { cargo fmt && git diff > "$RUNNER_TEMP/rustfmt.patch"; exit 1; }
+      - name: Upload rustfmt fix
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rustfmt-patch-shell
+          path: ${{ runner.temp }}/rustfmt.patch
+          if-no-files-found: ignore
       - uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
-          name: daemon-cargo-lock
-          path: ai-core/mcp-daemon/Cargo.lock
+          name: shell-cargo-lock
+          path: ui/osaima-shell/src-tauri/Cargo.lock
+
+  frontend:
+    name: Shell frontend
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ui/osaima-shell/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax check
+        run: |
+          for f in $(find src -name '*.js'); do
+            node --input-type=module --check < "$f" || { echo "::error file=$f::syntax error"; exit 1; }
+          done
+      - name: Unit tests
+        run: |
+          if ls tests/*.test.js >/dev/null 2>&1; then node --test tests/; else echo "no tests"; fi

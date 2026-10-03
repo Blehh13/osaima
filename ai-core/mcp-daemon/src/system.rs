@@ -126,7 +126,10 @@ impl fmt::Display for SignalError {
             Self::Protected(pid) => write!(f, "process {pid} is protected and cannot be signalled"),
             Self::NotFound(pid) => write!(f, "no process with pid {pid}"),
             Self::PermissionDenied(pid) => {
-                write!(f, "permission denied: process {pid} belongs to another user")
+                write!(
+                    f,
+                    "permission denied: process {pid} belongs to another user"
+                )
             }
             Self::Os(pid, err) => write!(f, "failed to signal process {pid}: {err}"),
         }
@@ -335,8 +338,13 @@ mod tests {
         let monitor = SystemMonitor::new();
         let all = monitor.processes(ProcessSort::Memory, usize::MAX);
         assert!(all.iter().any(|p| p.pid == std::process::id()));
-        assert!(all.windows(2).all(|w| w[0].memory_bytes >= w[1].memory_bytes));
-        assert_eq!(monitor.processes(ProcessSort::Cpu, 3).len(), all.len().min(3));
+        assert!(all
+            .windows(2)
+            .all(|w| w[0].memory_bytes >= w[1].memory_bytes));
+        assert_eq!(
+            monitor.processes(ProcessSort::Cpu, 3).len(),
+            all.len().min(3)
+        );
     }
 
     #[test]

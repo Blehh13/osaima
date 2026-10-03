@@ -120,7 +120,8 @@ pub fn call(
             reject_unknown(&args, &["pid", "signal"])?;
             let pid = optional_u64(&args, "pid")?
                 .ok_or_else(|| RpcError::invalid_params("pid is required"))?;
-            let pid = u32::try_from(pid).map_err(|_| RpcError::invalid_params("pid is too large"))?;
+            let pid =
+                u32::try_from(pid).map_err(|_| RpcError::invalid_params("pid is too large"))?;
             let signal = match optional_str(&args, "signal")? {
                 None => ProcessSignal::Term,
                 Some(name) => ProcessSignal::parse(name).ok_or_else(|| {
@@ -165,7 +166,9 @@ fn tool_error(message: String) -> Value {
 
 fn reject_unknown(args: &Map<String, Value>, allowed: &[&str]) -> Result<(), RpcError> {
     match args.keys().find(|k| !allowed.contains(&k.as_str())) {
-        Some(key) => Err(RpcError::invalid_params(format!("unexpected argument: {key}"))),
+        Some(key) => Err(RpcError::invalid_params(format!(
+            "unexpected argument: {key}"
+        ))),
         None => Ok(()),
     }
 }
@@ -173,10 +176,9 @@ fn reject_unknown(args: &Map<String, Value>, allowed: &[&str]) -> Result<(), Rpc
 fn optional_u64(args: &Map<String, Value>, key: &str) -> Result<Option<u64>, RpcError> {
     match args.get(key) {
         None | Some(Value::Null) => Ok(None),
-        Some(v) => v
-            .as_u64()
-            .map(Some)
-            .ok_or_else(|| RpcError::invalid_params(format!("{key} must be a non-negative integer"))),
+        Some(v) => v.as_u64().map(Some).ok_or_else(|| {
+            RpcError::invalid_params(format!("{key} must be a non-negative integer"))
+        }),
     }
 }
 
@@ -214,7 +216,10 @@ mod tests {
         let res = call(&monitor, ROOT, "get_system_stats", None).unwrap();
         assert_eq!(res["isError"], false);
         assert!(res["structuredContent"]["cpu"]["cores"].as_u64().unwrap() > 0);
-        assert!(res["content"][0]["text"].as_str().unwrap().contains("memory"));
+        assert!(res["content"][0]["text"]
+            .as_str()
+            .unwrap()
+            .contains("memory"));
     }
 
     #[test]
@@ -227,9 +232,19 @@ mod tests {
             Some(json!({ "limit": 2, "sort_by": "memory" })),
         )
         .unwrap();
-        assert!(res["structuredContent"]["processes"].as_array().unwrap().len() <= 2);
+        assert!(
+            res["structuredContent"]["processes"]
+                .as_array()
+                .unwrap()
+                .len()
+                <= 2
+        );
 
-        for bad in [json!({ "limit": 0 }), json!({ "sort_by": "io" }), json!({ "x": 1 })] {
+        for bad in [
+            json!({ "limit": 0 }),
+            json!({ "sort_by": "io" }),
+            json!({ "x": 1 }),
+        ] {
             let err = call(&monitor, ROOT, "list_processes", Some(bad)).unwrap_err();
             assert_eq!(err.code, INVALID_PARAMS);
         }
@@ -240,7 +255,10 @@ mod tests {
         let monitor = SystemMonitor::new();
         let res = call(&monitor, ROOT, "kill_process", Some(json!({ "pid": 1 }))).unwrap();
         assert_eq!(res["isError"], true);
-        assert!(res["content"][0]["text"].as_str().unwrap().contains("protected"));
+        assert!(res["content"][0]["text"]
+            .as_str()
+            .unwrap()
+            .contains("protected"));
     }
 
     #[test]

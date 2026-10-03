@@ -23,6 +23,8 @@ RDEPEND="
 	dev-libs/glib
 	x11-libs/gtk+:3
 	sys-apps/osaima-ai-core
+	media-fonts/inter
+	media-fonts/jetbrains-mono
 "
 DEPEND="${RDEPEND}"
 # Build: Rust/Cargo for the Tauri host, Node for the frontend assets.

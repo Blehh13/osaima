@@ -108,8 +108,9 @@ impl Server {
                 )
             }
             // Pre-MCP methods kept for existing clients.
-            "system.get_stats" => Ok(serde_json::to_value(self.monitor.stats())
-                .expect("stats always serialize")),
+            "system.get_stats" => {
+                Ok(serde_json::to_value(self.monitor.stats()).expect("stats always serialize"))
+            }
             "system.get_processes" => Ok(json!(self.monitor.processes(ProcessSort::Cpu, 40))),
             _ => Err(RpcError::new(
                 METHOD_NOT_FOUND,
@@ -153,7 +154,9 @@ mod tests {
     }
 
     fn roundtrip(server: &Server, session: &mut Session, raw: &str) -> Response {
-        let text = server.handle_message(raw, session).expect("expected a response");
+        let text = server
+            .handle_message(raw, session)
+            .expect("expected a response");
         serde_json::from_str(&text).unwrap()
     }
 
@@ -192,17 +195,29 @@ mod tests {
     #[test]
     fn ids_are_echoed_verbatim() {
         let (server, mut session) = setup();
-        let res = roundtrip(&server, &mut session, r#"{"jsonrpc":"2.0","id":42,"method":"ping"}"#);
+        let res = roundtrip(
+            &server,
+            &mut session,
+            r#"{"jsonrpc":"2.0","id":42,"method":"ping"}"#,
+        );
         assert_eq!(res.id, json!(42));
         assert_eq!(res.result, Some(json!({})));
-        let res = roundtrip(&server, &mut session, r#"{"jsonrpc":"2.0","id":"a","method":"ping"}"#);
+        let res = roundtrip(
+            &server,
+            &mut session,
+            r#"{"jsonrpc":"2.0","id":"a","method":"ping"}"#,
+        );
         assert_eq!(res.id, json!("a"));
     }
 
     #[test]
     fn tools_list_and_call() {
         let (server, mut session) = setup();
-        let res = roundtrip(&server, &mut session, r#"{"jsonrpc":"2.0","id":1,"method":"tools/list"}"#);
+        let res = roundtrip(
+            &server,
+            &mut session,
+            r#"{"jsonrpc":"2.0","id":1,"method":"tools/list"}"#,
+        );
         let names: Vec<String> = res.result.unwrap()["tools"]
             .as_array()
             .unwrap()
@@ -218,7 +233,13 @@ mod tests {
         );
         let result = res.result.unwrap();
         assert_eq!(result["isError"], false);
-        assert!(result["structuredContent"]["processes"].as_array().unwrap().len() <= 3);
+        assert!(
+            result["structuredContent"]["processes"]
+                .as_array()
+                .unwrap()
+                .len()
+                <= 3
+        );
     }
 
     #[test]
@@ -228,14 +249,26 @@ mod tests {
         assert_eq!(res.error.unwrap().code, PARSE_ERROR);
         assert_eq!(res.id, Value::Null);
 
-        let res = roundtrip(&server, &mut session, r#"{"jsonrpc":"1.0","id":1,"method":"ping"}"#);
+        let res = roundtrip(
+            &server,
+            &mut session,
+            r#"{"jsonrpc":"1.0","id":1,"method":"ping"}"#,
+        );
         assert_eq!(res.error.unwrap().code, INVALID_REQUEST);
 
-        let res = roundtrip(&server, &mut session, r#"{"jsonrpc":"2.0","id":3,"params":{}}"#);
+        let res = roundtrip(
+            &server,
+            &mut session,
+            r#"{"jsonrpc":"2.0","id":3,"params":{}}"#,
+        );
         assert_eq!(res.error.unwrap().code, INVALID_REQUEST);
         assert_eq!(res.id, json!(3));
 
-        let res = roundtrip(&server, &mut session, r#"{"jsonrpc":"2.0","id":4,"method":"rm_rf"}"#);
+        let res = roundtrip(
+            &server,
+            &mut session,
+            r#"{"jsonrpc":"2.0","id":4,"method":"rm_rf"}"#,
+        );
         assert_eq!(res.error.unwrap().code, METHOD_NOT_FOUND);
 
         let res = roundtrip(

@@ -48,6 +48,13 @@ function makeTerminal(services) {
 
       const history = [];
       let hIdx = 0;
+      let cwd = null; // null = the user's home directory
+      const setCwd = (dir) => {
+        cwd = dir;
+        const base = dir === '/' ? '/' : dir.split('/').pop();
+        prompt.textContent = base + ' ❯ ';
+      };
+      services.invoke('home_dir').then(setCwd).catch(() => {});
 
       const print = (text, cls) => {
         const line = el('div', 'term-line' + (cls ? ' ' + cls : ''));
@@ -61,10 +68,22 @@ function makeTerminal(services) {
 
       const commands = {
         help: () => {
-          print('built-ins: help  stats  ping  ws  layout  spawn <app>  apps  clear  echo <x>  date  neofetch');
+          print('built-ins: help  cd <dir>  stats  ping  ws  layout  spawn <app>  apps  clear  echo <x>  date  neofetch');
           print('anything else runs as a REAL command on Interstellar OS (ls, ps, uname, emerge, …)', 'term-dim');
         },
         clear: () => { output.innerHTML = ''; },
+        cd: async (args) => {
+          // Single-quote the path for /bin/sh; a leading ~ expands to $HOME.
+          const target = args.length ? args.join(' ') : '~';
+          const home = target === '~' || target.startsWith('~/');
+          const rest = home ? target.slice(1) : target;
+          const quoted = (home ? '"$HOME"' : '') + "'" + rest.replace(/'/g, "'\\''") + "'";
+          try {
+            const res = await services.invoke('run_command', { cmd: 'cd ' + quoted + ' && pwd', cwd });
+            if (res.exit_code === 0) setCwd(res.output.trim());
+            else print(res.output.trim() || 'cd: no such directory', 'term-err');
+          } catch (e) { print('cd: ' + e, 'term-err'); }
+        },
         echo: (args) => print(args.join(' ')),
         date: () => print(new Date().toString()),
         apps: () => print([...ctx.wm.appRegistry.keys()].join('  ')),
@@ -116,10 +135,11 @@ function makeTerminal(services) {
         if (fn) { await fn(args); return; }
         // Not a built-in — run it as a REAL command on the OS.
         try {
-          const out = await services.invoke('run_command', { cmd: line });
-          if (out && out.length) {
-            out.replace(/\n$/, '').split('\n').forEach((l) => print(l));
-          }
+          const res = await services.invoke('run_command', { cmd: line, cwd });
+          if (res.output) res.output.replace(/\n$/, '').split('\n').forEach((l) => print(l));
+          if (res.truncated) print('[output truncated]', 'term-dim');
+          if (res.timed_out) print('[stopped after 30 s: interactive programs are not supported yet]', 'term-err');
+          else if (res.exit_code) print('[exit ' + res.exit_code + ']', 'term-dim');
         } catch (e) {
           print('error: ' + e, 'term-err');
         }
@@ -322,6 +342,7 @@ function makeFiles(services) {
       const list = el('div', 'files-list');
       root.append(path, list);
       let cwd = '/';
+      const start = services.invoke('home_dir').then((h) => { cwd = h; }).catch(() => {});
 
       const goInto = (name) => { cwd = cwd === '/' ? '/' + name : cwd + '/' + name; render(); };
       const goUp = () => {
@@ -357,7 +378,7 @@ function makeFiles(services) {
         }
         if (entries.length === 0) list.appendChild(el('div', 'files-empty', '(empty)'));
       };
-      render();
+      start.then(render);
     },
   };
 }
@@ -617,7 +638,7 @@ function makeTaskManager(services) {
       root.innerHTML = `
         <div class="tk-toolbar">
           <span class="tk-title">Processes — live from /proc</span>
-          <span class="tk-hint">click a row · Renice / Kill</span>
+          <span class="tk-hint">click a row · Lower priority / End</span>
         </div>
         <div class="tk-head">
           <span class="tk-c-pid">PID</span>
@@ -628,13 +649,16 @@ function makeTaskManager(services) {
         </div>
         <div class="tk-rows"></div>
         <div class="tk-actions">
-          <button class="tk-btn tk-boost" disabled>⬆ Renice (boost)</button>
-          <button class="tk-btn tk-kill" disabled>✕ Kill</button>
+          <button class="tk-btn tk-boost" disabled>⬇ Lower priority</button>
+          <button class="tk-btn tk-kill" disabled>✕ End process</button>
+          <span class="tk-status"></span>
         </div>`;
 
       const rowsEl = root.querySelector('.tk-rows');
       const boostBtn = root.querySelector('.tk-boost');
       const killBtn = root.querySelector('.tk-kill');
+      const statusEl = root.querySelector('.tk-status');
+      const status = (msg) => { statusEl.textContent = msg; };
 
       let procs = [];
       let selectedPid = null;
@@ -642,15 +666,16 @@ function makeTaskManager(services) {
       const render = () => {
         rowsEl.innerHTML = '';
         for (const p of procs) {
-          const load = Math.max(0.02, Math.min(1, p.cpu / 40 + p.mem / 4000));
+          const memMiB = p.memory_bytes / 1048576;
+          const load = Math.max(0.02, Math.min(1, p.cpu_percent / 40 + memMiB / 4000));
           const pct = Math.round(load * 100);
           const cls = load > 0.66 ? 'hi' : load > 0.33 ? 'mid' : 'lo';
           const row = el('div', 'tk-row' + (p.pid === selectedPid ? ' selected' : ''));
           row.innerHTML = `
             <span class="tk-c-pid">${p.pid}</span>
             <span class="tk-c-name">${escapeHtml(p.name)}</span>
-            <span class="tk-c-cpu">${p.cpu.toFixed(1)}</span>
-            <span class="tk-c-mem">${p.mem.toFixed(0)}M</span>
+            <span class="tk-c-cpu">${p.cpu_percent.toFixed(1)}</span>
+            <span class="tk-c-mem">${memMiB.toFixed(0)}M</span>
             <span class="tk-c-pri"><span class="tk-prbar ${cls}" style="width:${pct}%"></span><b>${pct}</b></span>`;
           row.addEventListener('click', () => {
             selectedPid = p.pid;
@@ -665,18 +690,25 @@ function makeTaskManager(services) {
         try {
           const data = await services.invoke('list_processes');
           procs = data.processes || [];
-        } catch { return; }
+        } catch (e) { status('AI Core unavailable: ' + e); return; }
         render();
       };
 
       boostBtn.addEventListener('click', async () => {
         if (!selectedPid) return;
-        try { await services.invoke('run_command', { cmd: 'renice -n -5 -p ' + selectedPid }); } catch {}
+        // Raising priority needs root; lowering your own process's priority does not.
+        try {
+          const res = await services.invoke('run_command', { cmd: 'renice -n 10 -p ' + Number(selectedPid) });
+          status(res.exit_code === 0 ? 'Lowered priority of ' + selectedPid : res.output.trim());
+        } catch (e) { status(String(e)); }
         load();
       });
       killBtn.addEventListener('click', async () => {
         if (!selectedPid) return;
-        try { await services.invoke('kill_process', { pid: selectedPid }); } catch {}
+        try {
+          await services.invoke('kill_process', { pid: selectedPid });
+          status('Ended process ' + selectedPid);
+        } catch (e) { status(String(e)); }
         selectedPid = null;
         boostBtn.disabled = killBtn.disabled = true;
         load();
