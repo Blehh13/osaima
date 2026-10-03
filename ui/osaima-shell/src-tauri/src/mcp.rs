@@ -37,7 +37,11 @@ pub async fn request(method: &str, params: Value) -> Result<Value, String> {
 /// Call an MCP tool and return its `structuredContent`. In-band tool errors
 /// (`isError: true`) become `Err` with the tool's message.
 pub async fn call_tool(name: &str, arguments: Value) -> Result<Value, String> {
-    let result = request("tools/call", json!({ "name": name, "arguments": arguments })).await?;
+    let result = request(
+        "tools/call",
+        json!({ "name": name, "arguments": arguments }),
+    )
+    .await?;
     if result["isError"].as_bool().unwrap_or(false) {
         let message = result
             .pointer("/content/0/text")
@@ -45,7 +49,10 @@ pub async fn call_tool(name: &str, arguments: Value) -> Result<Value, String> {
             .unwrap_or("tool failed");
         return Err(message.to_string());
     }
-    Ok(result.get("structuredContent").cloned().unwrap_or(Value::Null))
+    Ok(result
+        .get("structuredContent")
+        .cloned()
+        .unwrap_or(Value::Null))
 }
 
 async fn send(method: &str, params: Value) -> Result<Value, String> {

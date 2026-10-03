@@ -115,9 +115,13 @@ mod tests {
 
     #[tokio::test]
     async fn captures_output_and_exit_code() {
-        let out = run_command("echo hi; echo err >&2; exit 3", Some(Path::new("/")), COMMAND_TIMEOUT)
-            .await
-            .unwrap();
+        let out = run_command(
+            "echo hi; echo err >&2; exit 3",
+            Some(Path::new("/")),
+            COMMAND_TIMEOUT,
+        )
+        .await
+        .unwrap();
         assert_eq!(out.output, "hi\nerr\n");
         assert_eq!(out.exit_code, Some(3));
         assert!(!out.timed_out);
@@ -145,9 +149,13 @@ mod tests {
 
     #[tokio::test]
     async fn truncates_huge_output() {
-        let out = run_command("head -c 400000 /dev/zero | tr '\\0' a", None, COMMAND_TIMEOUT)
-            .await
-            .unwrap();
+        let out = run_command(
+            "head -c 400000 /dev/zero | tr '\\0' a",
+            None,
+            COMMAND_TIMEOUT,
+        )
+        .await
+        .unwrap();
         assert!(out.truncated);
         assert_eq!(out.output.len(), MAX_OUTPUT_BYTES);
     }

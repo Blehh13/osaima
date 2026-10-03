@@ -82,10 +82,10 @@ jobs:
         with:
           workspaces: ui/osaima-shell/src-tauri
       - name: Test
-        run: cargo test
+        run: cargo test --locked
       - name: Clippy
         if: success() || failure()
-        run: cargo clippy --all-targets -- -D warnings
+        run: cargo clippy --locked --all-targets -- -D warnings
       - name: Format
         if: success() || failure()
         run: cargo fmt --check || { cargo fmt && git diff > "$RUNNER_TEMP/rustfmt.patch"; exit 1; }
@@ -96,11 +96,6 @@ jobs:
           name: rustfmt-patch-shell
           path: ${{ runner.temp }}/rustfmt.patch
           if-no-files-found: ignore
-      - uses: actions/upload-artifact@v4
-        if: success() || failure()
-        with:
-          name: shell-cargo-lock
-          path: ui/osaima-shell/src-tauri/Cargo.lock
 
   frontend:
     name: Shell frontend
@@ -119,5 +114,5 @@ jobs:
             node --input-type=module --check < "$f" || { echo "::error file=$f::syntax error"; exit 1; }
           done
       - name: Unit tests
-        run: |
-          if ls tests/*.test.js >/dev/null 2>&1; then node --test tests/; else echo "no tests"; fi
+        if: success() || failure()
+        run: npm test
