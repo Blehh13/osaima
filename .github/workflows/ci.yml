@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [master, "feat/**", "fix/**", "feature/**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  daemon:
+    name: AI Core daemon (Rust)
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ai-core/mcp-daemon
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ai-core/mcp-daemon
+      # Every check runs even if an earlier one fails, so one push reports everything.
+      - name: Test
+        run: cargo test
+      - name: Clippy
+        if: success() || failure()
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Format
+        if: success() || failure()
+        run: cargo fmt --check
+      - name: Release build
+        if: success() || failure()
+        run: cargo build --release
+      - uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: mcp-daemon
+          path: ai-core/mcp-daemon/target/release/mcp-daemon
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: daemon-cargo-lock
+          path: ai-core/mcp-daemon/Cargo.lock
