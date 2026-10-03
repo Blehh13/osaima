@@ -1,6 +1,7 @@
 //! Live system telemetry, sampled in the background so requests never block
 //! on `/proc` and CPU percentages are measured over a real interval.
 
+use std::cmp::Reverse;
 use std::fmt;
 use std::io;
 use std::os::unix::fs::MetadataExt;
@@ -211,7 +212,7 @@ impl SystemMonitor {
             .clone();
         match sort {
             ProcessSort::Cpu => procs.sort_by(|a, b| b.cpu_percent.total_cmp(&a.cpu_percent)),
-            ProcessSort::Memory => procs.sort_by(|a, b| b.memory_bytes.cmp(&a.memory_bytes)),
+            ProcessSort::Memory => procs.sort_by_key(|p| Reverse(p.memory_bytes)),
         }
         procs.truncate(limit);
         procs

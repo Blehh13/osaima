@@ -39,7 +39,14 @@ jobs:
         run: cargo clippy --all-targets -- -D warnings
       - name: Format
         if: success() || failure()
-        run: cargo fmt --check
+        run: cargo fmt --check || { cargo fmt && git diff > "$RUNNER_TEMP/rustfmt.patch"; exit 1; }
+      - name: Upload rustfmt fix (apply with git apply)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rustfmt-patch-daemon
+          path: ${{ runner.temp }}/rustfmt.patch
+          if-no-files-found: ignore
       - name: Release build
         if: success() || failure()
         run: cargo build --release
