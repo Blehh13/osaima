@@ -53,6 +53,15 @@ jobs:
       - name: Release build
         if: success() || failure()
         run: cargo build --locked --release
+      - uses: actions/setup-python@v5
+        if: success() || failure()
+        with:
+          python-version: "3.12"
+      - name: Interoperability with the official MCP SDK
+        if: success() || failure()
+        run: |
+          pip install --quiet "mcp>=1.10,<2"
+          python tests/interop/mcp_sdk_client.py target/release/mcp-daemon
       - uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
