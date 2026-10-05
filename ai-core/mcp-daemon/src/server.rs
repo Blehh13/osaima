@@ -9,13 +9,14 @@ use crate::protocol::{
     Request, Response, RpcError, INVALID_REQUEST, METHOD_NOT_FOUND, PARSE_ERROR,
 };
 use crate::system::{ProcessSort, SystemMonitor};
-use crate::tools::{self, Caller};
+use crate::tools::{self, Caller, HostPaths, ToolContext};
 
 /// Newest MCP revision implemented; listed first.
 pub const SUPPORTED_PROTOCOL_VERSIONS: [&str; 3] = ["2025-06-18", "2025-03-26", "2024-11-05"];
 
-const SERVER_INSTRUCTIONS: &str = "OSAIMA AI Core. Use get_system_stats and list_processes \
-    for live context. kill_process is destructive: always confirm with the user first.";
+const SERVER_INSTRUCTIONS: &str = "OSAIMA AI Core: live context and actions for this \
+    computer. Prefer read-only tools to gather facts. Tools annotated destructiveHint \
+    (kill_process, close_window, power_action) must be confirmed with the user first.";
 
 /// Per-connection state.
 #[derive(Debug)]
@@ -36,28 +37,36 @@ impl Session {
 
 #[derive(Clone)]
 pub struct Server {
-    monitor: Arc<SystemMonitor>,
+    ctx: ToolContext,
 }
 
 impl Server {
+    /// A server for the running system.
     pub fn new(monitor: Arc<SystemMonitor>) -> Self {
-        Self { monitor }
+        Self::with_context(ToolContext {
+            monitor,
+            paths: Arc::new(HostPaths::from_env()),
+        })
+    }
+
+    pub fn with_context(ctx: ToolContext) -> Self {
+        Self { ctx }
     }
 
     /// Handle one raw message. Returns the serialized response, or `None`
     /// for notifications.
-    pub fn handle_message(&self, raw: &str, session: &mut Session) -> Option<String> {
+    pub async fn handle_message(&self, raw: &str, session: &mut Session) -> Option<String> {
         let response = match serde_json::from_str::<Value>(raw) {
             Err(err) => Some(Response::failure(
                 Value::Null,
                 RpcError::new(PARSE_ERROR, format!("parse error: {err}")),
             )),
-            Ok(value) => self.handle_value(value, session),
+            Ok(value) => self.handle_value(value, session).await,
         };
         response.map(|r| serde_json::to_string(&r).expect("responses always serialize"))
     }
 
-    fn handle_value(&self, value: Value, session: &mut Session) -> Option<Response> {
+    async fn handle_value(&self, value: Value, session: &mut Session) -> Option<Response> {
         let fallback_id = value.get("id").cloned().unwrap_or(Value::Null);
         let request: Request = match serde_json::from_value(value) {
             Ok(req) => req,
@@ -75,7 +84,9 @@ impl Server {
             ));
         }
 
-        let result = self.dispatch(&request.method, request.params, session);
+        let result = self
+            .dispatch(&request.method, request.params, session)
+            .await;
         let id = request.id?; // notifications never get a response
         Some(match result {
             Ok(value) => Response::success(id, value),
@@ -83,7 +94,7 @@ impl Server {
         })
     }
 
-    fn dispatch(
+    async fn dispatch(
         &self,
         method: &str,
         params: Option<Value>,
@@ -101,17 +112,18 @@ impl Server {
                     .and_then(Value::as_str)
                     .ok_or_else(|| RpcError::invalid_params("params.name must be a string"))?;
                 tools::call(
-                    &self.monitor,
+                    &self.ctx,
                     session.caller,
                     name,
                     params.get("arguments").cloned(),
                 )
+                .await
             }
             // Pre-MCP methods kept for existing clients.
             "system.get_stats" => {
-                Ok(serde_json::to_value(self.monitor.stats()).expect("stats always serialize"))
+                Ok(serde_json::to_value(self.ctx.monitor.stats()).expect("stats always serialize"))
             }
-            "system.get_processes" => Ok(json!(self.monitor.processes(ProcessSort::Cpu, 40))),
+            "system.get_processes" => Ok(json!(self.ctx.monitor.processes(ProcessSort::Cpu, 40))),
             _ => Err(RpcError::new(
                 METHOD_NOT_FOUND,
                 format!("method not found: {method}"),
@@ -148,15 +160,21 @@ mod tests {
     use super::*;
     use crate::protocol::INVALID_PARAMS;
 
+    fn block_on<F: std::future::Future>(future: F) -> F::Output {
+        tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap()
+            .block_on(future)
+    }
+
     fn setup() -> (Server, Session) {
         let server = Server::new(Arc::new(SystemMonitor::new()));
         (server, Session::new(Caller { uid: 0 }))
     }
 
     fn roundtrip(server: &Server, session: &mut Session, raw: &str) -> Response {
-        let text = server
-            .handle_message(raw, session)
-            .expect("expected a response");
+        let text = block_on(server.handle_message(raw, session)).expect("expected a response");
         serde_json::from_str(&text).unwrap()
     }
 
@@ -189,7 +207,7 @@ mod tests {
     fn notifications_get_no_response() {
         let (server, mut session) = setup();
         let raw = r#"{"jsonrpc":"2.0","method":"notifications/initialized"}"#;
-        assert!(server.handle_message(raw, &mut session).is_none());
+        assert!(block_on(server.handle_message(raw, &mut session)).is_none());
     }
 
     #[test]

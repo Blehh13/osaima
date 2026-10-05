@@ -150,7 +150,7 @@ where
         if text.is_empty() {
             continue;
         }
-        if let Some(reply) = server.handle_message(text, &mut session) {
+        if let Some(reply) = server.handle_message(text, &mut session).await {
             writer.write_all(reply.as_bytes()).await?;
             writer.write_all(b"\n").await?;
             writer.flush().await?;
