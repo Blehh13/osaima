@@ -291,7 +291,7 @@ emerge dev-vcs/git
 - Installs **git** so you can download our project.
 
 ```bash
-git clone https://github.com/akashmanjunath2505/osaima.git /root/osaima
+git clone https://github.com/Blehh13/osaima.git /root/osaima
 cd /root/osaima
 ```
 - `git clone <url> <folder>` = download our whole repository into `/root/osaima`.

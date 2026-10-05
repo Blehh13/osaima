@@ -1,6 +1,6 @@
 [Unit]
 Description=OSAIMA MCP daemon (system context provider)
-Documentation=https://github.com/akashmanjunath2505/osaima
+Documentation=https://github.com/Blehh13/osaima
 
 [Service]
 ExecStart=/usr/bin/osaima-mcp-daemon

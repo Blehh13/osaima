@@ -165,7 +165,7 @@ function makeBrowser() {
   const BOOKMARKS = [
     { name: 'Wikipedia', url: 'https://en.wikipedia.org/wiki/Linux' },
     { name: 'Gentoo', url: 'https://www.gentoo.org' },
-    { name: 'OSAIMA · GitHub', url: 'https://github.com/akashmanjunath2505/osaima' },
+    { name: 'OSAIMA · GitHub', url: 'https://github.com/Blehh13/osaima' },
     { name: 'MDN Web Docs', url: 'https://developer.mozilla.org' },
     { name: 'Hacker News', url: 'https://news.ycombinator.com' },
     { name: 'archive.org', url: 'https://archive.org' },

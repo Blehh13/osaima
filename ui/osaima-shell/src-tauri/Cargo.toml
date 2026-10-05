@@ -5,7 +5,7 @@ edition = "2021"
 rust-version = "1.77"
 description = "OSAIMA agentic desktop shell (Tauri host)"
 license = "GPL-3.0-or-later"
-repository = "https://github.com/akashmanjunath2505/osaima"
+repository = "https://github.com/Blehh13/osaima"
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }

@@ -6,8 +6,8 @@ EAPI=8
 inherit git-r3
 
 DESCRIPTION="OSAIMA agentic desktop shell — Tauri UI with a Lua-driven tiling window manager"
-HOMEPAGE="https://github.com/akashmanjunath2505/osaima"
-EGIT_REPO_URI="https://github.com/akashmanjunath2505/osaima.git"
+HOMEPAGE="https://github.com/Blehh13/osaima"
+EGIT_REPO_URI="https://github.com/Blehh13/osaima.git"
 EGIT_CLONE_TYPE="shallow"
 # Only our code is needed — never fetch the kernel / portage submodules.
 EGIT_SUBMODULES=()

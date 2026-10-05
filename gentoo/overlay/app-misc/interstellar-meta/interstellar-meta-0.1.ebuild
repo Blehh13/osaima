@@ -4,7 +4,7 @@
 EAPI=8
 
 DESCRIPTION="Interstellar OS meta package — pulls the full agentic desktop"
-HOMEPAGE="https://github.com/akashmanjunath2505/osaima"
+HOMEPAGE="https://github.com/Blehh13/osaima"
 
 LICENSE="metapackage"
 SLOT="0"

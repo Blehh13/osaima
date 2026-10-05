@@ -4,7 +4,7 @@
 EAPI=8
 
 DESCRIPTION="Interstellar OS (OSAIMA) release identification and branding files"
-HOMEPAGE="https://github.com/akashmanjunath2505/osaima"
+HOMEPAGE="https://github.com/Blehh13/osaima"
 
 LICENSE="GPL-2"
 SLOT="0"
