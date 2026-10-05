@@ -10,7 +10,7 @@ use std::process::Stdio;
 use serde::Serialize;
 use serde_json::{json, Value};
 
-use super::{read_only, reversible, tool, to_value, Args, ToolContext, ToolError, ToolResult};
+use super::{read_only, reversible, to_value, tool, Args, ToolContext, ToolError, ToolResult};
 
 /// Terminal emulator used for `Terminal=true` entries when `$TERMINAL` is unset.
 const DEFAULT_TERMINAL: &str = "foot";
@@ -76,7 +76,10 @@ impl DesktopApp {
                 .comment
                 .as_deref()
                 .is_some_and(|c| c.to_lowercase().contains(&needle))
-            || self.keywords.iter().any(|k| k.to_lowercase().contains(&needle))
+            || self
+                .keywords
+                .iter()
+                .any(|k| k.to_lowercase().contains(&needle))
     }
 }
 
@@ -162,13 +165,15 @@ pub fn installed_apps(dirs: &[impl AsRef<Path>]) -> Vec<DesktopApp> {
             }
         }
     }
-    apps.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+    apps.sort_by_cached_key(|a| a.name.to_lowercase());
     apps
 }
 
 /// Desktop file ids use `-` for subdirectories (spec: "Desktop File ID").
 fn collect_desktop_files(root: &Path, dir: &Path, out: &mut Vec<(String, std::path::PathBuf)>) {
-    let Ok(entries) = fs::read_dir(dir) else { return };
+    let Ok(entries) = fs::read_dir(dir) else {
+        return;
+    };
     for entry in entries.filter_map(Result::ok) {
         let path = entry.path();
         if path.is_dir() {
@@ -414,9 +419,15 @@ mod tests {
         ];
         assert_eq!(resolve(&apps, "firefox").unwrap().name, "Firefox");
         assert_eq!(resolve(&apps, "FIREFOX.desktop").unwrap().name, "Firefox");
-        assert_eq!(resolve(&apps, "calculator").unwrap().id, "org.gnome.Calculator.desktop");
+        assert_eq!(
+            resolve(&apps, "calculator").unwrap().id,
+            "org.gnome.Calculator.desktop"
+        );
         assert_eq!(resolve(&apps, "web browser").unwrap().name, "Firefox");
-        assert!(matches!(resolve(&apps, "photoshop"), Err(ToolError::Failed(_))));
+        assert!(matches!(
+            resolve(&apps, "photoshop"),
+            Err(ToolError::Failed(_))
+        ));
     }
 
     #[tokio::test]
@@ -434,9 +445,14 @@ mod tests {
             ),
         );
         let started = std::time::Instant::now();
-        let res = launch_app(&ctx, Some(json!({ "app": "Toucher" }))).await.unwrap();
+        let res = launch_app(&ctx, Some(json!({ "app": "Toucher" })))
+            .await
+            .unwrap();
         assert_eq!(res["launched"], "touch.desktop");
-        assert!(started.elapsed() < std::time::Duration::from_millis(800), "must not wait");
+        assert!(
+            started.elapsed() < std::time::Duration::from_millis(800),
+            "must not wait"
+        );
         for _ in 0..100 {
             if marker.exists() {
                 return;

@@ -7,7 +7,7 @@ use std::path::Path;
 use serde::Serialize;
 use serde_json::{json, Value};
 
-use super::{read_only, tool, to_value, Args, ToolContext, ToolError, ToolResult};
+use super::{read_only, to_value, tool, Args, ToolContext, ToolError, ToolResult};
 
 pub fn definitions() -> Vec<Value> {
     vec![tool(
@@ -60,13 +60,19 @@ pub async fn package_info(ctx: &ToolContext, arguments: Option<Value>) -> ToolRe
 
 fn search(db: &Path, query: &str) -> Vec<Package> {
     let mut out = Vec::new();
-    let Ok(categories) = fs::read_dir(db) else { return out };
+    let Ok(categories) = fs::read_dir(db) else {
+        return out;
+    };
     for category in categories.filter_map(Result::ok) {
         let category_name = category.file_name().to_string_lossy().into_owned();
-        let Ok(packages) = fs::read_dir(category.path()) else { continue };
+        let Ok(packages) = fs::read_dir(category.path()) else {
+            continue;
+        };
         for pkg in packages.filter_map(Result::ok) {
             let dir_name = pkg.file_name().to_string_lossy().into_owned();
-            let Some((name, version)) = split_name_version(&dir_name) else { continue };
+            let Some((name, version)) = split_name_version(&dir_name) else {
+                continue;
+            };
             let atom = format!("{category_name}/{name}");
             if !atom.to_lowercase().contains(query) {
                 continue;
@@ -114,10 +120,22 @@ mod tests {
 
     #[test]
     fn splits_portage_directory_names() {
-        assert_eq!(split_name_version("firefox-128.3.0"), Some(("firefox", "128.3.0")));
-        assert_eq!(split_name_version("gtk+-3.24.41-r1"), Some(("gtk+", "3.24.41-r1")));
-        assert_eq!(split_name_version("font-misc-misc-1.1.3"), Some(("font-misc-misc", "1.1.3")));
-        assert_eq!(split_name_version("python-3.12.4_p1"), Some(("python", "3.12.4_p1")));
+        assert_eq!(
+            split_name_version("firefox-128.3.0"),
+            Some(("firefox", "128.3.0"))
+        );
+        assert_eq!(
+            split_name_version("gtk+-3.24.41-r1"),
+            Some(("gtk+", "3.24.41-r1"))
+        );
+        assert_eq!(
+            split_name_version("font-misc-misc-1.1.3"),
+            Some(("font-misc-misc", "1.1.3"))
+        );
+        assert_eq!(
+            split_name_version("python-3.12.4_p1"),
+            Some(("python", "3.12.4_p1"))
+        );
         assert_eq!(split_name_version("no-version"), None);
     }
 
@@ -126,8 +144,18 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let ctx = context(dir.path());
         for (cat, pkg, slot, desc) in [
-            ("www-client", "firefox-128.3.0", "rapid", "Firefox Web Browser"),
-            ("dev-lang", "rust-bin-1.82.0", "1.82.0", "Systems programming language"),
+            (
+                "www-client",
+                "firefox-128.3.0",
+                "rapid",
+                "Firefox Web Browser",
+            ),
+            (
+                "dev-lang",
+                "rust-bin-1.82.0",
+                "1.82.0",
+                "Systems programming language",
+            ),
             ("dev-lang", "python-3.12.4_p1", "3.12", "Python"),
         ] {
             let p = dir.path().join("pkg").join(cat).join(pkg);
@@ -135,9 +163,13 @@ mod tests {
             fs::write(p.join("SLOT"), format!("{slot}\n")).unwrap();
             fs::write(p.join("DESCRIPTION"), format!("{desc}\n")).unwrap();
         }
-        let res = package_info(&ctx, Some(json!({ "query": "dev-lang/" }))).await.unwrap();
+        let res = package_info(&ctx, Some(json!({ "query": "dev-lang/" })))
+            .await
+            .unwrap();
         assert_eq!(res["total_matches"], 2);
-        let res = package_info(&ctx, Some(json!({ "query": "Firefox" }))).await.unwrap();
+        let res = package_info(&ctx, Some(json!({ "query": "Firefox" })))
+            .await
+            .unwrap();
         let pkg = &res["packages"][0];
         assert_eq!(pkg["atom"], "www-client/firefox");
         assert_eq!(pkg["version"], "128.3.0");

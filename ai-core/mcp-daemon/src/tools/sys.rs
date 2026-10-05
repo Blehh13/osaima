@@ -2,7 +2,10 @@
 
 use serde_json::{json, Value};
 
-use super::{destructive, no_args, read_only, tool, to_value, Args, Caller, ToolContext, ToolError, ToolResult};
+use super::{
+    destructive, no_args, read_only, to_value, tool, Args, Caller, ToolContext, ToolError,
+    ToolResult,
+};
 use crate::system::{ProcessSignal, ProcessSort};
 
 const DEFAULT_PROCESS_LIMIT: u64 = 15;
@@ -159,7 +162,11 @@ mod tests {
             Err(ToolError::InvalidParams(_))
         ));
         assert!(matches!(
-            kill_process(&ctx, ROOT, Some(json!({ "pid": 4_000_000, "signal": "SEGV" }))),
+            kill_process(
+                &ctx,
+                ROOT,
+                Some(json!({ "pid": 4_000_000, "signal": "SEGV" }))
+            ),
             Err(ToolError::InvalidParams(_))
         ));
     }

@@ -90,7 +90,9 @@ fn find_backlight(dir: &Path) -> Result<Backlight, ToolError> {
         .filter_map(Result::ok)
         .filter_map(|entry| {
             let dir = entry.path();
-            let max = read_u64(&dir.join("max_brightness")).ok().filter(|m| *m > 0)?;
+            let max = read_u64(&dir.join("max_brightness"))
+                .ok()
+                .filter(|m| *m > 0)?;
             let rank = match fs::read_to_string(dir.join("type")).ok()?.trim() {
                 "firmware" => 0,
                 "platform" => 1,
@@ -160,8 +162,15 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let ctx = context(dir.path());
         fake_backlight(dir.path(), "panel", "raw", 7, 7);
-        assert_eq!(set_brightness(&ctx, Some(json!({ "percent": 1 }))).unwrap()["raw"], 1);
-        for bad in [json!({ "percent": 0 }), json!({ "percent": 101 }), json!({})] {
+        assert_eq!(
+            set_brightness(&ctx, Some(json!({ "percent": 1 }))).unwrap()["raw"],
+            1
+        );
+        for bad in [
+            json!({ "percent": 0 }),
+            json!({ "percent": 101 }),
+            json!({}),
+        ] {
             assert!(matches!(
                 set_brightness(&ctx, Some(bad)),
                 Err(ToolError::InvalidParams(_))

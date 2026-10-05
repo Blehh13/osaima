@@ -9,7 +9,10 @@ use serde_json::{json, Value};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::UnixStream;
 
-use super::{destructive, no_args, read_only, reversible, tool, to_value, Args, ToolContext, ToolError, ToolResult};
+use super::{
+    destructive, no_args, read_only, reversible, to_value, tool, Args, ToolContext, ToolError,
+    ToolResult,
+};
 
 const MAGIC: &[u8; 6] = b"i3-ipc";
 const RUN_COMMAND: u32 = 0;
@@ -94,7 +97,12 @@ async fn act_on_window(ctx: &ToolContext, arguments: Option<Value>, command: &st
         (_, Some(pattern)) => pick(all, pattern)?,
         _ => unreachable!("checked above"),
     };
-    let reply = ipc(socket, RUN_COMMAND, &format!("[con_id={}] {command}", window.id)).await?;
+    let reply = ipc(
+        socket,
+        RUN_COMMAND,
+        &format!("[con_id={}] {command}", window.id),
+    )
+    .await?;
     let ok = reply
         .as_array()
         .and_then(|r| r.first())
@@ -107,7 +115,9 @@ async fn act_on_window(ctx: &ToolContext, arguments: Option<Value>, command: &st
             .unwrap_or("sway refused the command");
         return Err(ToolError::failed(reason.to_string()));
     }
-    Ok(json!({ "window": to_value(&window), "action": if command == "kill" { "closed" } else { "focused" } }))
+    Ok(
+        json!({ "window": to_value(&window), "action": if command == "kill" { "closed" } else { "focused" } }),
+    )
 }
 
 /// The single window whose title or app contains `pattern`.
@@ -117,12 +127,16 @@ fn pick(windows: Vec<Window>, pattern: &str) -> Result<Window, ToolError> {
         .into_iter()
         .filter(|w| {
             w.title.to_lowercase().contains(&needle)
-                || w.app.as_deref().is_some_and(|a| a.to_lowercase().contains(&needle))
+                || w.app
+                    .as_deref()
+                    .is_some_and(|a| a.to_lowercase().contains(&needle))
         })
         .collect();
     match found.len() {
         1 => Ok(found.remove(0)),
-        0 => Err(ToolError::failed(format!("no open window matches {pattern:?}"))),
+        0 => Err(ToolError::failed(format!(
+            "no open window matches {pattern:?}"
+        ))),
         _ => Err(ToolError::failed(format!(
             "{pattern:?} matches several windows: {}. Use an id from list_windows.",
             found
@@ -135,10 +149,9 @@ fn pick(windows: Vec<Window>, pattern: &str) -> Result<Window, ToolError> {
 }
 
 fn sway_socket(ctx: &ToolContext) -> Result<&Path, ToolError> {
-    ctx.paths
-        .sway_socket
-        .as_deref()
-        .ok_or_else(|| ToolError::failed("window control needs the sway session (SWAYSOCK is not set)"))
+    ctx.paths.sway_socket.as_deref().ok_or_else(|| {
+        ToolError::failed("window control needs the sway session (SWAYSOCK is not set)")
+    })
 }
 
 async fn windows(socket: &Path) -> Result<Vec<Window>, ToolError> {
@@ -166,7 +179,10 @@ fn collect(node: &Value, workspace: Option<&str>, out: &mut Vec<Window>) {
     if is_window {
         let app = node["app_id"]
             .as_str()
-            .or_else(|| node.pointer("/window_properties/class").and_then(Value::as_str))
+            .or_else(|| {
+                node.pointer("/window_properties/class")
+                    .and_then(Value::as_str)
+            })
             .map(str::to_string);
         out.push(Window {
             id: node["id"].as_u64().unwrap_or_default(),
@@ -212,7 +228,8 @@ async fn ipc(socket: &Path, kind: u32, payload: &str) -> Result<Value, ToolError
         .await
         .map_err(|_| ToolError::failed("sway did not respond"))?
         .map_err(|e| ToolError::failed(format!("could not talk to sway: {e}")))?;
-    serde_json::from_slice(&body).map_err(|e| ToolError::failed(format!("bad reply from sway: {e}")))
+    serde_json::from_slice(&body)
+        .map_err(|e| ToolError::failed(format!("bad reply from sway: {e}")))
 }
 
 #[cfg(test)]
@@ -260,7 +277,9 @@ mod tests {
                 let reply = if kind == GET_TREE {
                     tree()
                 } else {
-                    seen.lock().unwrap().push(String::from_utf8(payload).unwrap());
+                    seen.lock()
+                        .unwrap()
+                        .push(String::from_utf8(payload).unwrap());
                     json!([{ "success": true }])
                 };
                 let body = reply.to_string();
@@ -302,7 +321,9 @@ mod tests {
         let listed = list_windows(&ctx, None).await.unwrap();
         assert_eq!(listed["windows"].as_array().unwrap().len(), 3);
 
-        focus_window(&ctx, Some(json!({ "match": "foot" }))).await.unwrap();
+        focus_window(&ctx, Some(json!({ "match": "foot" })))
+            .await
+            .unwrap();
         let closed = close_window(&ctx, Some(json!({ "id": 12 }))).await.unwrap();
         assert_eq!(closed["action"], "closed");
         assert_eq!(
@@ -317,9 +338,13 @@ mod tests {
         let ctx = sway_context(dir.path());
         fake_sway(&dir.path().join("sway.sock")).await;
 
-        let err = focus_window(&ctx, Some(json!({ "match": "o" }))).await.unwrap_err();
+        let err = focus_window(&ctx, Some(json!({ "match": "o" })))
+            .await
+            .unwrap_err();
         assert!(matches!(err, ToolError::Failed(m) if m.contains("several windows")));
-        let err = close_window(&ctx, Some(json!({ "id": 999 }))).await.unwrap_err();
+        let err = close_window(&ctx, Some(json!({ "id": 999 })))
+            .await
+            .unwrap_err();
         assert!(matches!(err, ToolError::Failed(m) if m.contains("no window")));
         let err = close_window(&ctx, Some(json!({}))).await.unwrap_err();
         assert!(matches!(err, ToolError::InvalidParams(_)));

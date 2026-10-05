@@ -11,7 +11,7 @@ use std::time::{Duration, Instant};
 use serde::Serialize;
 use serde_json::{json, Value};
 
-use super::{no_args, read_only, tool, to_value, Args, ToolContext, ToolError, ToolResult};
+use super::{no_args, read_only, to_value, tool, Args, ToolContext, ToolError, ToolResult};
 
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(4);
 const DEFAULT_HOST: &str = "example.com";
@@ -64,8 +64,10 @@ pub fn network_status(ctx: &ToolContext, arguments: Option<Value>) -> ToolResult
             Interface {
                 state: read_trimmed(&dir.join("operstate")).unwrap_or_else(|| "unknown".into()),
                 mac: read_trimmed(&dir.join("address")).filter(|m| m != "00:00:00:00:00:00"),
-                rx_bytes: read_trimmed(&dir.join("statistics/rx_bytes")).and_then(|v| v.parse().ok()),
-                tx_bytes: read_trimmed(&dir.join("statistics/tx_bytes")).and_then(|v| v.parse().ok()),
+                rx_bytes: read_trimmed(&dir.join("statistics/rx_bytes"))
+                    .and_then(|v| v.parse().ok()),
+                tx_bytes: read_trimmed(&dir.join("statistics/tx_bytes"))
+                    .and_then(|v| v.parse().ok()),
                 addresses,
                 name,
             }
@@ -147,7 +149,9 @@ fn validate_host(host: &str) -> Result<(), ToolError> {
     if ok || host.parse::<IpAddr>().is_ok() {
         Ok(())
     } else {
-        Err(ToolError::invalid(format!("{host:?} is not a valid host name")))
+        Err(ToolError::invalid(format!(
+            "{host:?} is not a valid host name"
+        )))
     }
 }
 

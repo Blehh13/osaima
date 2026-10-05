@@ -9,7 +9,7 @@ use std::time::{Duration, Instant, UNIX_EPOCH};
 use serde::Serialize;
 use serde_json::{json, Value};
 
-use super::{read_only, tool, to_value, Args, ToolContext, ToolError, ToolResult};
+use super::{read_only, to_value, tool, Args, ToolContext, ToolError, ToolResult};
 
 const MAX_DEPTH: usize = 8;
 const MAX_VISITED: usize = 100_000;
@@ -53,7 +53,7 @@ pub async fn search_files(ctx: &ToolContext, arguments: Option<Value>) -> ToolRe
 
     tokio::task::spawn_blocking(move || {
         let (mut hits, complete) = walk(&start, &query, include_hidden);
-        hits.sort_by(|a, b| b.modified_unix.cmp(&a.modified_unix));
+        hits.sort_by_key(|h| std::cmp::Reverse(h.modified_unix));
         let total = hits.len();
         hits.truncate(limit);
         Ok(json!({
@@ -80,7 +80,9 @@ fn resolve_folder(home: &Path, folder: Option<&str>) -> Result<PathBuf, ToolErro
     if candidate.starts_with(&home) {
         Ok(candidate)
     } else {
-        Err(ToolError::invalid("folder must be inside the home directory"))
+        Err(ToolError::invalid(
+            "folder must be inside the home directory",
+        ))
     }
 }
 
@@ -92,7 +94,9 @@ fn walk(start: &Path, query: &str, include_hidden: bool) -> (Vec<Hit>, bool) {
     let mut hits = Vec::new();
     let mut visited = 0usize;
     while let Some((dir, depth)) = queue.pop_front() {
-        let Ok(entries) = fs::read_dir(&dir) else { continue };
+        let Ok(entries) = fs::read_dir(&dir) else {
+            continue;
+        };
         for entry in entries.filter_map(Result::ok) {
             visited += 1;
             if visited > MAX_VISITED || started.elapsed() > TIME_BUDGET {
@@ -102,7 +106,9 @@ fn walk(start: &Path, query: &str, include_hidden: bool) -> (Vec<Hit>, bool) {
             if !include_hidden && name.starts_with('.') {
                 continue;
             }
-            let Ok(file_type) = entry.file_type() else { continue };
+            let Ok(file_type) = entry.file_type() else {
+                continue;
+            };
             let path = entry.path();
             if name.to_lowercase().contains(query) {
                 let meta = entry.metadata().ok();
@@ -144,7 +150,9 @@ mod tests {
     #[tokio::test]
     async fn finds_case_insensitively_and_skips_hidden() {
         let (_dir, ctx) = setup();
-        let res = search_files(&ctx, Some(json!({ "query": "REPORT" }))).await.unwrap();
+        let res = search_files(&ctx, Some(json!({ "query": "REPORT" })))
+            .await
+            .unwrap();
         let paths: Vec<&str> = res["results"]
             .as_array()
             .unwrap()
@@ -156,18 +164,24 @@ mod tests {
         assert!(paths.iter().all(|p| !p.contains(".config")));
         assert_eq!(res["search_complete"], true);
 
-        let res = search_files(&ctx, Some(json!({ "query": "report", "include_hidden": true })))
-            .await
-            .unwrap();
+        let res = search_files(
+            &ctx,
+            Some(json!({ "query": "report", "include_hidden": true })),
+        )
+        .await
+        .unwrap();
         assert_eq!(res["total_matches"], 3);
     }
 
     #[tokio::test]
     async fn stays_inside_home() {
         let (_dir, ctx) = setup();
-        let res = search_files(&ctx, Some(json!({ "query": "notes", "folder": "Documents" })))
-            .await
-            .unwrap();
+        let res = search_files(
+            &ctx,
+            Some(json!({ "query": "notes", "folder": "Documents" })),
+        )
+        .await
+        .unwrap();
         assert_eq!(res["total_matches"], 1);
         for escape in ["..", "../..", "/etc"] {
             let err = search_files(&ctx, Some(json!({ "query": "x", "folder": escape })))

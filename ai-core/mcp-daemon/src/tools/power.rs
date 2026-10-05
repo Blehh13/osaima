@@ -34,7 +34,10 @@ pub async fn power_action(arguments: Option<Value>) -> ToolResult {
     if out.success {
         Ok(json!({ "action": action, "done": true }))
     } else {
-        Err(ToolError::failed(format!("{action} failed: {}", out.stderr)))
+        Err(ToolError::failed(format!(
+            "{action} failed: {}",
+            out.stderr
+        )))
     }
 }
 

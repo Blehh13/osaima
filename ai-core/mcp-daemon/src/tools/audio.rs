@@ -50,7 +50,9 @@ pub async fn set_volume(arguments: Option<Value>) -> ToolResult {
     let change = args.i64("change")?;
     let muted = args.bool("muted")?;
     if percent.is_some() && change.is_some() {
-        return Err(ToolError::invalid("give either percent or change, not both"));
+        return Err(ToolError::invalid(
+            "give either percent or change, not both",
+        ));
     }
     if percent.is_none() && change.is_none() && muted.is_none() {
         return Err(ToolError::invalid("give percent, change or muted"));
@@ -132,7 +134,10 @@ mod tests {
             json!({ "muted": "yes" }),
         ] {
             assert!(
-                matches!(set_volume(Some(bad.clone())).await, Err(ToolError::InvalidParams(_))),
+                matches!(
+                    set_volume(Some(bad.clone())).await,
+                    Err(ToolError::InvalidParams(_))
+                ),
                 "{bad}"
             );
         }
