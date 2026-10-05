@@ -125,3 +125,46 @@ jobs:
       - name: Unit tests
         if: success() || failure()
         run: npm test
+
+  agent:
+    name: AI agent (Python)
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ai-core/agent
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: ai-core/agent/pyproject.toml
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ai-core/mcp-daemon
+      - name: Build the AI Core for integration tests
+        working-directory: ai-core/mcp-daemon
+        run: cargo build --locked
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Test
+        env:
+          OSAIMA_DAEMON_BIN: ${{ github.workspace }}/ai-core/mcp-daemon/target/debug/mcp-daemon
+        run: pytest -q
+      - name: Type check
+        if: success() || failure()
+        run: mypy
+      - name: Lint and format
+        if: success() || failure()
+        run: |
+          ruff check . && ruff format --check . || {
+            ruff check --fix . ; ruff format . ; git diff > "$RUNNER_TEMP/ruff.patch"; exit 1;
+          }
+      - name: Upload ruff fix
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ruff-patch-agent
+          path: ${{ runner.temp }}/ruff.patch
+          if-no-files-found: ignore
