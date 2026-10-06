@@ -1355,3 +1355,107 @@ body.demo-mode::after {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* ── AI Assistant: header, tool cards, approvals ─────────────────────────── */
+.app-assistant [hidden] { display: none !important; }
+.as-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--glass-border);
+  font-size: 11px;
+}
+.as-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); flex: none; }
+.as-dot[data-state="ok"] { background: var(--status-online); box-shadow: 0 0 6px var(--status-online); }
+.as-dot[data-state="warn"] { background: #f2b864; }
+.as-dot[data-state="off"] { background: var(--status-offline); }
+.as-status { flex: 1; min-width: 0; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.as-model, .as-new {
+  font: inherit;
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  background: var(--glass-highlight);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+.as-model:hover, .as-new:hover { color: var(--text-primary); border-color: rgba(120,180,255,0.3); }
+.as-model:focus-visible, .as-new:focus-visible, .as-chip:focus-visible, .as-send:focus-visible,
+.as-approve:focus-visible, .as-deny:focus-visible, .as-tool-head:focus-visible {
+  outline: 2px solid var(--accent-azure);
+  outline-offset: 1px;
+}
+.as-model option { background: #0a1424; color: #dce8ff; }
+
+.as-error { align-self: flex-start; color: #ff9a92; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); }
+.as-notice { align-self: center; color: var(--text-muted); font-size: 11px; padding: 2px 8px; background: none; border: 0; }
+.as-meta { align-self: flex-start; margin-top: -4px; padding-left: 4px; font: 10px var(--font-mono); color: var(--text-muted); }
+.as-meta[data-cloud="1"] { color: #f2b864; }
+.as-send[data-running="1"] { background: rgba(239,68,68,0.16); border-color: rgba(239,68,68,0.4); color: #ff9a92; }
+.as-input:disabled { opacity: 0.6; }
+
+.as-tool {
+  align-self: stretch;
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  background: rgba(4, 10, 22, 0.55);
+  font-size: 11.5px;
+  overflow: hidden;
+}
+.as-tool[data-result="ok"] { border-color: rgba(34,211,160,0.3); }
+.as-tool[data-result="failed"] { border-color: rgba(239,68,68,0.35); }
+.as-tool-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  font: inherit;
+  color: var(--text-secondary);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+}
+.as-tool-icon { flex: none; color: var(--accent-cyan); }
+.as-tool-title { flex: none; color: var(--text-primary); }
+.as-tool-args { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 10.5px var(--font-mono); color: var(--text-muted); }
+.as-tool-state { flex: none; font: 10.5px var(--font-mono); color: var(--text-muted); }
+.as-tool[data-result="ok"] .as-tool-state { color: var(--status-online); }
+.as-tool[data-result="failed"] .as-tool-state { color: #ff9a92; }
+.as-tool-output {
+  margin: 0;
+  padding: 8px 10px;
+  max-height: 160px;
+  overflow: auto;
+  font: 10.5px/1.5 var(--font-mono);
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  word-break: break-word;
+  border-top: 1px solid var(--glass-border);
+}
+.as-approval { padding: 8px 10px 10px; border-top: 1px solid var(--glass-border); }
+.as-approval[data-risk="high"] { background: rgba(239,68,68,0.08); }
+.as-approval[data-risk="done"] { color: var(--text-muted); }
+.as-approval-text { font-size: 11.5px; color: var(--text-primary); }
+.as-approval[data-risk="done"] .as-approval-text { color: var(--text-muted); }
+.as-approval-buttons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+.as-approve, .as-deny {
+  font: inherit;
+  font-size: 11px;
+  padding: 5px 14px;
+  border-radius: 7px;
+  cursor: pointer;
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  background: var(--glass-highlight);
+}
+.as-approve { color: var(--accent-azure); border-color: rgba(120,180,255,0.4); background: rgba(120,180,255,0.14); }
+.as-approval[data-risk="high"] .as-approve { color: #ff9a92; border-color: rgba(239,68,68,0.45); background: rgba(239,68,68,0.14); }
+.as-approve:hover, .as-deny:hover { filter: brightness(1.25); }
+
+@media (prefers-reduced-motion: reduce) {
+  .as-thinking { animation: none; }
+}

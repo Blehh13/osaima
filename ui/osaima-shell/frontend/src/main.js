@@ -14,6 +14,9 @@ import { initWindowManager } from './wm/boot.js';
 import { AgentCore } from './wm/agent-core.js';
 import { RagEngine, SEED_KNOWLEDGE } from './wm/rag.js';
 import { BehaviorStore } from './wm/behavior.js';
+import { tauriTransport } from './wm/agent-client.js';
+import { demoTransport } from './wm/agent-demo.js';
+import { askAssistant } from './wm/assistant.js';
 
 // ── Backend IPC ───────────────────────────────────────────────────────────
 // Inside Tauri (`withGlobalTauri`), calls go to the Rust host and the AI Core.
@@ -117,11 +120,14 @@ async function handleQuery(query) {
   const contentEl  = document.getElementById('response-content');
 
   responseEl.classList.remove('hidden');
-  contentEl.textContent = '⠋ Processing…';
 
-  await new Promise(r => setTimeout(r, 350)); // small thinking delay for UX
-
+  // Short commands ("open terminal") are shortcuts; anything longer is a request
+  // for the assistant, which can look into the system and act on it.
   const lower = query.toLowerCase();
+  if (query.trim().split(/\s+/).length > 3) return sendToAssistant(query, contentEl);
+
+  contentEl.textContent = '⠋ Processing…';
+  await new Promise(r => setTimeout(r, 200)); // brief pause so the change is visible
 
   if (lower.includes('stat') || lower.includes('system') || lower.includes('cpu') || lower.includes('mem')) {
     try {
@@ -157,13 +163,20 @@ MEMORY  : ${memPct}% used (${formatBytes(stats.memory.used_bytes)} / ${formatByt
     spawnFromLauncher('monitor', contentEl, 'System Monitor');
   } else if (lower.includes('about') || lower.includes('keybind') || lower.includes('help')) {
     spawnFromLauncher('about', contentEl, 'About / keybindings');
-  } else if (lower.includes('brightness')) {
-    contentEl.textContent = '→ Display brightness control:\n(Direct hardware control via udev — planned for Phase 4)';
-  } else if (lower.includes('network') || lower.includes('diagnostic')) {
-    contentEl.textContent = '→ Network diagnostics:\n(NetworkManager IPC integration — planned for Phase 4)';
   } else {
-    contentEl.textContent = `→ "${query}"\n\nAI routing is active. Full LLM integration via\nagentic-services and MCP planned in Phase 4.`;
+    sendToAssistant(query, contentEl);
   }
+}
+
+// Hand a request to the AI Assistant window and get the launcher out of the way.
+function sendToAssistant(query, contentEl) {
+  if (!WM) {
+    contentEl.textContent = 'The desktop is still starting…';
+    return;
+  }
+  contentEl.textContent = '→ Asking the assistant…';
+  askAssistant(WM, query);
+  setTimeout(closeLauncher, 200);
 }
 
 function runSuggestion(btn) {
@@ -456,6 +469,7 @@ rag.buildIndex();
   const { engine, reload } = await initWindowManager({
     surface,
     invoke: tauriInvoke,
+    agentTransport: window.__TAURI__ ? tauriTransport(window.__TAURI__) : demoTransport(),
     rag,
     behavior,
     hooks: {
