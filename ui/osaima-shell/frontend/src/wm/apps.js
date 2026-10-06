@@ -10,13 +10,15 @@
  * varied windows to tile, float, and move across workspaces during a demo.
  */
 
+import { makeAssistant } from './assistant.js';
+
 /**
  * @param {import('./window-manager.js').WindowManager} engine
  * @param {object} services  { invoke, getConfigSource, setConfigSource, reloadConfig }
  */
 export function registerApps(engine, services) {
   engine.registerApp(makeTerminal(services));
-  engine.registerApp(makeBrowser());
+  engine.registerApp(makeBrowser(services));
   engine.registerApp(makeMonitor(services));
   engine.registerApp(makeFiles(services));
   engine.registerApp(makeConfigEditor(engine, services));
@@ -160,16 +162,9 @@ function makeTerminal(services) {
 // ── Web Browser ───────────────────────────────────────────────────────────────
 // A real web browser inside the shell: address bar + iframe view + a start page
 // with bookmarks. It's a WebKit webview, so this is genuine web browsing.
-function makeBrowser() {
+function makeBrowser(services) {
   const HOME = 'about:home';
-  const BOOKMARKS = [
-    { name: 'Wikipedia', url: 'https://en.wikipedia.org/wiki/Linux' },
-    { name: 'Gentoo', url: 'https://www.gentoo.org' },
-    { name: 'OSAIMA · GitHub', url: 'https://github.com/Blehh13/osaima' },
-    { name: 'MDN Web Docs', url: 'https://developer.mozilla.org' },
-    { name: 'Hacker News', url: 'https://news.ycombinator.com' },
-    { name: 'archive.org', url: 'https://archive.org' },
-  ];
+  // Bookmarks and the search engine come from the Lua config (wm.shell{...}).
   return {
     id: 'browser',
     title: 'Browser',
@@ -208,7 +203,7 @@ function makeBrowser() {
           <div class="br-tiles"></div>
           <div class="br-note">Tip: some large sites (Google, YouTube) refuse to be embedded — that's their own security policy, not a shell bug. The bookmarks above load fine, and any address you type works.</div>`;
         const tiles = startPage.querySelector('.br-tiles');
-        for (const b of BOOKMARKS) {
+        for (const b of services.settings().bookmarks) {
           const t = el('button', 'br-tile', b.name);
           t.addEventListener('click', () => navigate(b.url));
           tiles.append(t);
@@ -224,7 +219,7 @@ function makeBrowser() {
         if (s === HOME) return HOME;
         if (/^https?:\/\//i.test(s)) return s;
         if (/^[\w-]+(\.[\w-]+)+(\/.*)?$/.test(s)) return 'https://' + s;
-        return 'https://en.wikipedia.org/w/index.php?search=' + encodeURIComponent(s);
+        return services.settings().searchUrl.replace('%s', encodeURIComponent(s));
       };
 
       const navigate = (raw) => {
@@ -322,7 +317,7 @@ function makeMonitor(services) {
       };
 
       tick();
-      const timer = setInterval(tick, 1500);
+      const timer = setInterval(tick, services.settings().monitorPollMs);
       ctx.win._monitorTimer = timer;
     },
     unmount(win) { if (win._monitorTimer) clearInterval(win._monitorTimer); },
@@ -462,168 +457,6 @@ function makeAbout(engine) {
   };
 }
 
-// ── AI Assistant (agentic) ───────────────────────────────────────────────────
-// A natural-language agent that actually drives the window manager: it parses
-// intent and calls the WM engine, then reports back — the core "agentic OS" idea.
-function makeAssistant(engine, services) {
-  return {
-    id: 'assistant',
-    title: 'AI Assistant',
-    icon: '✦',
-    width: 460, height: 480,
-    floating: true,
-    mount(root, ctx) {
-      root.classList.add('app-assistant');
-      const log = el('div', 'as-log');
-      const inputWrap = el('div', 'as-inputwrap');
-      const input = document.createElement('input');
-      input.className = 'as-input';
-      input.placeholder = 'Ask me to do something…';
-      input.spellcheck = false;
-      const send = el('button', 'as-send', '➤');
-      inputWrap.append(input, send);
-
-      const chips = el('div', 'as-chips');
-      ['Tile the windows', 'Open a terminal', 'How is the system?', 'Go to workspace 2', 'Use spiral layout']
-        .forEach((s) => {
-          const c = el('button', 'as-chip', s);
-          c.addEventListener('click', () => { input.value = s; submit(); });
-          chips.append(c);
-        });
-
-      root.append(log, chips, inputWrap);
-
-      const add = (text, who) => {
-        const row = el('div', 'as-msg as-' + who);
-        row.textContent = text;
-        log.append(row);
-        log.scrollTop = log.scrollHeight;
-        return row;
-      };
-      const thinking = () => {
-        const row = el('div', 'as-msg as-agent as-thinking', '• • •');
-        log.append(row);
-        log.scrollTop = log.scrollHeight;
-        return row;
-      };
-
-      add("Hi — I'm your OS agent. I can arrange windows, switch workspaces, "
-        + "launch apps and report on the system. Try the chips below.", 'agent');
-
-      async function respond(query) {
-        const q = query.toLowerCase().trim();
-        const w = ctx.wm;
-        if (services.behavior) services.behavior.recordAssistantQuery(query);
-
-        // ── intent: system status ──
-        if (/(how|status|health|stat|cpu|memory|ram).*(system|doing|is it|are you)|^(stats?|status)$|how (is|are)/.test(q)
-            || q.includes('how is the system') || q === 'stats') {
-          try {
-            const s = await services.invoke('get_system_stats');
-            const memPct = ((s.memory.used_bytes / s.memory.total_bytes) * 100).toFixed(0);
-            return `System looks healthy. CPU is at ${s.cpu.usage_percent.toFixed(0)}% across `
-              + `${s.cpu.cores} cores, memory ${memPct}% used, running ${s.kernel}.`;
-          } catch { return 'I could not reach the MCP daemon for stats right now.'; }
-        }
-
-        // ── intent: layout ──
-        for (const lay of ['tile', 'monocle', 'grid', 'spiral', 'float']) {
-          if (q.includes(lay)) {
-            w.setLayout(lay);
-            w.notify('Layout → ' + lay, 'ok');
-            return `Done — switched to the ${lay} layout.`;
-          }
-        }
-        if (q.includes('arrange') || q.includes('organi') || q.includes('clean up')) {
-          w.setLayout('tile');
-          return 'Arranged everything into a tidy tiling layout.';
-        }
-
-        // ── intent: workspace ──
-        const wsMatch = q.match(/workspace\s*(\d+)|desktop\s*(\d+)|go to\s*(\d+)/);
-        if (wsMatch) {
-          const n = parseInt(wsMatch[1] || wsMatch[2] || wsMatch[3], 10);
-          w.switchWorkspace(n - 1);
-          return `Switched to workspace ${n} (${w.workspaces[n - 1] ? w.workspaces[n - 1].name : n}).`;
-        }
-
-        // ── intent: launch app ──
-        const appAliases = {
-          browser: ['browser', 'web', 'internet', 'chrome', 'website'],
-          terminal: ['terminal', 'shell', 'console', 'command'],
-          files: ['files', 'file', 'explorer', 'folder'],
-          monitor: ['monitor', 'system monitor', 'usage', 'graph'],
-          taskmanager: ['task', 'process', 'task manager', 'processes'],
-          config: ['config', 'settings', 'wm.lua', 'lua'],
-          about: ['about', 'keybind', 'shortcut', 'help window'],
-        };
-        if (q.includes('open') || q.includes('launch') || q.includes('start') || q.includes('run')) {
-          for (const [id, words] of Object.entries(appAliases)) {
-            if (words.some((word) => q.includes(word))) {
-              w.spawn(id);
-              w.notify('Launched ' + id, 'ok');
-              return `Opened ${id} for you.`;
-            }
-          }
-          return "I can open: terminal, files, monitor, task manager, config, or about. Which one?";
-        }
-
-        // ── intent: close ──
-        if (q.includes('close') || q.includes('quit')) {
-          if (w.focusedId) { w.closeFocused(); return 'Closed the focused window.'; }
-          return 'There is no focused window to close.';
-        }
-
-        // ── intent: gaps ──
-        const gapMatch = q.match(/gap[s]?\s*(?:to|of)?\s*(\d+)/);
-        if (gapMatch) {
-          w.config.gaps = parseInt(gapMatch[1], 10);
-          w.layout();
-          return `Set window gaps to ${gapMatch[1]}px.`;
-        }
-
-        // ── intent: help ──
-        if (q.includes('help') || q.includes('what can you') || q === '?') {
-          return 'I understand things like: "tile the windows", "use spiral layout", '
-            + '"open the terminal", "go to workspace 3", "how is the system?", "set gaps to 20", "close this".';
-        }
-
-        if (q.includes('thank')) return "Anytime. ✦";
-        if (/^(hi|hello|hey|yo)\b/.test(q)) return 'Hello! What would you like me to do?';
-
-        // ── RAG fallback: answer knowledge questions from the indexed corpus ──
-        if (services.rag) {
-          const res = services.rag.answer(query);
-          if (res.sources.length > 0) {
-            const cite = res.sources.map((s) => s.title).filter((v, i, a) => a.indexOf(v) === i);
-            return `${res.answer}\n\n— retrieved from: ${cite.join(', ')}`;
-          }
-        }
-
-        return "I'm not sure how to do that yet — try 'help', or ask a question and "
-          + "I'll search my knowledge base. (Rule-based + RAG for the demo; a local LLM plugs in here next.)";
-      }
-
-      async function submit() {
-        const v = input.value.trim();
-        if (!v) return;
-        input.value = '';
-        add(v, 'user');
-        const t = thinking();
-        await new Promise((r) => setTimeout(r, 380));
-        const reply = await respond(v);
-        t.remove();
-        add(reply, 'agent');
-      }
-
-      send.addEventListener('click', submit);
-      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
-      root.addEventListener('mousedown', () => setTimeout(() => input.focus(), 0));
-      setTimeout(() => input.focus(), 30);
-    },
-  };
-}
-
 // ── Task Manager (ML-prioritized processes) ──────────────────────────────────
 // Nods to the kernel's ML-based scheduling vision: each process shows an
 // ML-assigned priority the "scheduler" adjusts over time.
@@ -715,7 +548,7 @@ function makeTaskManager(services) {
       });
 
       load();
-      const timer = setInterval(load, 2000);
+      const timer = setInterval(load, services.settings().taskPollMs);
       ctx.win._tkTimer = timer;
     },
     unmount(win) { if (win._tkTimer) clearInterval(win._tkTimer); },

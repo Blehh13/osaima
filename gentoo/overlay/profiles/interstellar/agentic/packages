@@ -1,4 +1,5 @@
 # The agentic flavor pulls the full Interstellar experience into @system.
 *app-misc/interstellar-release
 *sys-apps/osaima-ai-core
+*sys-apps/osaima-agent
 *gui-apps/osaima-shell

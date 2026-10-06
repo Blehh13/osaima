@@ -1,9 +1,15 @@
+mod agent;
 mod host;
 mod mcp;
+mod settings;
 
 use std::path::PathBuf;
+use std::sync::Arc;
 
 use serde_json::{json, Value};
+use tauri::{Emitter, Manager, State};
+
+use agent::AgentBridge;
 
 /// Live system statistics from the AI Core.
 #[tauri::command]
@@ -42,7 +48,14 @@ async fn list_disks() -> Result<Value, String> {
 #[tauri::command]
 async fn run_command(cmd: String, cwd: Option<String>) -> Result<host::CommandOutput, String> {
     let cwd = cwd.filter(|c| !c.is_empty()).map(PathBuf::from);
-    host::run_command(&cmd, cwd.as_deref(), host::COMMAND_TIMEOUT).await
+    let limits = settings::get();
+    host::run_command(
+        &cmd,
+        cwd.as_deref(),
+        limits.command_timeout,
+        limits.command_output_limit,
+    )
+    .await
 }
 
 /// List a directory for the Files app.
@@ -52,6 +65,22 @@ async fn read_dir(path: Option<String>) -> Result<Value, String> {
     host::read_dir(path.as_deref())
 }
 
+/// Talk to the assistant service. Only `agent.*` methods are allowed through.
+/// Progress arrives separately as `agent-event` events.
+#[tauri::command]
+async fn agent_call(
+    bridge: State<'_, AgentBridge>,
+    method: String,
+    params: Option<Value>,
+) -> Result<Value, String> {
+    if !method.starts_with("agent.") {
+        return Err(format!("{method} is not an assistant method"));
+    }
+    bridge
+        .call(&method, params.unwrap_or_else(|| json!({})))
+        .await
+}
+
 /// The user's home directory, so apps can start there.
 #[tauri::command]
 fn home_dir() -> String {
@@ -59,13 +88,33 @@ fn home_dir() -> String {
 }
 
 fn main() {
+    let settings = match settings::init() {
+        Ok(settings) => settings,
+        Err(err) => {
+            eprintln!("osaima-shell: invalid setting {err}");
+            std::process::exit(2);
+        }
+    };
     tauri::Builder::default()
+        .setup(|app| {
+            let handle = app.handle().clone();
+            let sink: agent::EventSink = Arc::new(move |event| {
+                let _ = handle.emit("agent-event", event);
+            });
+            app.manage(AgentBridge::new(
+                agent::socket_path(),
+                settings.agent_timeout,
+                sink,
+            ));
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             get_system_stats,
             ping_daemon,
             list_processes,
             kill_process,
             list_disks,
+            agent_call,
             run_command,
             read_dir,
             home_dir,

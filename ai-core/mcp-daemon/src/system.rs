@@ -14,9 +14,6 @@ use sysinfo::{
     CpuRefreshKind, Disks, MemoryRefreshKind, ProcessRefreshKind, RefreshKind, System, UpdateKind,
 };
 
-/// How often the background sampler refreshes CPU, memory and process data.
-pub const SAMPLE_INTERVAL: Duration = Duration::from_secs(2);
-
 #[derive(Debug, Clone, Serialize)]
 pub struct SystemStats {
     pub os: String,

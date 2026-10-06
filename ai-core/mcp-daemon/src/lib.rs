@@ -8,6 +8,7 @@
 pub mod paths;
 pub mod protocol;
 pub mod server;
+pub mod settings;
 pub mod system;
 pub mod tools;
 pub mod transport;

@@ -3,33 +3,34 @@
 use std::env;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::Duration;
 
 use serde_json::{json, Value};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::UnixStream;
 
-const REQUEST_TIMEOUT: Duration = Duration::from_secs(3);
-
 static NEXT_ID: AtomicU64 = AtomicU64::new(1);
 
-/// Same lookup order as the daemon: `$OSAIMA_MCP_SOCKET`, then
-/// `$XDG_RUNTIME_DIR/osaima/mcp.sock`, then `/tmp/osaima-<uid>/mcp.sock`.
+/// Directory holding OSAIMA's sockets: `$XDG_RUNTIME_DIR/osaima`, else `/tmp/osaima-<uid>`.
+pub fn runtime_dir() -> PathBuf {
+    if let Some(dir) = env::var_os("XDG_RUNTIME_DIR").filter(|p| !p.is_empty()) {
+        return PathBuf::from(dir).join("osaima");
+    }
+    // SAFETY: geteuid has no preconditions and cannot fail.
+    let uid = unsafe { libc::geteuid() };
+    PathBuf::from(format!("/tmp/osaima-{uid}"))
+}
+
+/// Same lookup order as the daemon: `$OSAIMA_MCP_SOCKET`, else `mcp.sock` in [`runtime_dir`].
 pub fn socket_path() -> PathBuf {
     if let Some(path) = env::var_os("OSAIMA_MCP_SOCKET").filter(|p| !p.is_empty()) {
         return PathBuf::from(path);
     }
-    if let Some(dir) = env::var_os("XDG_RUNTIME_DIR").filter(|p| !p.is_empty()) {
-        return PathBuf::from(dir).join("osaima").join("mcp.sock");
-    }
-    // SAFETY: geteuid has no preconditions and cannot fail.
-    let uid = unsafe { libc::geteuid() };
-    PathBuf::from(format!("/tmp/osaima-{uid}")).join("mcp.sock")
+    runtime_dir().join("mcp.sock")
 }
 
 /// Send one JSON-RPC request and return its `result`.
 pub async fn request(method: &str, params: Value) -> Result<Value, String> {
-    tokio::time::timeout(REQUEST_TIMEOUT, send(method, params))
+    tokio::time::timeout(crate::settings::get().core_timeout, send(method, params))
         .await
         .map_err(|_| "AI Core did not respond in time".to_string())?
 }

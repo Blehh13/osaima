@@ -2,7 +2,7 @@
 name = "osaima-shell"
 version = "0.2.0"
 edition = "2021"
-rust-version = "1.77"
+rust-version = "1.82"
 description = "OSAIMA agentic desktop shell (Tauri host)"
 license = "GPL-3.0-or-later"
 repository = "https://github.com/Blehh13/osaima"
@@ -15,7 +15,7 @@ libc = "0.2"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tauri = { version = "2", features = [] }
-tokio = { version = "1.35", features = ["io-util", "net", "process", "time"] }
+tokio = { version = "1.35", features = ["io-util", "net", "process", "rt", "sync", "time"] }
 
 [dev-dependencies]
 tempfile = "3"

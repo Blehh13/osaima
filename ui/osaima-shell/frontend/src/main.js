@@ -14,6 +14,13 @@ import { initWindowManager } from './wm/boot.js';
 import { AgentCore } from './wm/agent-core.js';
 import { RagEngine, SEED_KNOWLEDGE } from './wm/rag.js';
 import { BehaviorStore } from './wm/behavior.js';
+import { tauriTransport } from './wm/agent-client.js';
+import { demoTransport } from './wm/agent-demo.js';
+import { askAssistant } from './wm/assistant.js';
+import { DEFAULTS as DEFAULT_SHELL_SETTINGS } from './wm/shell-settings.js';
+
+// Tunable values come from the Lua config (wm.shell{...}); see wm/shell-settings.js.
+let shellSettings = DEFAULT_SHELL_SETTINGS;
 
 // ── Backend IPC ───────────────────────────────────────────────────────────
 // Inside Tauri (`withGlobalTauri`), calls go to the Rust host and the AI Core.
@@ -31,7 +38,7 @@ function resizeCanvas() {
   canvas.height = window.innerHeight;
 }
 
-function initStars(count = 320) {
+function initStars(count = shellSettings.starCount) {
   stars = Array.from({ length: count }, () => ({
     x: Math.random() * canvas.width,
     y: Math.random() * canvas.height,
@@ -75,7 +82,6 @@ function updateClock() {
   });
 }
 updateClock();
-setInterval(updateClock, 1000);
 
 // ── 3. Launcher (AI Command Hub) ──────────────────────────────────────────
 const launcher = document.getElementById('launcher');
@@ -117,11 +123,14 @@ async function handleQuery(query) {
   const contentEl  = document.getElementById('response-content');
 
   responseEl.classList.remove('hidden');
-  contentEl.textContent = '⠋ Processing…';
 
-  await new Promise(r => setTimeout(r, 350)); // small thinking delay for UX
-
+  // Short commands ("open terminal") are shortcuts; anything longer is a request
+  // for the assistant, which can look into the system and act on it.
   const lower = query.toLowerCase();
+  if (query.trim().split(/\s+/).length > 3) return sendToAssistant(query, contentEl);
+
+  contentEl.textContent = '⠋ Processing…';
+  await new Promise(r => setTimeout(r, 200)); // brief pause so the change is visible
 
   if (lower.includes('stat') || lower.includes('system') || lower.includes('cpu') || lower.includes('mem')) {
     try {
@@ -157,13 +166,20 @@ MEMORY  : ${memPct}% used (${formatBytes(stats.memory.used_bytes)} / ${formatByt
     spawnFromLauncher('monitor', contentEl, 'System Monitor');
   } else if (lower.includes('about') || lower.includes('keybind') || lower.includes('help')) {
     spawnFromLauncher('about', contentEl, 'About / keybindings');
-  } else if (lower.includes('brightness')) {
-    contentEl.textContent = '→ Display brightness control:\n(Direct hardware control via udev — planned for Phase 4)';
-  } else if (lower.includes('network') || lower.includes('diagnostic')) {
-    contentEl.textContent = '→ Network diagnostics:\n(NetworkManager IPC integration — planned for Phase 4)';
   } else {
-    contentEl.textContent = `→ "${query}"\n\nAI routing is active. Full LLM integration via\nagentic-services and MCP planned in Phase 4.`;
+    sendToAssistant(query, contentEl);
   }
+}
+
+// Hand a request to the AI Assistant window and get the launcher out of the way.
+function sendToAssistant(query, contentEl) {
+  if (!WM) {
+    contentEl.textContent = 'The desktop is still starting…';
+    return;
+  }
+  contentEl.textContent = '→ Asking the assistant…';
+  askAssistant(WM, query);
+  setTimeout(closeLauncher, 200);
 }
 
 function runSuggestion(btn) {
@@ -172,9 +188,18 @@ function runSuggestion(btn) {
 }
 document.getElementById('launcher-backdrop').addEventListener('click', closeLauncher);
 document.getElementById('launcher-close').addEventListener('click', closeLauncher);
-for (const chip of document.querySelectorAll('.suggestion-chip')) {
-  chip.addEventListener('click', () => runSuggestion(chip));
+function renderLauncherChips() {
+  const grid = document.querySelector('.suggestions-grid');
+  grid.replaceChildren();
+  for (const text of shellSettings.launcherSuggestions) {
+    const chip = document.createElement('button');
+    chip.className = 'suggestion-chip';
+    chip.textContent = text;
+    chip.addEventListener('click', () => runSuggestion(chip));
+    grid.appendChild(chip);
+  }
 }
+renderLauncherChips();
 
 // ── 5. MCP System Stats Polling ───────────────────────────────────────────
 async function pollStats() {
@@ -221,9 +246,29 @@ async function pollStats() {
   }
 }
 
-// Poll immediately, then every 3 seconds
+// Poll immediately, then on the configured interval. The clock tickers list
+// lets other widgets (the control center clock) share the clock timer.
 pollStats();
-setInterval(pollStats, 3000);
+const clockTickers = [updateClock];
+const timers = { clock: null, stats: null };
+
+function scheduleTimers(settings) {
+  clearInterval(timers.clock);
+  clearInterval(timers.stats);
+  timers.clock = setInterval(() => clockTickers.forEach((tick) => tick()), settings.clockMs);
+  timers.stats = setInterval(pollStats, settings.statsPollMs);
+}
+scheduleTimers(shellSettings);
+
+/** Apply settings from the Lua config, at startup and whenever it is reloaded. */
+function applyShellSettings(settings) {
+  shellSettings = settings;
+  scheduleTimers(settings);
+  initStars(settings.starCount);
+  renderLauncherChips();
+  if (WM) renderDockApps();
+  window.AGENT?.configure(settings);
+}
 
 // ── 5b. Control Center (quick settings flyout) ────────────────────────────
 const controlToggle = document.getElementById('control-toggle');
@@ -285,7 +330,7 @@ if (controlToggle) {
   // Clock in the footer.
   const cc2 = document.getElementById('cc-clock2');
   const tickCC = () => { cc2.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); };
-  tickCC(); setInterval(tickCC, 1000);
+  tickCC(); clockTickers.push(tickCC);
 }
 
 // ── Utility ───────────────────────────────────────────────────────────────
@@ -341,19 +386,6 @@ const dockWorkspaces = document.getElementById('dock-workspaces');
 const dockLayout = document.getElementById('dock-layout');
 const ambientCenter = document.getElementById('ambient-center');
 
-const APP_LAUNCHERS = [
-  { id: 'assistant', icon: '✦', label: 'AI Assistant' },
-  { id: 'browser', icon: '🌐', label: 'Browser' },
-  { id: 'terminal', icon: '❯', label: 'Terminal' },
-  { id: 'files', icon: '🗂', label: 'Files' },
-  { id: 'monitor', icon: '📊', label: 'Monitor' },
-  { id: 'taskmanager', icon: '⚡', label: 'Task Manager' },
-  { id: 'knowledge', icon: '📚', label: 'Knowledge (RAG)' },
-  { id: 'behavior', icon: '🧠', label: 'Behavior Profile' },
-  { id: 'config', icon: '⚙', label: 'wm.lua' },
-  { id: 'about', icon: '✧', label: 'About' },
-];
-
 // ── Desktop notifications ─────────────────────────────────────────────────
 const notificationsEl = document.getElementById('notifications');
 // opts: { actionLabel, onAction, timeout }
@@ -382,17 +414,24 @@ function pushNotification(message, kind = 'info', opts = {}) {
 
   notificationsEl.appendChild(toast);
   requestAnimationFrame(() => toast.classList.add('show'));
-  setTimeout(dismiss, opts.timeout || (opts.actionLabel ? 7000 : 3200));
+  setTimeout(dismiss, opts.timeout || (opts.actionLabel ? shellSettings.notifyActionMs : shellSettings.notifyMs));
 }
 
+// The dock shows the apps named in `dock_apps`, with icon and title taken from the
+// app registry (so there is one list of apps). Unknown names are skipped.
 function renderDockApps() {
-  dockApps.innerHTML = '';
-  for (const app of APP_LAUNCHERS) {
+  dockApps.replaceChildren();
+  for (const id of shellSettings.dockApps) {
+    const app = WM && WM.appRegistry.get(id);
+    if (!app) continue;
     const btn = document.createElement('button');
     btn.className = 'dock-app';
-    btn.title = app.label;
-    btn.innerHTML = `<span class="dock-app-icon">${app.icon}</span>`;
-    btn.addEventListener('click', () => WM && WM.spawn(app.id));
+    btn.title = app.title;
+    const icon = document.createElement('span');
+    icon.className = 'dock-app-icon';
+    icon.textContent = app.icon;
+    btn.append(icon);
+    btn.addEventListener('click', () => WM.spawn(id));
     dockApps.appendChild(btn);
   }
 }
@@ -456,6 +495,7 @@ rag.buildIndex();
   const { engine, reload } = await initWindowManager({
     surface,
     invoke: tauriInvoke,
+    agentTransport: window.__TAURI__ ? tauriTransport(window.__TAURI__) : demoTransport(),
     rag,
     behavior,
     hooks: {
@@ -469,6 +509,7 @@ rag.buildIndex();
       onLayoutChange: (name) => { dockLayout.textContent = name; behavior.recordLayout(name); },
       onWorkspaceChange: (cur, wss) => { renderDockWorkspaces(cur, wss); renderDockWindows(); behavior.recordWorkspace(cur); },
       onNotify: (msg, kind) => pushNotification(msg, kind),
+      onConfigApplied: (settings) => applyShellSettings(settings),
     },
   });
   WM = engine;
@@ -493,7 +534,7 @@ rag.buildIndex();
       });
     },
   });
-  agent.start();
+  agent.start(engine.shellSettings);
   window.AGENT = agent;
   window.RAG = rag;
   window.BEHAVIOR = behavior;

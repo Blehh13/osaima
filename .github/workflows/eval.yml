@@ -1,0 +1,63 @@
+name: Model evaluation
+
+# Measures how well a local model chooses tools, using Ollama on a free GitHub
+# runner (CPU only, so it is slow but costs nothing). Run it by hand from the
+# Actions tab; the report is in the job summary and the results are an artifact.
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "Ollama model to test (must support tool calling)"
+        default: "qwen2.5:7b"
+      limit:
+        description: "Only the first N cases (empty for all 157)"
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    defaults:
+      run:
+        working-directory: ai-core/agent
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install the agent
+        run: pip install -e .
+      - name: Check the evaluation data
+        run: python -m osaima_agent eval --validate-only
+      - name: Install Ollama
+        run: curl -fsSL https://ollama.com/install.sh | sh
+      - name: Wait for Ollama and download the model
+        env:
+          MODEL: ${{ inputs.model }}
+        run: |
+          for _ in $(seq 1 30); do
+            curl -fs http://127.0.0.1:11434/api/version && break
+            sleep 2
+          done
+          ollama pull "$MODEL"
+      - name: Run the evaluation
+        env:
+          MODEL: ${{ inputs.model }}
+          LIMIT: ${{ inputs.limit }}
+        run: |
+          args=(--provider local --model "$MODEL" --out results)
+          if [ -n "$LIMIT" ]; then args+=(--limit "$LIMIT"); fi
+          python -m osaima_agent eval "${args[@]}"
+      - name: Show the report
+        if: always()
+        run: |
+          if [ -f results/summary.md ]; then cat results/summary.md >> "$GITHUB_STEP_SUMMARY"; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-results
+          path: ai-core/agent/results

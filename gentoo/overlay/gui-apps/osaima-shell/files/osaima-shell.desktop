@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Interstellar OS Shell
-Comment=OSAIMA agentic desktop shell (Lua window manager)
-Exec=/usr/bin/osaima-shell
+Comment=Interstellar OS: AI-first desktop with an assistant, started by the OSAIMA session
+Exec=/usr/bin/osaima-session
 Type=Application
 DesktopNames=Interstellar

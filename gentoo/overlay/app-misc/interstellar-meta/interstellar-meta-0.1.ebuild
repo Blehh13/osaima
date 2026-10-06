@@ -9,13 +9,17 @@ HOMEPAGE="https://github.com/Blehh13/osaima"
 LICENSE="metapackage"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE="+shell +ai desktop devtools"
+IUSE="+shell +ai +ollama desktop devtools"
 
 # A meta package has no source — it only expresses dependencies.
 RDEPEND="
 	app-misc/interstellar-release
 	shell? ( gui-apps/osaima-shell )
-	ai? ( sys-apps/osaima-ai-core )
+	ai? (
+		sys-apps/osaima-ai-core
+		sys-apps/osaima-agent
+		ollama? ( sci-ml/ollama )
+	)
 	desktop? (
 		gui-wm/sway
 		x11-terms/foot
