@@ -1,0 +1,416 @@
+[
+  {
+    "name": "check_connectivity",
+    "title": "Check connectivity",
+    "description": "Resolve a host name and open a TCP connection to it, reporting DNS results and connection latency. Use it to diagnose \"no internet\" problems.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "host": {
+          "default": "example.com",
+          "description": "Host name or IP address",
+          "type": "string"
+        },
+        "port": {
+          "default": 443,
+          "maximum": 65535,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "annotations": {
+      "openWorldHint": true,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "close_window",
+    "title": "Close a window",
+    "description": "Close a window, by id or by matching its title or app. Unsaved work may be lost, so confirm with the user first.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Window id from list_windows",
+          "type": "integer"
+        },
+        "match": {
+          "description": "Text matched against window title and app id",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "focus_window",
+    "title": "Focus a window",
+    "description": "Bring a window to the front, by id or by matching its title or app.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Window id from list_windows",
+          "type": "integer"
+        },
+        "match": {
+          "description": "Text matched against window title and app id",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "get_brightness",
+    "title": "Get screen brightness",
+    "description": "Current screen backlight brightness as a percentage.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "annotations": {
+      "openWorldHint": false,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "get_system_stats",
+    "title": "System statistics",
+    "description": "Current OS, kernel, host, uptime, load average, CPU usage and memory usage.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "annotations": {
+      "openWorldHint": false,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "get_volume",
+    "title": "Get volume",
+    "description": "Current output volume (percent) and whether it is muted.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "annotations": {
+      "openWorldHint": false,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "kill_process",
+    "title": "End a process",
+    "description": "Send a signal (default TERM) to a process owned by the user. Confirm with the user first.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "pid": {
+          "minimum": 2,
+          "type": "integer"
+        },
+        "signal": {
+          "default": "TERM",
+          "enum": [
+            "TERM",
+            "KILL",
+            "INT",
+            "HUP",
+            "STOP",
+            "CONT"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "pid"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "launch_app",
+    "title": "Open an app",
+    "description": "Start an installed application by its id (e.g. \"firefox.desktop\") or name (e.g. \"Firefox\").",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "app": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "app"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "list_apps",
+    "title": "List installed apps",
+    "description": "Installed desktop applications. Optionally filter by a search term matched against name, description and keywords.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "limit": {
+          "default": 50,
+          "maximum": 200,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "query": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "annotations": {
+      "openWorldHint": false,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "list_disks",
+    "title": "List disks",
+    "description": "Mounted filesystems with total and available space.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "annotations": {
+      "openWorldHint": false,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "list_processes",
+    "title": "List processes",
+    "description": "Running processes, highest resource usage first. cpu_percent is relative to one core.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "limit": {
+          "default": 15,
+          "maximum": 200,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "sort_by": {
+          "default": "cpu",
+          "enum": [
+            "cpu",
+            "memory"
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "annotations": {
+      "openWorldHint": false,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "list_windows",
+    "title": "List windows",
+    "description": "Open application windows with their id, title, app, workspace and which one is focused.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "annotations": {
+      "openWorldHint": false,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "network_status",
+    "title": "Network status",
+    "description": "Network interfaces with state, MAC and IP addresses, traffic counters, the default gateway and DNS servers.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "annotations": {
+      "openWorldHint": false,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "package_info",
+    "title": "Installed packages",
+    "description": "Search installed Portage packages by name (e.g. \"firefox\" or \"dev-lang/rust\"), with version, slot and description.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "limit": {
+          "default": 20,
+          "maximum": 200,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "query": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "openWorldHint": false,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "power_action",
+    "title": "Power and session",
+    "description": "Lock the screen, suspend, reboot or power off the computer. Always confirm with the user first.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "enum": [
+            "lock",
+            "suspend",
+            "reboot",
+            "poweroff"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "action"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "search_files",
+    "title": "Find files",
+    "description": "Find files and folders in the user's home whose name contains the query (case-insensitive). Most recently modified first.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "folder": {
+          "description": "Folder inside home to search, e.g. \"Documents\"",
+          "type": "string"
+        },
+        "include_hidden": {
+          "default": false,
+          "type": "boolean"
+        },
+        "limit": {
+          "default": 20,
+          "maximum": 100,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "query": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "openWorldHint": false,
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "set_brightness",
+    "title": "Set screen brightness",
+    "description": "Set the screen backlight brightness to a percentage (1-100).",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "percent": {
+          "maximum": 100,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "percent"
+      ],
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    }
+  },
+  {
+    "name": "set_volume",
+    "title": "Set volume",
+    "description": "Change the output volume. Give `percent` for an absolute level, `change` for a relative step (e.g. -10), and/or `muted`.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "change": {
+          "maximum": 100,
+          "minimum": -100,
+          "type": "integer"
+        },
+        "muted": {
+          "type": "boolean"
+        },
+        "percent": {
+          "maximum": 150,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "annotations": {
+      "destructiveHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    }
+  }
+]
