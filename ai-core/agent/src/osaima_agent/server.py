@@ -4,9 +4,11 @@ Requests (newline-delimited JSON-RPC 2.0):
 
 - ``agent.status`` -> which models are configured and reachable
 - ``agent.chat {message, conversation_id?, model?, client_tools?}`` ->
-  ``{turn_id, conversation_id}``; progress then arrives as ``agent.event`` notifications carrying ``turn_id``
+  ``{turn_id, conversation_id}``; progress then arrives as ``agent.event``
+  notifications carrying ``turn_id``
 - ``agent.approve {turn_id, call_id, approved}`` answers an ``approval_required`` event
-- ``agent.client_tool_result {turn_id, call_id, ok, output}`` answers a ``client_tool_call`` event
+- ``agent.client_tool_result {turn_id, call_id, ok, output}`` answers a
+  ``client_tool_call`` event
 - ``agent.cancel {turn_id}``, ``agent.reset {conversation_id}``, ``agent.audit {limit?}``
 
 Only processes of the same user may connect (checked with SO_PEERCRED).
