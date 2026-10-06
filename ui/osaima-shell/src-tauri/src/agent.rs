@@ -64,7 +64,10 @@ impl AgentBridge {
         let (tx, rx) = oneshot::channel();
         let pending = {
             let mut guard = self.0.link.lock().await;
-            if guard.as_ref().is_none_or(|l| !l.alive.load(Ordering::Acquire)) {
+            if guard
+                .as_ref()
+                .is_none_or(|l| !l.alive.load(Ordering::Acquire))
+            {
                 *guard = Some(self.connect().await?);
             }
             let link = guard.as_mut().expect("link was just established");
@@ -78,7 +81,10 @@ impl AgentBridge {
             line.push('\n');
             if let Err(err) = link.writer.write_all(line.as_bytes()).await {
                 link.alive.store(false, Ordering::Release);
-                link.pending.lock().expect("pending map poisoned").remove(&id);
+                link.pending
+                    .lock()
+                    .expect("pending map poisoned")
+                    .remove(&id);
                 return Err(format!("lost connection to the assistant service: {err}"));
             }
             Arc::clone(&link.pending)
@@ -118,7 +124,12 @@ impl AgentBridge {
     }
 }
 
-async fn read_loop(reader: OwnedReadHalf, pending: Pending, alive: Arc<AtomicBool>, sink: EventSink) {
+async fn read_loop(
+    reader: OwnedReadHalf,
+    pending: Pending,
+    alive: Arc<AtomicBool>,
+    sink: EventSink,
+) {
     let mut lines = BufReader::new(reader).lines();
     while let Ok(Some(line)) = lines.next_line().await {
         let Ok(mut message) = serde_json::from_str::<Value>(&line) else {
@@ -209,7 +220,10 @@ mod tests {
         let echoed = bridge.call("agent.status", json!({"a": 1})).await.unwrap();
         assert_eq!(echoed, json!({"a": 1}));
 
-        let started = bridge.call("agent.chat", json!({"message": "x"})).await.unwrap();
+        let started = bridge
+            .call("agent.chat", json!({"message": "x"}))
+            .await
+            .unwrap();
         assert_eq!(started["turn_id"], "t1");
         // The event is delivered by the reader task; give it a moment.
         for _ in 0..50 {
@@ -239,13 +253,25 @@ mod tests {
         assert!(bridge.call("agent.status", json!(1)).await.is_ok());
         // The server hung up after one reply; wait for the reader to notice.
         for _ in 0..100 {
-            if events.lock().unwrap().iter().any(|e| e["type"] == "disconnected") {
+            if events
+                .lock()
+                .unwrap()
+                .iter()
+                .any(|e| e["type"] == "disconnected")
+            {
                 break;
             }
             tokio::time::sleep(Duration::from_millis(10)).await;
         }
-        assert!(events.lock().unwrap().iter().any(|e| e["type"] == "disconnected"));
-        assert_eq!(bridge.call("agent.status", json!(2)).await.unwrap(), json!(2));
+        assert!(events
+            .lock()
+            .unwrap()
+            .iter()
+            .any(|e| e["type"] == "disconnected"));
+        assert_eq!(
+            bridge.call("agent.status", json!(2)).await.unwrap(),
+            json!(2)
+        );
     }
 
     #[tokio::test]

@@ -68,7 +68,9 @@ async fn agent_call(
     if !method.starts_with("agent.") {
         return Err(format!("{method} is not an assistant method"));
     }
-    bridge.call(&method, params.unwrap_or_else(|| json!({}))).await
+    bridge
+        .call(&method, params.unwrap_or_else(|| json!({})))
+        .await
 }
 
 /// The user's home directory, so apps can start there.
