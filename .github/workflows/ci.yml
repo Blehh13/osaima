@@ -168,3 +168,23 @@ jobs:
           name: ruff-patch-agent
           path: ${{ runner.temp }}/ruff.patch
           if-no-files-found: ignore
+
+  scripts:
+    name: Session and packaging scripts
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: ShellCheck
+        run: |
+          shellcheck --severity=style \
+            gentoo/overlay/gui-apps/osaima-shell/files/osaima-session \
+            build-tools/tests/test-session.sh
+      - name: Session script test
+        if: success() || failure()
+        run: sh build-tools/tests/test-session.sh
+      - name: Install udev rule syntax check
+        if: success() || failure()
+        run: |
+          sudo apt-get install -y --no-install-recommends udev
+          sudo cp gentoo/overlay/sys-apps/osaima-ai-core/files/90-osaima-backlight.rules /etc/udev/rules.d/
+          sudo udevadm verify /etc/udev/rules.d/90-osaima-backlight.rules

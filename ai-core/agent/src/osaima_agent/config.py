@@ -4,7 +4,7 @@ Example file::
 
     [local]
     url = "http://127.0.0.1:11434"
-    model = "qwen2.5:7b-instruct"
+    model = "qwen2.5:7b-instruct"   # default: chosen from this computer's RAM
 
     [cloud]
     enabled = true            # off by default: nothing leaves the machine
@@ -29,6 +29,35 @@ from typing import Any, Literal
 
 ConfirmMode = Literal["destructive", "all_changes"]
 EFFORTS = ("low", "medium", "high", "xhigh", "max")
+
+
+GIB = 1024**3
+
+
+def total_ram_bytes() -> int | None:
+    """Physical memory from /proc/meminfo, or None where unavailable."""
+    try:
+        for line in Path("/proc/meminfo").read_text(encoding="ascii").splitlines():
+            if line.startswith("MemTotal:"):
+                return int(line.split()[1]) * 1024
+    except (OSError, ValueError, IndexError):
+        pass
+    return None
+
+
+def recommend_model(ram_bytes: int | None) -> str:
+    """The largest tool-calling model that fits comfortably next to the desktop.
+
+    Quantized weights take roughly 1 GB per billion parameters plus context, and
+    the shell, browser and system need several GB of their own.
+    """
+    if ram_bytes is None:
+        return "qwen2.5:3b-instruct"  # unknown: the middle size
+    if ram_bytes < 6 * GIB:
+        return "qwen2.5:1.5b-instruct"
+    if ram_bytes < 14 * GIB:
+        return "qwen2.5:3b-instruct"
+    return "qwen2.5:7b-instruct"
 
 
 @dataclass(frozen=True)
@@ -100,7 +129,7 @@ def load(path: Path | None = None) -> AgentConfig:
     try:
         raw = tomllib.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError:
-        return AgentConfig()
+        return from_dict({})
     except tomllib.TOMLDecodeError as err:
         raise ConfigError(f"{path}: {err}") from err
     return from_dict(raw)
@@ -126,7 +155,7 @@ def from_dict(raw: dict[str, Any]) -> AgentConfig:
         local=LocalConfig(
             enabled=bool(local.get("enabled", defaults.local.enabled)),
             url=str(local.get("url", defaults.local.url)).rstrip("/"),
-            model=str(local.get("model", defaults.local.model)),
+            model=str(local.get("model") or recommend_model(total_ram_bytes())),
             context_tokens=int(local.get("context_tokens", defaults.local.context_tokens)),
             timeout_s=float(local.get("timeout_s", defaults.local.timeout_s)),
         ),

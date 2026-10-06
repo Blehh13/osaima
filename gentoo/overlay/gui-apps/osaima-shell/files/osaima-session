@@ -1,0 +1,116 @@
+#!/bin/sh
+# osaima-session: start the Interstellar OS desktop session.
+#
+# Starts the AI Core and the assistant (restarting either one if it crashes),
+# starts Ollama unless it is already running, then runs the compositor with the
+# shell on top. When the compositor exits the session ends and everything
+# started here is stopped.
+#
+# Overrides, mainly for tests:
+#   OSAIMA_COMPOSITOR      compositor command (default: sway with the shipped config)
+#   OSAIMA_MCP_BIN         AI Core binary        (default: osaima-mcp-daemon)
+#   OSAIMA_AGENT_BIN       assistant binary      (default: osaima-agent)
+#   OSAIMA_OLLAMA_BIN      Ollama binary         (default: ollama)
+#   OSAIMA_START_OLLAMA=0  never start Ollama
+#   OSAIMA_RESTART_MAX     longest wait before restarting a crashed service, seconds (default 30)
+
+set -u
+
+log() { printf 'osaima-session: %s\n' "$*" >&2; }
+
+if [ -z "${XDG_RUNTIME_DIR:-}" ]; then
+	log "XDG_RUNTIME_DIR is not set; log in through elogind (or systemd-logind)."
+	exit 1
+fi
+
+# Programs in the session expect a session bus.
+if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ] && command -v dbus-run-session >/dev/null 2>&1; then
+	exec dbus-run-session -- "$0" "$@"
+fi
+
+export XDG_SESSION_TYPE=wayland
+export XDG_CURRENT_DESKTOP=Interstellar
+export XDG_SESSION_DESKTOP=Interstellar
+export MOZ_ENABLE_WAYLAND=1
+
+MCP_BIN=${OSAIMA_MCP_BIN:-osaima-mcp-daemon}
+AGENT_BIN=${OSAIMA_AGENT_BIN:-osaima-agent}
+OLLAMA_BIN=${OSAIMA_OLLAMA_BIN:-ollama}
+COMPOSITOR=${OSAIMA_COMPOSITOR:-sway -c /usr/share/osaima/sway.conf}
+RESTART_MAX=${OSAIMA_RESTART_MAX:-30}
+
+SUPERVISORS=""
+COMPOSITOR_PID=""
+
+# supervise NAME COMMAND...: run COMMAND, restarting it when it exits. The wait
+# doubles after each quick failure (up to RESTART_MAX) so a broken service
+# doesn't spin; a run that lasted a minute resets it.
+supervise() {
+	name=$1
+	shift
+	(
+		child=""
+		trap '[ -n "$child" ] && kill "$child" 2>/dev/null; exit 0' TERM INT
+		delay=1
+		while :; do
+			started=$(date +%s)
+			"$@" &
+			child=$!
+			wait "$child"
+			status=$?
+			child=""
+			if [ $(($(date +%s) - started)) -ge 60 ]; then
+				delay=1
+			fi
+			log "$name exited with status $status; restarting in ${delay}s"
+			sleep "$delay" &
+			child=$!
+			wait "$child"
+			child=""
+			delay=$((delay * 2))
+			if [ "$delay" -gt "$RESTART_MAX" ]; then
+				delay=$RESTART_MAX
+			fi
+		done
+	) &
+	SUPERVISORS="$SUPERVISORS $!"
+}
+
+cleanup() {
+	if [ -n "$COMPOSITOR_PID" ]; then
+		kill "$COMPOSITOR_PID" 2>/dev/null
+	fi
+	for pid in $SUPERVISORS; do
+		kill "$pid" 2>/dev/null
+	done
+	wait
+}
+trap cleanup EXIT
+trap 'exit 143' TERM
+trap 'exit 130' INT HUP
+
+# Brightness control needs the video group (see the AI core's udev rule).
+if [ -d /sys/class/backlight ] && ! id -nG | tr ' ' '\n' | grep -qx video; then
+	log "note: you are not in the 'video' group, so the assistant can't change brightness."
+fi
+
+supervise ai-core "$MCP_BIN"
+supervise assistant "$AGENT_BIN" serve
+
+if [ "${OSAIMA_START_OLLAMA:-1}" != 0 ] && command -v "$OLLAMA_BIN" >/dev/null 2>&1; then
+	if ! { command -v pgrep >/dev/null 2>&1 && pgrep -x "$(basename "$OLLAMA_BIN")" >/dev/null 2>&1; }; then
+		supervise ollama "$OLLAMA_BIN" serve
+	fi
+fi
+
+# Run the compositor in the background and wait for it: a shell only handles
+# a signal (such as logout's SIGTERM) after its foreground command finishes,
+# but `wait` is interrupted at once.
+# shellcheck disable=SC2086 # the compositor command is meant to be split into words
+$COMPOSITOR &
+COMPOSITOR_PID=$!
+wait "$COMPOSITOR_PID"
+status=$?
+COMPOSITOR_PID=""
+log "compositor exited with status $status; ending the session"
+exit "$status"

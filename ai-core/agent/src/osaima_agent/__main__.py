@@ -10,7 +10,9 @@ import os
 import sys
 from pathlib import Path
 
-from . import __version__, config
+import httpx
+
+from . import __version__, config, doctor
 from .agent import Agent, Conversation
 from .audit import AuditLog
 from .llm import Provider, ToolCall, ToolSpec
@@ -55,6 +57,31 @@ async def serve(cfg: config.AgentConfig, socket_path: Path) -> None:
         await AgentServer(agent, audit).serve(socket_path)
     finally:
         await mcp.aclose()
+
+
+async def run_doctor(cfg: config.AgentConfig, pull: bool) -> int:
+    mcp = McpClient(cfg.mcp_socket_path)
+    async with httpx.AsyncClient(base_url=cfg.local.url, timeout=5.0) as ollama:
+        try:
+            checks = await doctor.run_checks(cfg, mcp, ollama)
+            local = next((c for c in checks if c.name == "Local model"), None)
+            if pull and local is not None and local.status == "fail":
+                print(f"Downloading {cfg.local.model} (this can take a while)…")
+                try:
+                    await doctor.pull_model(
+                        ollama, cfg.local.model, lambda line: print(f"  {line}", flush=True)
+                    )
+                except RuntimeError as err:
+                    print(f"error: {err}", file=sys.stderr)
+                    return 1
+                checks = await doctor.run_checks(cfg, mcp, ollama)
+        finally:
+            await mcp.aclose()
+    print(doctor.render(checks))
+    ready = doctor.verdict(checks)
+    print()
+    print("The assistant is ready." if ready else "The assistant is not ready yet.")
+    return 0 if ready else 1
 
 
 async def ask(cfg: config.AgentConfig, question: str, model: str, yes: bool) -> int:
@@ -115,6 +142,8 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="command")
     serve_cmd = sub.add_parser("serve", help="run the agent service (default)")
     serve_cmd.add_argument("--socket", type=Path, help="socket path")
+    doctor_cmd = sub.add_parser("doctor", help="check the setup and fix what's missing")
+    doctor_cmd.add_argument("--pull", action="store_true", help="download the local model")
     ask_cmd = sub.add_parser("ask", help="ask one question in the terminal")
     ask_cmd.add_argument("question", nargs="+")
     ask_cmd.add_argument("--model", choices=["auto", "local", "cloud"], default="auto")
@@ -132,6 +161,8 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     try:
+        if args.command == "doctor":
+            return asyncio.run(run_doctor(cfg, args.pull))
         if args.command == "ask":
             return asyncio.run(ask(cfg, " ".join(args.question), args.model, args.yes))
         socket_path = getattr(args, "socket", None) or cfg.socket_path

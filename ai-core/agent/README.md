@@ -21,18 +21,32 @@ osaima-agent ask --model cloud "why is my laptop slow?"
 ```
 
 The AI Core daemon must be running. For the local model, install
-[Ollama](https://ollama.com) and pull a model that supports tool calling:
+[Ollama](https://ollama.com), then let the agent check everything and download
+the model it recommends for this computer:
 
 ```bash
-ollama pull qwen2.5:7b-instruct        # 8 GB RAM or more
-ollama pull qwen2.5:3b-instruct        # smaller machines; set local.model below
+osaima-agent doctor            # what's working, and how to fix what isn't
+osaima-agent doctor --pull     # also downloads the local model, with progress
 ```
+
+Unless `local.model` is set, the model is chosen from the installed RAM:
+`qwen2.5:7b-instruct` from 14 GB, `qwen2.5:3b-instruct` from 6 GB,
+`qwen2.5:1.5b-instruct` below that. All three support tool calling; the smaller
+ones follow instructions less reliably, which is what the evaluation measures.
+
+### On Interstellar OS
+
+`emerge sys-apps/osaima-agent` installs it; `app-misc/interstellar-meta` pulls
+it in together with Ollama (`ollama` USE flag). The desktop session
+(`osaima-session`, shipped with the shell) starts the AI Core, this service and
+Ollama, restarts any of them that crash, and stops them at logout. systemd
+users get equivalent user units instead.
 
 ## Settings (`~/.config/osaima/agent.toml`)
 
 ```toml
 [local]
-model = "qwen2.5:7b-instruct"
+# model = "qwen2.5:7b-instruct"   # default: chosen from this computer's RAM
 url = "http://127.0.0.1:11434"
 
 [cloud]

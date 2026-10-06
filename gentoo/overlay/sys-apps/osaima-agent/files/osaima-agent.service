@@ -1,0 +1,15 @@
+[Unit]
+Description=OSAIMA assistant
+Documentation=https://github.com/Blehh13/osaima
+After=osaima-mcp-daemon.service
+Wants=osaima-mcp-daemon.service
+
+[Service]
+ExecStart=/usr/bin/osaima-agent serve
+Restart=on-failure
+# Sandbox per the OSAIMA security model: no privilege gain, private /tmp.
+NoNewPrivileges=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=default.target
