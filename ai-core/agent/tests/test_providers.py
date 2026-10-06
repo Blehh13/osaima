@@ -6,12 +6,11 @@ from typing import Any
 
 import httpx
 import pytest
+from conftest import SPECS
 
 from osaima_agent.llm import Message, NativeContent, ProviderError, ProviderUnavailable, ToolCall
 from osaima_agent.llm.claude import BETAS, ClaudeProvider, completion_from, to_claude
 from osaima_agent.llm.ollama import MAX_HISTORY_MESSAGES, OllamaProvider, to_ollama
-
-from conftest import SPECS
 
 
 async def collect() -> tuple[list[str], Any]:
@@ -101,9 +100,7 @@ def test_ollama_history_is_trimmed_to_a_user_turn() -> None:
     history: list[Message] = []
     for i in range(20):
         history.append(Message("user", f"q{i}"))
-        history.append(
-            Message("assistant", "", tool_calls=[ToolCall(f"c{i}", "get_volume", {})])
-        )
+        history.append(Message("assistant", "", tool_calls=[ToolCall(f"c{i}", "get_volume", {})]))
         history.append(Message("tool", "50%", tool_call_id=f"c{i}", tool_name="get_volume"))
     converted = to_ollama(history)
     assert len(converted) <= MAX_HISTORY_MESSAGES
@@ -146,7 +143,9 @@ def test_local_tool_calls_convert_to_tool_use_blocks() -> None:
     out = to_claude(
         [
             Message("user", "mute"),
-            Message("assistant", "Muting.", tool_calls=[ToolCall("x", "set_volume", {"muted": True})]),
+            Message(
+                "assistant", "Muting.", tool_calls=[ToolCall("x", "set_volume", {"muted": True})]
+            ),
             Message("tool", "ok", tool_call_id="x", tool_name="set_volume"),
         ]
     )
@@ -161,7 +160,9 @@ def block(kind: str, **fields: Any) -> SimpleNamespace:
 
 
 def message(stop: str, *content: SimpleNamespace, **extra: Any) -> SimpleNamespace:
-    return SimpleNamespace(content=list(content), stop_reason=stop, model="claude-opus-5-5", **extra)
+    return SimpleNamespace(
+        content=list(content), stop_reason=stop, model="claude-opus-5-5", **extra
+    )
 
 
 def test_completion_from_maps_stop_reasons() -> None:

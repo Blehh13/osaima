@@ -88,7 +88,11 @@ async def ask(cfg: config.AgentConfig, question: str, model: str, yes: bool) -> 
 
     try:
         result = await agent.run_turn(
-            convo, question, emit=emit, approve=approve, model=model  # type: ignore[arg-type]
+            convo,
+            question,
+            emit=emit,
+            approve=approve,
+            model=model,  # type: ignore[arg-type]
         )
     finally:
         await mcp.aclose()
@@ -101,8 +105,12 @@ async def ask(cfg: config.AgentConfig, question: str, model: str, yes: bool) -> 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="osaima-agent", description=__doc__)
     parser.add_argument("--version", action="version", version=f"osaima-agent {__version__}")
-    parser.add_argument("--config", type=Path, help="settings file (default: %(default)s)",
-                        default=config.config_path())
+    parser.add_argument(
+        "--config",
+        type=Path,
+        help="settings file (default: %(default)s)",
+        default=config.config_path(),
+    )
     parser.add_argument("-v", "--verbose", action="store_true")
     sub = parser.add_subparsers(dest="command")
     serve_cmd = sub.add_parser("serve", help="run the agent service (default)")

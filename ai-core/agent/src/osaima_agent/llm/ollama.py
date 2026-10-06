@@ -12,6 +12,7 @@ from . import (
     Message,
     ProviderError,
     ProviderUnavailable,
+    StopReason,
     TextSink,
     ToolCall,
     ToolSpec,
@@ -99,7 +100,13 @@ class OllamaProvider:
         except (httpx.HTTPError, json.JSONDecodeError) as err:
             raise ProviderError(f"Ollama request failed: {err}") from err
 
-        stop = "tool_calls" if calls else ("max_tokens" if done_reason == "length" else "end")
+        stop: StopReason
+        if calls:
+            stop = "tool_calls"
+        elif done_reason == "length":
+            stop = "max_tokens"
+        else:
+            stop = "end"
         return Completion(
             text="".join(text_parts),
             tool_calls=calls,

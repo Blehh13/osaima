@@ -3,8 +3,8 @@
 Requests (newline-delimited JSON-RPC 2.0):
 
 - ``agent.status`` -> which models are configured and reachable
-- ``agent.chat {message, conversation_id?, model?, client_tools?}`` -> ``{turn_id, conversation_id}``;
-  progress then arrives as ``agent.event`` notifications carrying ``turn_id``
+- ``agent.chat {message, conversation_id?, model?, client_tools?}`` ->
+  ``{turn_id, conversation_id}``; progress then arrives as ``agent.event`` notifications carrying ``turn_id``
 - ``agent.approve {turn_id, call_id, approved}`` answers an ``approval_required`` event
 - ``agent.client_tool_result {turn_id, call_id, ok, output}`` answers a ``client_tool_call`` event
 - ``agent.cancel {turn_id}``, ``agent.reset {conversation_id}``, ``agent.audit {limit?}``
@@ -226,7 +226,11 @@ class _Session:
         async def emit(event: dict[str, Any]) -> None:
             with contextlib.suppress(ConnectionError):
                 await self.send(
-                    {"jsonrpc": "2.0", "method": "agent.event", "params": {"turn_id": turn_id, **event}}
+                    {
+                        "jsonrpc": "2.0",
+                        "method": "agent.event",
+                        "params": {"turn_id": turn_id, **event},
+                    }
                 )
 
         async def approve(call: ToolCall, spec: ToolSpec) -> bool:
@@ -243,7 +247,7 @@ class _Session:
             )
             try:
                 outcome = await asyncio.wait_for(self._wait(turn_id, call.id), timeout=30)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 return ToolOutcome(ok=False, text="The shell did not respond.")
             if not isinstance(outcome, ToolOutcome):
                 return ToolOutcome(ok=False, text="The shell sent an invalid result.")

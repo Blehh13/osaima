@@ -93,7 +93,7 @@ class McpClient:
                     self._reset()
                     if attempt == 1:
                         raise
-                except (OSError, asyncio.TimeoutError, json.JSONDecodeError) as err:
+                except (TimeoutError, OSError, json.JSONDecodeError) as err:
                     self._reset()
                     if attempt == 1:
                         raise McpError(f"lost connection to the AI Core: {err}") from err

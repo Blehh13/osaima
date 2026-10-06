@@ -46,7 +46,11 @@ class FakeDaemon:
             elif msg["params"]["name"] == "broken":
                 result = {"content": [{"type": "text", "text": "it broke"}], "isError": True}
             elif msg["params"]["name"] == "invalid":
-                reply = {"jsonrpc": "2.0", "id": msg["id"], "error": {"code": -32602, "message": "bad pid"}}
+                reply = {
+                    "jsonrpc": "2.0",
+                    "id": msg["id"],
+                    "error": {"code": -32602, "message": "bad pid"},
+                }
                 writer.write(json.dumps(reply).encode() + b"\n")
                 continue
             else:
@@ -55,7 +59,9 @@ class FakeDaemon:
                     "structuredContent": {"percent": 40},
                     "isError": False,
                 }
-            writer.write(json.dumps({"jsonrpc": "2.0", "id": msg["id"], "result": result}).encode() + b"\n")
+            writer.write(
+                json.dumps({"jsonrpc": "2.0", "id": msg["id"], "result": result}).encode() + b"\n"
+            )
             await writer.drain()
             replies += 1
             if self.drop_after is not None and replies >= self.drop_after:

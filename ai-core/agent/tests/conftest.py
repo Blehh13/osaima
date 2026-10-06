@@ -15,7 +15,9 @@ from osaima_agent.mcp_client import ToolOutcome
 class ScriptedProvider:
     """Plays back a fixed list of completions (or raises listed exceptions)."""
 
-    def __init__(self, name: str, script: list[Completion | Exception], model: str = "test") -> None:
+    def __init__(
+        self, name: str, script: list[Completion | Exception], model: str = "test"
+    ) -> None:
         self.name = name
         self.model = model
         self.script = list(script)

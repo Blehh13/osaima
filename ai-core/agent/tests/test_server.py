@@ -78,7 +78,9 @@ async def connect(path: Path) -> Client:
     return Client(reader, writer)
 
 
-async def test_chat_streams_events_and_keeps_conversations(socket_dir: Path, audit: AuditLog) -> None:
+async def test_chat_streams_events_and_keeps_conversations(
+    socket_dir: Path, audit: AuditLog
+) -> None:
     local = ScriptedProvider("local", [reply("First."), reply("Second.")])
     task, path = await start(socket_dir, local, audit)
     try:
@@ -132,7 +134,10 @@ async def test_client_tool_round_trip(socket_dir: Path, audit: AuditLog) -> None
                     {
                         "name": "shell_open_app",
                         "description": "Open a built-in app",
-                        "inputSchema": {"type": "object", "properties": {"app": {"type": "string"}}},
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {"app": {"type": "string"}},
+                        },
                         "annotations": {"readOnlyHint": False, "destructiveHint": False},
                     }
                 ],
@@ -159,7 +164,9 @@ async def test_rejects_bad_requests_and_concurrent_turns(socket_dir: Path, audit
     try:
         client = await connect(path)
         assert (await client.send("agent.chat", message=""))["error"]["code"] == -32602
-        assert (await client.send("agent.chat", message="x", model="gpt"))["error"]["code"] == -32602
+        assert (await client.send("agent.chat", message="x", model="gpt"))["error"][
+            "code"
+        ] == -32602
         assert (await client.send("agent.nope"))["error"]["code"] == -32601
         stray = await client.send("agent.approve", turn_id="t", call_id="c", approved=True)
         assert stray["error"]["code"] == -32602

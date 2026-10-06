@@ -315,7 +315,7 @@ class Agent:
                 approved = await asyncio.wait_for(
                     approve(call, spec), timeout=self._approval_timeout_s
                 )
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 approved = False
             if not approved:
                 outcome = ToolOutcome(ok=False, text="The user declined this action.")
