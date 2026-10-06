@@ -498,8 +498,6 @@ def validate_cases(cases: list[Case], specs: list[ToolSpec]) -> list[str]:
                     problems.append(f"{case.id}: unknown tool {step.tool!r}")
                     continue
                 problems += [f"{case.id}: {p}" for p in _check_args(spec, step.args)]
-                if case.approval and spec.read_only:
-                    problems.append(f"{case.id}: marked approval but {step.tool} is read-only")
         if case.approval and not any(
             by_name[s.tool].destructive for alt in case.expect for s in alt if s.tool in by_name
         ):
