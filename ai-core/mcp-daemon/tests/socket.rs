@@ -4,8 +4,8 @@ use std::os::unix::fs::PermissionsExt;
 use std::sync::Arc;
 
 use mcp_daemon::server::Server;
-use mcp_daemon::system::SystemMonitor;
 use mcp_daemon::settings::Settings;
+use mcp_daemon::system::SystemMonitor;
 use mcp_daemon::transport::SocketListener;
 use serde_json::{json, Value};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
@@ -141,7 +141,10 @@ async fn the_message_limit_is_a_setting() {
     client.send(&"x".repeat(3000)).await;
     let res = client.recv().await.expect("expected an error reply");
     assert_eq!(res["error"]["code"], -32600);
-    assert!(res["error"]["message"].as_str().unwrap().contains("2048-byte"));
+    assert!(res["error"]["message"]
+        .as_str()
+        .unwrap()
+        .contains("2048-byte"));
     assert!(client.recv().await.is_none(), "connection should be closed");
 
     task.abort();

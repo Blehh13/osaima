@@ -82,7 +82,13 @@ impl Settings {
     pub fn from_lookup(get: impl Fn(&str) -> Option<String>) -> Result<Self, SettingsError> {
         let d = Self::default();
         let settings = Self {
-            sample_interval: millis(&get, "OSAIMA_SAMPLE_INTERVAL_MS", d.sample_interval, 250, 60_000)?,
+            sample_interval: millis(
+                &get,
+                "OSAIMA_SAMPLE_INTERVAL_MS",
+                d.sample_interval,
+                250,
+                60_000,
+            )?,
             max_message_bytes: number(
                 &get,
                 "OSAIMA_MAX_MESSAGE_BYTES",
@@ -90,8 +96,20 @@ impl Settings {
                 1024,
                 64 * 1024 * 1024,
             )? as usize,
-            helper_timeout: millis(&get, "OSAIMA_HELPER_TIMEOUT_MS", d.helper_timeout, 500, 120_000)?,
-            connect_timeout: millis(&get, "OSAIMA_CONNECT_TIMEOUT_MS", d.connect_timeout, 200, 60_000)?,
+            helper_timeout: millis(
+                &get,
+                "OSAIMA_HELPER_TIMEOUT_MS",
+                d.helper_timeout,
+                500,
+                120_000,
+            )?,
+            connect_timeout: millis(
+                &get,
+                "OSAIMA_CONNECT_TIMEOUT_MS",
+                d.connect_timeout,
+                200,
+                60_000,
+            )?,
             connectivity_host: text(&get, "OSAIMA_CONNECTIVITY_HOST", &d.connectivity_host)?,
             process_list_default: number(
                 &get,
@@ -101,8 +119,13 @@ impl Settings {
                 1000,
             )?,
             process_list_max: number(&get, "OSAIMA_PROCESS_LIST_MAX", d.process_list_max, 1, 1000)?,
-            search_max_depth: number(&get, "OSAIMA_SEARCH_MAX_DEPTH", d.search_max_depth as u64, 1, 64)?
-                as usize,
+            search_max_depth: number(
+                &get,
+                "OSAIMA_SEARCH_MAX_DEPTH",
+                d.search_max_depth as u64,
+                1,
+                64,
+            )? as usize,
             search_max_entries: number(
                 &get,
                 "OSAIMA_SEARCH_MAX_ENTRIES",
@@ -117,7 +140,13 @@ impl Settings {
                 100,
                 60_000,
             )?,
-            max_volume_percent: number(&get, "OSAIMA_MAX_VOLUME_PERCENT", d.max_volume_percent, 100, 200)?,
+            max_volume_percent: number(
+                &get,
+                "OSAIMA_MAX_VOLUME_PERCENT",
+                d.max_volume_percent,
+                100,
+                200,
+            )?,
             terminal: terminal(&get, &d.terminal)?,
         };
         if settings.process_list_default > settings.process_list_max {
@@ -196,7 +225,11 @@ fn text(
 fn terminal(get: &impl Fn(&str) -> Option<String>, default: &str) -> Result<String, SettingsError> {
     let value = ["OSAIMA_TERMINAL", "TERMINAL"]
         .into_iter()
-        .find_map(|name| get(name).map(|v| v.trim().to_string()).filter(|v| !v.is_empty()))
+        .find_map(|name| {
+            get(name)
+                .map(|v| v.trim().to_string())
+                .filter(|v| !v.is_empty())
+        })
         .unwrap_or_else(|| default.to_string());
     if value.chars().any(char::is_whitespace) {
         return Err(SettingsError {
@@ -263,9 +296,17 @@ mod tests {
     fn bad_values_name_the_variable() {
         let cases = [
             ("OSAIMA_SAMPLE_INTERVAL_MS", "fast", "not a whole number"),
-            ("OSAIMA_SAMPLE_INTERVAL_MS", "10", "outside the allowed range"),
+            (
+                "OSAIMA_SAMPLE_INTERVAL_MS",
+                "10",
+                "outside the allowed range",
+            ),
             ("OSAIMA_MAX_MESSAGE_BYTES", "-1", "not a whole number"),
-            ("OSAIMA_MAX_VOLUME_PERCENT", "500", "outside the allowed range"),
+            (
+                "OSAIMA_MAX_VOLUME_PERCENT",
+                "500",
+                "outside the allowed range",
+            ),
             ("OSAIMA_SEARCH_MAX_DEPTH", "0", "outside the allowed range"),
             ("OSAIMA_CONNECTIVITY_HOST", "a b;c", "not a valid host"),
             ("OSAIMA_CONNECTIVITY_HOST", "-oProxy", "not a valid host"),
@@ -287,7 +328,10 @@ mod tests {
 
     #[test]
     fn terminal_falls_back_to_the_conventional_variable() {
-        assert_eq!(settings(&[("TERMINAL", "xterm")]).unwrap().terminal, "xterm");
+        assert_eq!(
+            settings(&[("TERMINAL", "xterm")]).unwrap().terminal,
+            "xterm"
+        );
         let both = settings(&[("TERMINAL", "xterm"), ("OSAIMA_TERMINAL", "kitty")]).unwrap();
         assert_eq!(both.terminal, "kitty");
     }

@@ -141,9 +141,14 @@ mod tests {
     #[tokio::test]
     async fn times_out_and_kills_the_group() {
         let start = std::time::Instant::now();
-        let out = run_command("sleep 30 & sleep 30", None, Duration::from_millis(300), LIMIT)
-            .await
-            .unwrap();
+        let out = run_command(
+            "sleep 30 & sleep 30",
+            None,
+            Duration::from_millis(300),
+            LIMIT,
+        )
+        .await
+        .unwrap();
         assert!(out.timed_out);
         assert!(start.elapsed() < Duration::from_secs(5));
     }

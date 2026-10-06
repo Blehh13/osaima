@@ -104,12 +104,7 @@ fn resolve_folder(home: &Path, folder: Option<&str>) -> Result<PathBuf, ToolErro
 
 /// Breadth-first name search. Returns the hits and whether the walk finished
 /// within its limits. Symlinked directories are not followed.
-fn walk(
-    start: &Path,
-    query: &str,
-    include_hidden: bool,
-    limits: SearchLimits,
-) -> (Vec<Hit>, bool) {
+fn walk(start: &Path, query: &str, include_hidden: bool, limits: SearchLimits) -> (Vec<Hit>, bool) {
     let started = Instant::now();
     let mut queue = VecDeque::from([(start.to_path_buf(), 0usize)]);
     let mut hits = Vec::new();

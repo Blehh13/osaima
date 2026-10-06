@@ -86,7 +86,10 @@ pub fn network_status(ctx: &ToolContext, arguments: Option<Value>) -> ToolResult
 
 pub async fn check_connectivity(ctx: &ToolContext, arguments: Option<Value>) -> ToolResult {
     let args = Args::parse(arguments, &["host", "port"])?;
-    let host = args.str("host")?.map(str::trim).unwrap_or(ctx.settings.connectivity_host.as_str());
+    let host = args
+        .str("host")?
+        .map(str::trim)
+        .unwrap_or(ctx.settings.connectivity_host.as_str());
     validate_host(host)?;
     let connect_timeout = ctx.settings.connect_timeout;
     let port = u16::try_from(args.u64_in("port", 1, 65_535, 443)?)
