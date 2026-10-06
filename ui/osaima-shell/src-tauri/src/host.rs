@@ -8,11 +8,6 @@ use std::time::Duration;
 use serde::Serialize;
 use serde_json::{json, Value};
 
-/// Commands are killed (with their whole process group) after this long.
-pub const COMMAND_TIMEOUT: Duration = Duration::from_secs(30);
-/// Output beyond this many bytes is dropped.
-pub const MAX_OUTPUT_BYTES: usize = 256 * 1024;
-
 #[derive(Debug, Default, Serialize, PartialEq)]
 pub struct CommandOutput {
     pub output: String,
@@ -28,12 +23,14 @@ pub fn home_dir() -> PathBuf {
         .unwrap_or_else(|| PathBuf::from("/"))
 }
 
-/// Run `cmd` through `/bin/sh -c` in `cwd` (default: home), with stdin closed
-/// and a timeout. Returns combined stdout + stderr.
+/// Run `cmd` through `/bin/sh -c` in `cwd` (default: home), with stdin closed.
+/// The command and everything it started are killed after `timeout`, and output
+/// beyond `max_output` bytes is dropped. Returns combined stdout + stderr.
 pub async fn run_command(
     cmd: &str,
     cwd: Option<&Path>,
     timeout: Duration,
+    max_output: usize,
 ) -> Result<CommandOutput, String> {
     let cmd = cmd.trim();
     if cmd.is_empty() {
@@ -58,8 +55,8 @@ pub async fn run_command(
         Ok(Ok(out)) => {
             let mut bytes = out.stdout;
             bytes.extend_from_slice(&out.stderr);
-            let truncated = bytes.len() > MAX_OUTPUT_BYTES;
-            bytes.truncate(MAX_OUTPUT_BYTES);
+            let truncated = bytes.len() > max_output;
+            bytes.truncate(max_output);
             Ok(CommandOutput {
                 output: String::from_utf8_lossy(&bytes).into_owned(),
                 exit_code: out.status.code(),
@@ -113,12 +110,16 @@ pub fn read_dir(path: Option<&Path>) -> Result<Value, String> {
 mod tests {
     use super::*;
 
+    const TIMEOUT: Duration = Duration::from_secs(30);
+    const LIMIT: usize = 256 * 1024;
+
     #[tokio::test]
     async fn captures_output_and_exit_code() {
         let out = run_command(
             "echo hi; echo err >&2; exit 3",
             Some(Path::new("/")),
-            COMMAND_TIMEOUT,
+            TIMEOUT,
+            LIMIT,
         )
         .await
         .unwrap();
@@ -130,7 +131,7 @@ mod tests {
     #[tokio::test]
     async fn runs_in_requested_directory() {
         let dir = tempfile::tempdir().unwrap();
-        let out = run_command("pwd", Some(dir.path()), COMMAND_TIMEOUT)
+        let out = run_command("pwd", Some(dir.path()), TIMEOUT, LIMIT)
             .await
             .unwrap();
         let reported = std::fs::canonicalize(out.output.trim()).unwrap();
@@ -140,7 +141,7 @@ mod tests {
     #[tokio::test]
     async fn times_out_and_kills_the_group() {
         let start = std::time::Instant::now();
-        let out = run_command("sleep 30 & sleep 30", None, Duration::from_millis(300))
+        let out = run_command("sleep 30 & sleep 30", None, Duration::from_millis(300), LIMIT)
             .await
             .unwrap();
         assert!(out.timed_out);
@@ -152,12 +153,13 @@ mod tests {
         let out = run_command(
             "head -c 400000 /dev/zero | tr '\\0' a",
             None,
-            COMMAND_TIMEOUT,
+            TIMEOUT,
+            1000, // a small, configured limit
         )
         .await
         .unwrap();
         assert!(out.truncated);
-        assert_eq!(out.output.len(), MAX_OUTPUT_BYTES);
+        assert_eq!(out.output.len(), 1000);
     }
 
     #[test]

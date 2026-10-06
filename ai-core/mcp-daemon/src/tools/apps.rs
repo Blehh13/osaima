@@ -12,9 +12,6 @@ use serde_json::{json, Value};
 
 use super::{read_only, reversible, to_value, tool, Args, ToolContext, ToolError, ToolResult};
 
-/// Terminal emulator used for `Terminal=true` entries when `$TERMINAL` is unset.
-const DEFAULT_TERMINAL: &str = "foot";
-
 pub fn definitions() -> Vec<Value> {
     vec![
         tool(
@@ -107,8 +104,8 @@ pub async fn launch_app(ctx: &ToolContext, arguments: Option<Value>) -> ToolResu
     let mut argv = exec_argv(&app.exec)
         .map_err(|e| ToolError::failed(format!("{} has an invalid Exec line: {e}", app.id)))?;
     if app.terminal {
-        let terminal = std::env::var("TERMINAL").unwrap_or_else(|_| DEFAULT_TERMINAL.into());
-        argv.splice(0..0, [terminal, "-e".into()]);
+        // `Terminal=true` entries run inside the configured terminal (OSAIMA_TERMINAL).
+        argv.splice(0..0, [ctx.settings.terminal.clone(), "-e".into()]);
     }
     spawn_detached(&argv, &ctx.paths.home).await?;
     tracing::info!(app = %app.id, "launched application");

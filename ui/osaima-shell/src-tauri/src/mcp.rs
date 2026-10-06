@@ -3,13 +3,10 @@
 use std::env;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::Duration;
 
 use serde_json::{json, Value};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::UnixStream;
-
-const REQUEST_TIMEOUT: Duration = Duration::from_secs(3);
 
 static NEXT_ID: AtomicU64 = AtomicU64::new(1);
 
@@ -33,7 +30,7 @@ pub fn socket_path() -> PathBuf {
 
 /// Send one JSON-RPC request and return its `result`.
 pub async fn request(method: &str, params: Value) -> Result<Value, String> {
-    tokio::time::timeout(REQUEST_TIMEOUT, send(method, params))
+    tokio::time::timeout(crate::settings::get().core_timeout, send(method, params))
         .await
         .map_err(|_| "AI Core did not respond in time".to_string())?
 }

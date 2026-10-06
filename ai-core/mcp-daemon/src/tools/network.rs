@@ -6,17 +6,15 @@ use std::fs;
 use std::io;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::path::Path;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 use serde::Serialize;
 use serde_json::{json, Value};
 
 use super::{no_args, read_only, to_value, tool, Args, ToolContext, ToolError, ToolResult};
+use crate::settings::Settings;
 
-const CONNECT_TIMEOUT: Duration = Duration::from_secs(4);
-const DEFAULT_HOST: &str = "example.com";
-
-pub fn definitions() -> Vec<Value> {
+pub fn definitions(settings: &Settings) -> Vec<Value> {
     vec![
         tool(
             "network_status",
@@ -32,7 +30,7 @@ pub fn definitions() -> Vec<Value> {
             json!({
                 "type": "object",
                 "properties": {
-                    "host": { "type": "string", "default": DEFAULT_HOST, "description": "Host name or IP address" },
+                    "host": { "type": "string", "default": settings.connectivity_host, "description": "Host name or IP address" },
                     "port": { "type": "integer", "minimum": 1, "maximum": 65535, "default": 443 }
                 },
                 "additionalProperties": false
@@ -86,16 +84,17 @@ pub fn network_status(ctx: &ToolContext, arguments: Option<Value>) -> ToolResult
     }))
 }
 
-pub async fn check_connectivity(arguments: Option<Value>) -> ToolResult {
+pub async fn check_connectivity(ctx: &ToolContext, arguments: Option<Value>) -> ToolResult {
     let args = Args::parse(arguments, &["host", "port"])?;
-    let host = args.str("host")?.map(str::trim).unwrap_or(DEFAULT_HOST);
+    let host = args.str("host")?.map(str::trim).unwrap_or(ctx.settings.connectivity_host.as_str());
     validate_host(host)?;
+    let connect_timeout = ctx.settings.connect_timeout;
     let port = u16::try_from(args.u64_in("port", 1, 65_535, 443)?)
         .map_err(|_| ToolError::invalid("port must be between 1 and 65535"))?;
 
     let started = Instant::now();
     let resolved: Vec<SocketAddr> =
-        match tokio::time::timeout(CONNECT_TIMEOUT, tokio::net::lookup_host((host, port))).await {
+        match tokio::time::timeout(connect_timeout, tokio::net::lookup_host((host, port))).await {
             Ok(Ok(addrs)) => addrs.collect(),
             Ok(Err(err)) => {
                 return Ok(json!({
@@ -121,7 +120,7 @@ pub async fn check_connectivity(arguments: Option<Value>) -> ToolResult {
     };
     let connect_started = Instant::now();
     let (reachable, error) =
-        match tokio::time::timeout(CONNECT_TIMEOUT, tokio::net::TcpStream::connect(target)).await {
+        match tokio::time::timeout(connect_timeout, tokio::net::TcpStream::connect(target)).await {
             Ok(Ok(_)) => (true, None),
             Ok(Err(err)) => (false, Some(format!("connection failed: {err}"))),
             Err(_) => (false, Some("connection timed out".to_string())),
@@ -282,9 +281,11 @@ mod tests {
 
     #[tokio::test]
     async fn connectivity_to_a_local_listener() {
+        let dir = tempfile::tempdir().unwrap();
+        let ctx = context(dir.path());
         let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
         let port = listener.local_addr().unwrap().port();
-        let res = check_connectivity(Some(json!({ "host": "127.0.0.1", "port": port })))
+        let res = check_connectivity(&ctx, Some(json!({ "host": "127.0.0.1", "port": port })))
             .await
             .unwrap();
         assert_eq!(res["reachable"], true);
@@ -293,12 +294,14 @@ mod tests {
 
     #[tokio::test]
     async fn connectivity_reports_refused_connections() {
+        let dir = tempfile::tempdir().unwrap();
+        let ctx = context(dir.path());
         // Bind then drop to get a port with nothing listening.
         let port = {
             let l = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
             l.local_addr().unwrap().port()
         };
-        let res = check_connectivity(Some(json!({ "host": "127.0.0.1", "port": port })))
+        let res = check_connectivity(&ctx, Some(json!({ "host": "127.0.0.1", "port": port })))
             .await
             .unwrap();
         assert_eq!(res["reachable"], false);

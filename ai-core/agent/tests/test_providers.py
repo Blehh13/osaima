@@ -8,9 +8,16 @@ import httpx
 import pytest
 from conftest import SPECS
 
+from osaima_agent.config import LocalConfig
 from osaima_agent.llm import Message, NativeContent, ProviderError, ProviderUnavailable, ToolCall
-from osaima_agent.llm.claude import BETAS, ClaudeProvider, completion_from, to_claude
-from osaima_agent.llm.ollama import MAX_HISTORY_MESSAGES, OllamaProvider, to_ollama
+from osaima_agent.llm.claude import (
+    BINDING_BETA,
+    FALLBACK_BETA,
+    ClaudeProvider,
+    completion_from,
+    to_claude,
+)
+from osaima_agent.llm.ollama import OllamaProvider, to_ollama
 
 
 async def collect() -> tuple[list[str], Any]:
@@ -102,8 +109,9 @@ def test_ollama_history_is_trimmed_to_a_user_turn() -> None:
         history.append(Message("user", f"q{i}"))
         history.append(Message("assistant", "", tool_calls=[ToolCall(f"c{i}", "get_volume", {})]))
         history.append(Message("tool", "50%", tool_call_id=f"c{i}", tool_name="get_volume"))
-    converted = to_ollama(history)
-    assert len(converted) <= MAX_HISTORY_MESSAGES
+    converted = to_ollama(history, LocalConfig.history_messages)
+    assert len(converted) <= LocalConfig.history_messages
+    assert len(to_ollama(history, 6)) <= 6
     assert converted[0]["role"] == "user"
     assert converted[-1] == {"role": "tool", "content": "50%", "tool_name": "get_volume"}
 
@@ -235,7 +243,7 @@ async def test_claude_request_shape_and_streaming() -> None:
     request = client.requests[0]
     assert request["model"] == "claude-opus-5-5"
     assert request["fallbacks"] == "default"
-    assert request["betas"] == BETAS
+    assert request["betas"] == [BINDING_BETA, FALLBACK_BETA]
     assert request["output_config"] == {"effort": "low"}
     assert request["thinking"]["block_binding"] == {"prefix_mismatch_behavior": "drop_block"}
     assert all(t["eager_input_streaming"] for t in request["tools"])

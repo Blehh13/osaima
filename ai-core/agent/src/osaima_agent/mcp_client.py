@@ -13,7 +13,7 @@ from . import __version__
 from .llm import ToolSpec
 
 PROTOCOL_VERSION = "2025-06-18"
-REQUEST_TIMEOUT_S = 30.0
+DEFAULT_REQUEST_TIMEOUT_S = 30.0
 
 
 class McpError(RuntimeError):
@@ -34,8 +34,11 @@ class ToolOutcome:
 class McpClient:
     """One persistent session; reconnects transparently after a failure."""
 
-    def __init__(self, socket_path: Path) -> None:
+    def __init__(
+        self, socket_path: Path, request_timeout_s: float = DEFAULT_REQUEST_TIMEOUT_S
+    ) -> None:
         self._path = socket_path
+        self._timeout = request_timeout_s
         self._reader: asyncio.StreamReader | None = None
         self._writer: asyncio.StreamWriter | None = None
         self._lock = asyncio.Lock()
@@ -65,7 +68,7 @@ class McpClient:
         payload = {"jsonrpc": "2.0", "id": request_id, "method": method, "params": params}
         self._writer.write(json.dumps(payload).encode() + b"\n")
         await self._writer.drain()
-        line = await asyncio.wait_for(self._reader.readline(), REQUEST_TIMEOUT_S)
+        line = await asyncio.wait_for(self._reader.readline(), self._timeout)
         if not line:
             raise McpError("AI Core closed the connection")
         reply = json.loads(line)

@@ -18,9 +18,6 @@ use tokio::net::unix::{OwnedReadHalf, OwnedWriteHalf};
 use tokio::net::UnixStream;
 use tokio::sync::oneshot;
 
-/// Replies are quick (the answer itself arrives as events); this only bounds a hung service.
-const REQUEST_TIMEOUT: Duration = Duration::from_secs(15);
-
 type Pending = Arc<Mutex<HashMap<u64, oneshot::Sender<Result<Value, String>>>>>;
 pub type EventSink = Arc<dyn Fn(Value) + Send + Sync>;
 
@@ -40,6 +37,8 @@ struct Link {
 
 struct Inner {
     path: PathBuf,
+    /// Replies are quick (the answer itself arrives as events); this only bounds a hung service.
+    request_timeout: Duration,
     sink: EventSink,
     link: tokio::sync::Mutex<Option<Link>>,
     next_id: AtomicU64,
@@ -49,9 +48,10 @@ struct Inner {
 pub struct AgentBridge(Arc<Inner>);
 
 impl AgentBridge {
-    pub fn new(path: PathBuf, sink: EventSink) -> Self {
+    pub fn new(path: PathBuf, request_timeout: Duration, sink: EventSink) -> Self {
         Self(Arc::new(Inner {
             path,
+            request_timeout,
             sink,
             link: tokio::sync::Mutex::new(None),
             next_id: AtomicU64::new(1),
@@ -90,7 +90,7 @@ impl AgentBridge {
             Arc::clone(&link.pending)
         };
 
-        match tokio::time::timeout(REQUEST_TIMEOUT, rx).await {
+        match tokio::time::timeout(self.0.request_timeout, rx).await {
             Ok(Ok(reply)) => reply,
             Ok(Err(_)) => Err("the assistant service disconnected".into()),
             Err(_) => {
@@ -215,7 +215,7 @@ mod tests {
         let listener = UnixListener::bind(&path).unwrap();
         tokio::spawn(async move { serve_once(&listener, None).await });
         let (sink, events) = collector();
-        let bridge = AgentBridge::new(path, sink);
+        let bridge = AgentBridge::new(path, Duration::from_secs(5), sink);
 
         let echoed = bridge.call("agent.status", json!({"a": 1})).await.unwrap();
         assert_eq!(echoed, json!({"a": 1}));
@@ -248,7 +248,7 @@ mod tests {
             serve_once(&listener, None).await;
         });
         let (sink, events) = collector();
-        let bridge = AgentBridge::new(path, sink);
+        let bridge = AgentBridge::new(path, Duration::from_secs(5), sink);
 
         assert!(bridge.call("agent.status", json!(1)).await.is_ok());
         // The server hung up after one reply; wait for the reader to notice.
@@ -278,7 +278,7 @@ mod tests {
     async fn a_missing_service_is_a_clear_error() {
         let dir = tempfile::tempdir().unwrap();
         let (sink, _) = collector();
-        let bridge = AgentBridge::new(dir.path().join("none.sock"), sink);
+        let bridge = AgentBridge::new(dir.path().join("none.sock"), Duration::from_secs(5), sink);
         let err = bridge.call("agent.status", json!({})).await.unwrap_err();
         assert!(err.contains("not running"), "{err}");
     }

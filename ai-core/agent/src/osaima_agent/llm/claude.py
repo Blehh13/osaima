@@ -17,6 +17,7 @@ from typing import Any
 
 import anthropic
 
+from ..config import CloudConfig
 from . import (
     Completion,
     Message,
@@ -28,9 +29,9 @@ from . import (
     ToolSpec,
 )
 
-BETAS = ["server-side-fallback-2026-07-01", "thinking-binding-controls-2026-08-01"]
-# Re-issue a turn at most this many times when streamed tool input is unparseable.
-MAX_JSON_RETRIES = 2
+# Anthropic API feature identifiers (protocol constants, not settings).
+FALLBACK_BETA = "server-side-fallback-2026-07-01"
+BINDING_BETA = "thinking-binding-controls-2026-08-01"
 
 
 class ClaudeProvider:
@@ -40,19 +41,41 @@ class ClaudeProvider:
         self,
         model: str = "claude-opus-5-5",
         *,
-        effort: str = "medium",
-        max_tokens: int = 16000,
+        effort: str = CloudConfig.effort,
+        max_tokens: int = CloudConfig.max_tokens,
+        server_fallback: bool = CloudConfig.server_fallback,
+        timeout_s: float = CloudConfig.timeout_s,
+        max_retries: int = CloudConfig.max_retries,
+        json_retries: int = CloudConfig.json_retries,
         client: anthropic.AsyncAnthropic | None = None,
     ) -> None:
         self.model = model
         self._effort = effort
         self._max_tokens = max_tokens
+        self._server_fallback = server_fallback
+        self._timeout_s = timeout_s
+        self._max_retries = max_retries
+        self._json_retries = json_retries
         self._client = client
+
+    @classmethod
+    def from_config(cls, cfg: CloudConfig) -> ClaudeProvider:
+        return cls(
+            cfg.model,
+            effort=cfg.effort,
+            max_tokens=cfg.max_tokens,
+            server_fallback=cfg.server_fallback,
+            timeout_s=cfg.timeout_s,
+            max_retries=cfg.max_retries,
+            json_retries=cfg.json_retries,
+        )
 
     def _get_client(self) -> anthropic.AsyncAnthropic:
         if self._client is None:
             # Credentials come from ANTHROPIC_API_KEY or an `ant auth login` profile.
-            self._client = anthropic.AsyncAnthropic(max_retries=2, timeout=120.0)
+            self._client = anthropic.AsyncAnthropic(
+                max_retries=self._max_retries, timeout=self._timeout_s
+            )
         return self._client
 
     async def available(self) -> bool:
@@ -86,10 +109,12 @@ class ClaudeProvider:
                 "block_binding": {"prefix_mismatch_behavior": "drop_block"},
             },
             "cache_control": {"type": "ephemeral"},
-            "fallbacks": "default",
-            "betas": BETAS,
+            "betas": [BINDING_BETA],
         }
-        for _ in range(MAX_JSON_RETRIES + 1):
+        if self._server_fallback:
+            request["fallbacks"] = "default"
+            request["betas"].append(FALLBACK_BETA)
+        for _ in range(self._json_retries + 1):
             try:
                 final = await self._stream(client, request, on_text)
                 return completion_from(final, self.name)

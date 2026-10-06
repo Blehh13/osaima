@@ -5,7 +5,8 @@ use std::sync::Arc;
 
 use mcp_daemon::server::Server;
 use mcp_daemon::system::SystemMonitor;
-use mcp_daemon::transport::{SocketListener, MAX_MESSAGE_BYTES};
+use mcp_daemon::settings::Settings;
+use mcp_daemon::transport::SocketListener;
 use serde_json::{json, Value};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::UnixStream;
@@ -51,7 +52,7 @@ async fn full_mcp_session_over_socket() {
     let mode = std::fs::metadata(&path).unwrap().permissions().mode();
     assert_eq!(mode & 0o777, 0o600, "socket must be owner-only");
 
-    let server = Server::new(Arc::new(SystemMonitor::new()));
+    let server = Server::new(Arc::new(SystemMonitor::new()), Settings::default());
     let task = tokio::spawn(async move { listener.serve(server).await });
 
     let mut client = Client::connect(&path).await;
@@ -105,14 +106,42 @@ async fn oversized_message_closes_connection() {
     let dir = tempfile::tempdir().unwrap();
     let path = dir.path().join("mcp.sock");
     let listener = SocketListener::bind(&path).unwrap();
-    let server = Server::new(Arc::new(SystemMonitor::new()));
+    let server = Server::new(Arc::new(SystemMonitor::new()), Settings::default());
     let task = tokio::spawn(async move { listener.serve(server).await });
 
     let mut client = Client::connect(&path).await;
-    let huge = "x".repeat(MAX_MESSAGE_BYTES + 10);
+    let huge = "x".repeat(Settings::default().max_message_bytes + 10);
     client.send(&huge).await;
     let res = client.recv().await.expect("expected an error reply");
     assert_eq!(res["error"]["code"], -32600);
+    assert!(client.recv().await.is_none(), "connection should be closed");
+
+    task.abort();
+}
+
+#[tokio::test]
+async fn the_message_limit_is_a_setting() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("mcp.sock");
+    let listener = SocketListener::bind(&path).unwrap();
+    let settings = Settings {
+        max_message_bytes: 2048,
+        ..Settings::default()
+    };
+    let server = Server::new(Arc::new(SystemMonitor::new()), settings);
+    let task = tokio::spawn(async move { listener.serve(server).await });
+
+    let mut client = Client::connect(&path).await;
+    // A normal message still works.
+    let pong = client
+        .request(json!({ "jsonrpc": "2.0", "id": 1, "method": "ping" }))
+        .await;
+    assert_eq!(pong["id"], 1);
+    // Larger than the configured limit, though far below the default.
+    client.send(&"x".repeat(3000)).await;
+    let res = client.recv().await.expect("expected an error reply");
+    assert_eq!(res["error"]["code"], -32600);
+    assert!(res["error"]["message"].as_str().unwrap().contains("2048-byte"));
     assert!(client.recv().await.is_none(), "connection should be closed");
 
     task.abort();

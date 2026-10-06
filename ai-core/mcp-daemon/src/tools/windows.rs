@@ -17,7 +17,6 @@ use super::{
 const MAGIC: &[u8; 6] = b"i3-ipc";
 const RUN_COMMAND: u32 = 0;
 const GET_TREE: u32 = 4;
-const TIMEOUT: Duration = Duration::from_secs(3);
 const MAX_REPLY_BYTES: usize = 32 * 1024 * 1024;
 
 pub fn definitions() -> Vec<Value> {
@@ -68,7 +67,7 @@ pub struct Window {
 pub async fn list_windows(ctx: &ToolContext, arguments: Option<Value>) -> ToolResult {
     Args::parse(arguments, &[])?;
     let socket = sway_socket(ctx)?;
-    let windows = windows(socket).await?;
+    let windows = windows(socket, ctx.settings.helper_timeout).await?;
     Ok(json!({ "windows": to_value(&windows) }))
 }
 
@@ -88,7 +87,8 @@ async fn act_on_window(ctx: &ToolContext, arguments: Option<Value>, command: &st
         return Err(ToolError::invalid("give exactly one of id or match"));
     }
     let socket = sway_socket(ctx)?;
-    let all = windows(socket).await?;
+    let timeout = ctx.settings.helper_timeout;
+    let all = windows(socket, timeout).await?;
     let window = match (id, pattern) {
         (Some(id), _) => all
             .into_iter()
@@ -101,6 +101,7 @@ async fn act_on_window(ctx: &ToolContext, arguments: Option<Value>, command: &st
         socket,
         RUN_COMMAND,
         &format!("[con_id={}] {command}", window.id),
+        timeout,
     )
     .await?;
     let ok = reply
@@ -154,8 +155,8 @@ fn sway_socket(ctx: &ToolContext) -> Result<&Path, ToolError> {
     })
 }
 
-async fn windows(socket: &Path) -> Result<Vec<Window>, ToolError> {
-    let tree = ipc(socket, GET_TREE, "").await?;
+async fn windows(socket: &Path, timeout: Duration) -> Result<Vec<Window>, ToolError> {
+    let tree = ipc(socket, GET_TREE, "", timeout).await?;
     let mut out = Vec::new();
     collect(&tree, None, &mut out);
     Ok(out)
@@ -200,7 +201,12 @@ fn collect(node: &Value, workspace: Option<&str>, out: &mut Vec<Window>) {
 }
 
 /// One request/reply exchange on the sway socket.
-async fn ipc(socket: &Path, kind: u32, payload: &str) -> Result<Value, ToolError> {
+async fn ipc(
+    socket: &Path,
+    kind: u32,
+    payload: &str,
+    timeout: Duration,
+) -> Result<Value, ToolError> {
     let exchange = async {
         let mut stream = UnixStream::connect(socket).await?;
         let len = u32::try_from(payload.len()).map_err(std::io::Error::other)?;
@@ -224,7 +230,7 @@ async fn ipc(socket: &Path, kind: u32, payload: &str) -> Result<Value, ToolError
         stream.read_exact(&mut body).await?;
         Ok(body)
     };
-    let body = tokio::time::timeout(TIMEOUT, exchange)
+    let body = tokio::time::timeout(timeout, exchange)
         .await
         .map_err(|_| ToolError::failed("sway did not respond"))?
         .map_err(|e| ToolError::failed(format!("could not talk to sway: {e}")))?;

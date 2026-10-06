@@ -31,14 +31,11 @@ from typing import Any
 from . import __version__
 from .agent import Agent, Conversation, ModelChoice
 from .audit import AuditLog
+from .config import LimitsConfig
 from .llm import ToolCall, ToolSpec
 from .mcp_client import McpError, ToolOutcome
 
 log = logging.getLogger(__name__)
-
-MAX_LINE_BYTES = 1024 * 1024
-MAX_CONVERSATIONS = 32
-MAX_MESSAGE_CHARS = 8000
 
 INVALID_REQUEST = -32600
 METHOD_NOT_FOUND = -32601
@@ -54,9 +51,10 @@ class RpcError(Exception):
 
 
 class AgentServer:
-    def __init__(self, agent: Agent, audit: AuditLog) -> None:
+    def __init__(self, agent: Agent, audit: AuditLog, limits: LimitsConfig | None = None) -> None:
         self._agent = agent
         self._audit = audit
+        self._limits = limits or LimitsConfig()
         self._conversations: OrderedDict[str, Conversation] = OrderedDict()
         self._busy: set[str] = set()
 
@@ -67,7 +65,7 @@ class AgentServer:
         old_umask = os.umask(0o177)  # socket created as 0600
         try:
             server = await asyncio.start_unix_server(
-                self._handle_connection, path=str(path), limit=MAX_LINE_BYTES
+                self._handle_connection, path=str(path), limit=self._limits.max_line_bytes
             )
         finally:
             os.umask(old_umask)
@@ -105,7 +103,7 @@ class AgentServer:
 
     def remember(self, convo: Conversation) -> None:
         self._conversations[convo.id] = convo
-        while len(self._conversations) > MAX_CONVERSATIONS:
+        while len(self._conversations) > self._limits.max_conversations:
             self._conversations.popitem(last=False)
 
 
@@ -186,8 +184,9 @@ class _Session:
 
     async def _chat(self, params: dict[str, Any]) -> dict[str, Any]:
         text = _require(params, "message", str).strip()
-        if not text or len(text) > MAX_MESSAGE_CHARS:
-            raise RpcError(INVALID_PARAMS, f"message must be 1-{MAX_MESSAGE_CHARS} characters")
+        max_chars = self._server._limits.max_message_chars
+        if not text or len(text) > max_chars:
+            raise RpcError(INVALID_PARAMS, f"message must be 1-{max_chars} characters")
         model: ModelChoice
         match params.get("model", "auto"):
             case "auto":
@@ -245,7 +244,10 @@ class _Session:
                 }
             )
             try:
-                outcome = await asyncio.wait_for(self._wait(turn_id, call.id), timeout=30)
+                outcome = await asyncio.wait_for(
+                    self._wait(turn_id, call.id),
+                    timeout=self._server._limits.client_tool_timeout_s,
+                )
             except TimeoutError:
                 return ToolOutcome(ok=False, text="The shell did not respond.")
             if not isinstance(outcome, ToolOutcome):

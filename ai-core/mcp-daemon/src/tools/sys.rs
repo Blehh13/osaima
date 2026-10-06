@@ -6,12 +6,10 @@ use super::{
     destructive, no_args, read_only, to_value, tool, Args, Caller, ToolContext, ToolError,
     ToolResult,
 };
+use crate::settings::Settings;
 use crate::system::{ProcessSignal, ProcessSort};
 
-const DEFAULT_PROCESS_LIMIT: u64 = 15;
-const MAX_PROCESS_LIMIT: u64 = 200;
-
-pub fn definitions() -> Vec<Value> {
+pub fn definitions(settings: &Settings) -> Vec<Value> {
     vec![
         tool(
             "get_system_stats",
@@ -30,8 +28,8 @@ pub fn definitions() -> Vec<Value> {
                     "limit": {
                         "type": "integer",
                         "minimum": 1,
-                        "maximum": MAX_PROCESS_LIMIT,
-                        "default": DEFAULT_PROCESS_LIMIT
+                        "maximum": settings.process_list_max,
+                        "default": settings.process_list_default
                     },
                     "sort_by": { "type": "string", "enum": ["cpu", "memory"], "default": "cpu" }
                 },
@@ -71,7 +69,12 @@ pub fn get_system_stats(ctx: &ToolContext, arguments: Option<Value>) -> ToolResu
 
 pub fn list_processes(ctx: &ToolContext, arguments: Option<Value>) -> ToolResult {
     let args = Args::parse(arguments, &["limit", "sort_by"])?;
-    let limit = args.u64_in("limit", 1, MAX_PROCESS_LIMIT, DEFAULT_PROCESS_LIMIT)?;
+    let limit = args.u64_in(
+        "limit",
+        1,
+        ctx.settings.process_list_max,
+        ctx.settings.process_list_default,
+    )?;
     let sort = match args.str("sort_by")? {
         None | Some("cpu") => ProcessSort::Cpu,
         Some("memory") => ProcessSort::Memory,
@@ -143,6 +146,26 @@ mod tests {
                 Err(ToolError::InvalidParams(_))
             ));
         }
+    }
+
+    #[test]
+    fn configured_process_limits_are_enforced() {
+        use crate::settings::Settings;
+        use crate::tools::test_support::context_with;
+        let dir = tempfile::tempdir().unwrap();
+        let settings = Settings {
+            process_list_max: 5,
+            process_list_default: 2,
+            ..Settings::default()
+        };
+        let ctx = context_with(dir.path(), settings);
+        let default = list_processes(&ctx, None).unwrap();
+        assert!(default["processes"].as_array().unwrap().len() <= 2);
+        assert!(matches!(
+            list_processes(&ctx, Some(json!({ "limit": 6 }))),
+            Err(ToolError::InvalidParams(_))
+        ));
+        assert!(list_processes(&ctx, Some(json!({ "limit": 5 }))).is_ok());
     }
 
     #[test]

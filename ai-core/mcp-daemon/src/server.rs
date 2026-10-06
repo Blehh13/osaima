@@ -8,6 +8,7 @@ use serde_json::{json, Value};
 use crate::protocol::{
     Request, Response, RpcError, INVALID_REQUEST, METHOD_NOT_FOUND, PARSE_ERROR,
 };
+use crate::settings::Settings;
 use crate::system::{ProcessSort, SystemMonitor};
 use crate::tools::{self, Caller, HostPaths, ToolContext};
 
@@ -42,11 +43,16 @@ pub struct Server {
 
 impl Server {
     /// A server for the running system.
-    pub fn new(monitor: Arc<SystemMonitor>) -> Self {
+    pub fn new(monitor: Arc<SystemMonitor>, settings: Settings) -> Self {
         Self::with_context(ToolContext {
             monitor,
             paths: Arc::new(HostPaths::from_env()),
+            settings: Arc::new(settings),
         })
+    }
+
+    pub fn settings(&self) -> &Settings {
+        &self.ctx.settings
     }
 
     pub fn with_context(ctx: ToolContext) -> Self {
@@ -104,7 +110,7 @@ impl Server {
             "initialize" => Ok(self.initialize(params, session)),
             "ping" => Ok(json!({})),
             "notifications/initialized" | "notifications/cancelled" => Ok(Value::Null),
-            "tools/list" => Ok(json!({ "tools": tools::definitions() })),
+            "tools/list" => Ok(json!({ "tools": tools::definitions(&self.ctx.settings) })),
             "tools/call" => {
                 let params = params.unwrap_or(Value::Null);
                 let name = params
@@ -169,7 +175,7 @@ mod tests {
     }
 
     fn setup() -> (Server, Session) {
-        let server = Server::new(Arc::new(SystemMonitor::new()));
+        let server = Server::new(Arc::new(SystemMonitor::new()), Settings::default());
         (server, Session::new(Caller { uid: 0 }))
     }
 

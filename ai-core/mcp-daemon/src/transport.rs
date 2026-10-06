@@ -17,9 +17,6 @@ use crate::protocol::{Response, RpcError, INVALID_REQUEST, PARSE_ERROR};
 use crate::server::{Server, Session};
 use crate::tools::Caller;
 
-/// Largest accepted message; longer lines close the connection.
-pub const MAX_MESSAGE_BYTES: usize = 1024 * 1024;
-
 /// A bound daemon socket. The socket file is removed when this is dropped.
 pub struct SocketListener {
     listener: UnixListener,
@@ -110,6 +107,8 @@ pub async fn serve_stdio(server: Server) -> io::Result<()> {
 }
 
 /// Run one session over any byte stream.
+///
+/// Messages longer than the server's `max_message_bytes` setting end the connection.
 pub async fn serve_connection<R, W>(
     reader: R,
     mut writer: W,
@@ -123,9 +122,10 @@ where
     let mut reader = BufReader::new(reader);
     let mut session = Session::new(caller);
     let mut buf = Vec::new();
+    let max_bytes = server.settings().max_message_bytes;
     loop {
         buf.clear();
-        let limit = MAX_MESSAGE_BYTES as u64 + 1;
+        let limit = max_bytes as u64 + 1;
         if (&mut reader)
             .take(limit)
             .read_until(b'\n', &mut buf)
@@ -134,8 +134,11 @@ where
         {
             return Ok(());
         }
-        if buf.len() > MAX_MESSAGE_BYTES {
-            let err = RpcError::new(INVALID_REQUEST, "message exceeds the 1 MiB limit");
+        if buf.len() > max_bytes {
+            let err = RpcError::new(
+                INVALID_REQUEST,
+                format!("message exceeds the {max_bytes}-byte limit"),
+            );
             write_line(&mut writer, &Response::failure(Value::Null, err)).await?;
             return Ok(());
         }

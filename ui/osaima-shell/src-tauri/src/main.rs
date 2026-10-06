@@ -1,6 +1,7 @@
 mod agent;
 mod host;
 mod mcp;
+mod settings;
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -47,7 +48,14 @@ async fn list_disks() -> Result<Value, String> {
 #[tauri::command]
 async fn run_command(cmd: String, cwd: Option<String>) -> Result<host::CommandOutput, String> {
     let cwd = cwd.filter(|c| !c.is_empty()).map(PathBuf::from);
-    host::run_command(&cmd, cwd.as_deref(), host::COMMAND_TIMEOUT).await
+    let limits = settings::get();
+    host::run_command(
+        &cmd,
+        cwd.as_deref(),
+        limits.command_timeout,
+        limits.command_output_limit,
+    )
+    .await
 }
 
 /// List a directory for the Files app.
@@ -80,13 +88,24 @@ fn home_dir() -> String {
 }
 
 fn main() {
+    let settings = match settings::init() {
+        Ok(settings) => settings,
+        Err(err) => {
+            eprintln!("osaima-shell: invalid setting {err}");
+            std::process::exit(2);
+        }
+    };
     tauri::Builder::default()
         .setup(|app| {
             let handle = app.handle().clone();
             let sink: agent::EventSink = Arc::new(move |event| {
                 let _ = handle.emit("agent-event", event);
             });
-            app.manage(AgentBridge::new(agent::socket_path(), sink));
+            app.manage(AgentBridge::new(
+                agent::socket_path(),
+                settings.agent_timeout,
+                sink,
+            ));
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

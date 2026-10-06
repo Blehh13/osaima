@@ -4,7 +4,8 @@ use std::sync::Arc;
 
 use mcp_daemon::paths;
 use mcp_daemon::server::Server;
-use mcp_daemon::system::{SystemMonitor, SAMPLE_INTERVAL};
+use mcp_daemon::settings::Settings;
+use mcp_daemon::system::SystemMonitor;
 use mcp_daemon::transport::{self, SocketListener};
 use tokio::signal::unix::{signal, SignalKind};
 use tracing_subscriber::EnvFilter;
@@ -21,7 +22,21 @@ Options:
   -h, --help     Show this help
   -V, --version  Show the version
 
-Logging goes to stderr; set OSAIMA_LOG (e.g. OSAIMA_LOG=debug) to change the level.";
+Logging goes to stderr; set OSAIMA_LOG (e.g. OSAIMA_LOG=debug) to change the level.
+
+Settings (environment variables, defaults in brackets; docs/configuration.md has details):
+  OSAIMA_SAMPLE_INTERVAL_MS     how often system data is re-sampled        [2000]
+  OSAIMA_MAX_MESSAGE_BYTES      longest accepted message                   [1048576]
+  OSAIMA_HELPER_TIMEOUT_MS      limit for wpctl, loginctl and sway calls   [5000]
+  OSAIMA_CONNECT_TIMEOUT_MS     limit per step of check_connectivity       [4000]
+  OSAIMA_CONNECTIVITY_HOST      host tested when none is given             [example.com]
+  OSAIMA_PROCESS_LIST_DEFAULT   processes listed by default                [15]
+  OSAIMA_PROCESS_LIST_MAX       most processes one call may list           [200]
+  OSAIMA_SEARCH_MAX_DEPTH       directory levels file search descends      [8]
+  OSAIMA_SEARCH_MAX_ENTRIES     entries file search examines at most       [100000]
+  OSAIMA_SEARCH_TIME_BUDGET_MS  time budget for one file search            [3000]
+  OSAIMA_MAX_VOLUME_PERCENT     highest volume set_volume accepts          [150]
+  OSAIMA_TERMINAL               terminal for Terminal=true apps ($TERMINAL) [foot]";
 
 #[derive(Debug, PartialEq)]
 enum Mode {
@@ -76,12 +91,19 @@ async fn main() -> ExitCode {
         }
     };
 
+    let settings = match Settings::from_env() {
+        Ok(settings) => settings,
+        Err(err) => {
+            eprintln!("error: invalid setting {err}");
+            return ExitCode::from(2);
+        }
+    };
     let monitor = Arc::new(SystemMonitor::new());
-    if let Err(err) = monitor.spawn_sampler(SAMPLE_INTERVAL) {
+    if let Err(err) = monitor.spawn_sampler(settings.sample_interval) {
         tracing::error!(error = %err, "could not start the system sampler");
         return ExitCode::FAILURE;
     }
-    let server = Server::new(monitor);
+    let server = Server::new(monitor, settings);
 
     match mode {
         Mode::Stdio => match transport::serve_stdio(server).await {

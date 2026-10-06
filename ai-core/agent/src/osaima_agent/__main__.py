@@ -24,44 +24,36 @@ from .server import AgentServer
 
 
 def build_agent(cfg: config.AgentConfig, mcp: McpClient) -> tuple[Agent, AuditLog]:
-    local: Provider | None = None
-    if cfg.local.enabled:
-        local = OllamaProvider(
-            cfg.local.url,
-            cfg.local.model,
-            context_tokens=cfg.local.context_tokens,
-            timeout_s=cfg.local.timeout_s,
-        )
-    cloud: Provider | None = None
-    if cfg.cloud.enabled:
-        cloud = ClaudeProvider(
-            cfg.cloud.model, effort=cfg.cloud.effort, max_tokens=cfg.cloud.max_tokens
-        )
-    audit = AuditLog(cfg.audit_log)
+    local: Provider | None = OllamaProvider.from_config(cfg.local) if cfg.local.enabled else None
+    cloud: Provider | None = ClaudeProvider.from_config(cfg.cloud) if cfg.cloud.enabled else None
+    audit = AuditLog(cfg.audit_log, cfg.audit.max_bytes)
     agent = Agent(
         tools=mcp,
         local=local,
         cloud=cloud,
         policy=Policy(cfg.policy.confirm, cfg.policy.deny),
         audit=audit,
-        max_steps=cfg.max_steps,
+        limits=cfg.limits,
+        system_prompt=cfg.system_prompt,
         approval_timeout_s=cfg.policy.approval_timeout_s,
     )
     return agent, audit
 
 
 async def serve(cfg: config.AgentConfig, socket_path: Path) -> None:
-    mcp = McpClient(cfg.mcp_socket_path)
+    mcp = McpClient(cfg.mcp_socket_path, cfg.limits.core_request_timeout_s)
     agent, audit = build_agent(cfg, mcp)
     try:
-        await AgentServer(agent, audit).serve(socket_path)
+        await AgentServer(agent, audit, cfg.limits).serve(socket_path)
     finally:
         await mcp.aclose()
 
 
 async def run_doctor(cfg: config.AgentConfig, pull: bool) -> int:
-    mcp = McpClient(cfg.mcp_socket_path)
-    async with httpx.AsyncClient(base_url=cfg.local.url, timeout=5.0) as ollama:
+    mcp = McpClient(cfg.mcp_socket_path, cfg.limits.core_request_timeout_s)
+    async with httpx.AsyncClient(
+        base_url=cfg.local.url, timeout=cfg.local.connect_timeout_s
+    ) as ollama:
         try:
             checks = await doctor.run_checks(cfg, mcp, ollama)
             local = next((c for c in checks if c.name == "Local model"), None)
@@ -86,7 +78,7 @@ async def run_doctor(cfg: config.AgentConfig, pull: bool) -> int:
 
 async def ask(cfg: config.AgentConfig, question: str, model: str, yes: bool) -> int:
     """One request in the terminal, with approvals asked on stdin."""
-    mcp = McpClient(cfg.mcp_socket_path)
+    mcp = McpClient(cfg.mcp_socket_path, cfg.limits.core_request_timeout_s)
     agent, _ = build_agent(cfg, mcp)
     try:
         convo: Conversation = await agent.new_conversation()

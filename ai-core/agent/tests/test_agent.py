@@ -8,6 +8,7 @@ from conftest import FakeTools, ScriptedProvider, call, reply
 
 from osaima_agent.agent import Agent, Conversation
 from osaima_agent.audit import AuditLog
+from osaima_agent.config import LimitsConfig
 from osaima_agent.llm import Completion, NativeContent, ProviderUnavailable, ToolCall, ToolSpec
 from osaima_agent.mcp_client import ToolOutcome
 from osaima_agent.policy import Policy
@@ -200,7 +201,7 @@ async def test_repeated_invalid_tool_calls_escalate_to_cloud(audit: AuditLog) ->
 
 async def test_stops_after_max_steps(audit: AuditLog) -> None:
     local = ScriptedProvider("local", [call("get_system_stats") for _ in range(3)])
-    agent, _ = make_agent(local, audit=audit, max_steps=3)
+    agent, _ = make_agent(local, audit=audit, limits=LimitsConfig(max_steps=3))
     result, rec, _ = await run(agent, "loop forever")
     assert result.stopped == "max_steps"
     assert rec.types()[-1] == "done"

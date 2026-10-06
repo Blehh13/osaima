@@ -7,6 +7,7 @@ from typing import Any
 
 import httpx
 
+from ..config import LocalConfig
 from . import (
     Completion,
     Message,
@@ -19,9 +20,6 @@ from . import (
     new_call_id,
 )
 
-# Small local models have short context windows; keep the recent conversation.
-MAX_HISTORY_MESSAGES = 24
-
 
 class OllamaProvider:
     name = "ollama"
@@ -31,21 +29,42 @@ class OllamaProvider:
         url: str,
         model: str,
         *,
-        context_tokens: int = 8192,
-        timeout_s: float = 120.0,
+        context_tokens: int = LocalConfig.context_tokens,
+        timeout_s: float = LocalConfig.timeout_s,
+        connect_timeout_s: float = LocalConfig.connect_timeout_s,
+        temperature: float = LocalConfig.temperature,
+        keep_alive: str = LocalConfig.keep_alive,
+        history_messages: int = LocalConfig.history_messages,
         transport: httpx.AsyncBaseTransport | None = None,
     ) -> None:
         self.model = model
         self._context_tokens = context_tokens
+        self._temperature = temperature
+        self._keep_alive = keep_alive
+        self._history_messages = history_messages
+        self._connect_timeout = connect_timeout_s
         self._client = httpx.AsyncClient(
             base_url=url,
-            timeout=httpx.Timeout(timeout_s, connect=3.0),
+            timeout=httpx.Timeout(timeout_s, connect=connect_timeout_s),
             transport=transport,
+        )
+
+    @classmethod
+    def from_config(cls, cfg: LocalConfig) -> OllamaProvider:
+        return cls(
+            cfg.url,
+            cfg.model,
+            context_tokens=cfg.context_tokens,
+            timeout_s=cfg.timeout_s,
+            connect_timeout_s=cfg.connect_timeout_s,
+            temperature=cfg.temperature,
+            keep_alive=cfg.keep_alive,
+            history_messages=cfg.history_messages,
         )
 
     async def available(self) -> bool:
         try:
-            response = await self._client.get("/api/tags", timeout=3.0)
+            response = await self._client.get("/api/tags", timeout=self._connect_timeout)
             response.raise_for_status()
         except httpx.HTTPError:
             return False
@@ -61,11 +80,14 @@ class OllamaProvider:
     ) -> Completion:
         body = {
             "model": self.model,
-            "messages": [{"role": "system", "content": system}, *to_ollama(messages)],
+            "messages": [
+                {"role": "system", "content": system},
+                *to_ollama(messages, self._history_messages),
+            ],
             "tools": [ollama_tool(t) for t in tools],
             "stream": True,
-            "keep_alive": "10m",
-            "options": {"temperature": 0.2, "num_ctx": self._context_tokens},
+            "keep_alive": self._keep_alive,
+            "options": {"temperature": self._temperature, "num_ctx": self._context_tokens},
         }
         text_parts: list[str] = []
         calls: list[ToolCall] = []
@@ -144,9 +166,15 @@ def ollama_tool(tool: ToolSpec) -> dict[str, Any]:
     }
 
 
-def to_ollama(messages: list[Message]) -> list[dict[str, Any]]:
-    """Convert the recent part of a conversation, starting at a user turn."""
-    recent = messages[-MAX_HISTORY_MESSAGES:]
+def to_ollama(
+    messages: list[Message], history_messages: int = LocalConfig.history_messages
+) -> list[dict[str, Any]]:
+    """Convert the recent part of a conversation, starting at a user turn.
+
+    Small local models have short context windows, so only the last
+    `history_messages` messages are sent.
+    """
+    recent = messages[-history_messages:]
     while recent and recent[0].role != "user":
         recent = recent[1:]
     out: list[dict[str, Any]] = []

@@ -1,14 +1,11 @@
 //! Session and power actions through elogind's `loginctl`. Every action here
 //! is marked destructive, so clients must confirm with the user first.
 
-use std::time::Duration;
-
 use serde_json::{json, Value};
 
-use super::{destructive, run_program, tool, Args, ToolError, ToolResult};
+use super::{destructive, run_program, tool, Args, ToolContext, ToolError, ToolResult};
 
 const ACTIONS: [&str; 4] = ["lock", "suspend", "reboot", "poweroff"];
-const TIMEOUT: Duration = Duration::from_secs(10);
 
 pub fn definitions() -> Vec<Value> {
     vec![tool(
@@ -25,12 +22,12 @@ pub fn definitions() -> Vec<Value> {
     )]
 }
 
-pub async fn power_action(arguments: Option<Value>) -> ToolResult {
+pub async fn power_action(ctx: &ToolContext, arguments: Option<Value>) -> ToolResult {
     let args = Args::parse(arguments, &["action"])?;
     let action = args.required_str("action")?;
     let command = loginctl_args(action)?;
     tracing::warn!(action, "performing power action");
-    let out = run_program("loginctl", &command, TIMEOUT).await?;
+    let out = run_program("loginctl", &command, ctx.settings.helper_timeout).await?;
     if out.success {
         Ok(json!({ "action": action, "done": true }))
     } else {
@@ -66,9 +63,11 @@ mod tests {
 
     #[tokio::test]
     async fn rejects_unknown_actions_without_running_anything() {
+        let dir = tempfile::tempdir().unwrap();
+        let ctx = crate::tools::test_support::context(dir.path());
         for bad in [json!({}), json!({ "action": "shutdown -h now" })] {
             assert!(matches!(
-                power_action(Some(bad)).await,
+                power_action(&ctx, Some(bad)).await,
                 Err(ToolError::InvalidParams(_))
             ));
         }

@@ -30,6 +30,7 @@ use serde::Serialize;
 use serde_json::{json, Value};
 
 use crate::protocol::RpcError;
+use crate::settings::Settings;
 use crate::system::SystemMonitor;
 
 pub use args::Args;
@@ -94,6 +95,7 @@ impl HostPaths {
 pub struct ToolContext {
     pub monitor: Arc<SystemMonitor>,
     pub paths: Arc<HostPaths>,
+    pub settings: Arc<Settings>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -118,12 +120,12 @@ impl ToolError {
 pub type ToolResult = Result<Value, ToolError>;
 
 /// Tool definitions for `tools/list`.
-pub fn definitions() -> Value {
+pub fn definitions(settings: &Settings) -> Value {
     let all: Vec<Value> = [
-        sys::definitions(),
-        network::definitions(),
+        sys::definitions(settings),
+        network::definitions(settings),
         display::definitions(),
-        audio::definitions(),
+        audio::definitions(settings),
         apps::definitions(),
         windows::definitions(),
         power::definitions(),
@@ -149,17 +151,17 @@ pub async fn call(
         "kill_process" => sys::kill_process(ctx, caller, arguments),
         "list_disks" => sys::list_disks(ctx, arguments),
         "network_status" => network::network_status(ctx, arguments),
-        "check_connectivity" => network::check_connectivity(arguments).await,
+        "check_connectivity" => network::check_connectivity(ctx, arguments).await,
         "get_brightness" => display::get_brightness(ctx, arguments),
         "set_brightness" => display::set_brightness(ctx, arguments),
-        "get_volume" => audio::get_volume(arguments).await,
-        "set_volume" => audio::set_volume(arguments).await,
+        "get_volume" => audio::get_volume(ctx, arguments).await,
+        "set_volume" => audio::set_volume(ctx, arguments).await,
         "list_apps" => apps::list_apps(ctx, arguments),
         "launch_app" => apps::launch_app(ctx, arguments).await,
         "list_windows" => windows::list_windows(ctx, arguments).await,
         "focus_window" => windows::focus_window(ctx, arguments).await,
         "close_window" => windows::close_window(ctx, arguments).await,
-        "power_action" => power::power_action(arguments).await,
+        "power_action" => power::power_action(ctx, arguments).await,
         "search_files" => files::search_files(ctx, arguments).await,
         "package_info" => packages::package_info(ctx, arguments).await,
         _ => return Err(RpcError::invalid_params(format!("unknown tool: {name}"))),
@@ -287,6 +289,11 @@ pub(crate) mod test_support {
 
     /// A context whose host paths all live under `root`.
     pub fn context(root: &Path) -> ToolContext {
+        context_with(root, Settings::default())
+    }
+
+    /// Like [`context`], with custom settings.
+    pub fn context_with(root: &Path, settings: Settings) -> ToolContext {
         let paths = HostPaths {
             home: root.join("home"),
             application_dirs: vec![root.join("apps-user"), root.join("apps-system")],
@@ -300,6 +307,7 @@ pub(crate) mod test_support {
         ToolContext {
             monitor: Arc::new(SystemMonitor::new()),
             paths: Arc::new(paths),
+            settings: Arc::new(settings),
         }
     }
 }
@@ -311,7 +319,7 @@ mod tests {
 
     #[test]
     fn definitions_are_unique_and_annotated() {
-        let defs = definitions();
+        let defs = definitions(&Settings::default());
         let tools = defs.as_array().unwrap();
         assert_eq!(tools.len(), 18);
         let mut names: Vec<&str> = tools.iter().map(|t| t["name"].as_str().unwrap()).collect();
@@ -323,6 +331,30 @@ mod tests {
             assert!(tool["annotations"]["readOnlyHint"].is_boolean(), "{tool}");
             assert!(tool["description"].as_str().unwrap().len() > 10, "{tool}");
         }
+    }
+
+    #[test]
+    fn definitions_reflect_settings() {
+        let settings = Settings {
+            process_list_max: 50,
+            process_list_default: 7,
+            max_volume_percent: 100,
+            connectivity_host: "gentoo.org".into(),
+            ..Settings::default()
+        };
+        let defs = definitions(&settings);
+        let find = |name: &str| {
+            defs.as_array()
+                .unwrap()
+                .iter()
+                .find(|t| t["name"] == name)
+                .unwrap()["inputSchema"]["properties"]
+                .clone()
+        };
+        assert_eq!(find("list_processes")["limit"]["maximum"], 50);
+        assert_eq!(find("list_processes")["limit"]["default"], 7);
+        assert_eq!(find("set_volume")["percent"]["maximum"], 100);
+        assert_eq!(find("check_connectivity")["host"]["default"], "gentoo.org");
     }
 
     #[tokio::test]

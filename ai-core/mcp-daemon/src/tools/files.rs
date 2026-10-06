@@ -10,10 +10,25 @@ use serde::Serialize;
 use serde_json::{json, Value};
 
 use super::{read_only, to_value, tool, Args, ToolContext, ToolError, ToolResult};
+use crate::settings::Settings;
 
-const MAX_DEPTH: usize = 8;
-const MAX_VISITED: usize = 100_000;
-const TIME_BUDGET: Duration = Duration::from_secs(3);
+/// How far one search may go. Set with `OSAIMA_SEARCH_*` (see [`Settings`]).
+#[derive(Debug, Clone, Copy)]
+struct SearchLimits {
+    depth: usize,
+    entries: usize,
+    budget: Duration,
+}
+
+impl From<&Settings> for SearchLimits {
+    fn from(settings: &Settings) -> Self {
+        Self {
+            depth: settings.search_max_depth,
+            entries: settings.search_max_entries,
+            budget: settings.search_time_budget,
+        }
+    }
+}
 
 pub fn definitions() -> Vec<Value> {
     vec![tool(
@@ -50,9 +65,10 @@ pub async fn search_files(ctx: &ToolContext, arguments: Option<Value>) -> ToolRe
     let include_hidden = args.bool("include_hidden")?.unwrap_or(false);
     let home = ctx.paths.home.clone();
     let start = resolve_folder(&home, args.str("folder")?)?;
+    let limits = SearchLimits::from(&*ctx.settings);
 
     tokio::task::spawn_blocking(move || {
-        let (mut hits, complete) = walk(&start, &query, include_hidden);
+        let (mut hits, complete) = walk(&start, &query, include_hidden, limits);
         hits.sort_by_key(|h| std::cmp::Reverse(h.modified_unix));
         let total = hits.len();
         hits.truncate(limit);
@@ -88,7 +104,12 @@ fn resolve_folder(home: &Path, folder: Option<&str>) -> Result<PathBuf, ToolErro
 
 /// Breadth-first name search. Returns the hits and whether the walk finished
 /// within its limits. Symlinked directories are not followed.
-fn walk(start: &Path, query: &str, include_hidden: bool) -> (Vec<Hit>, bool) {
+fn walk(
+    start: &Path,
+    query: &str,
+    include_hidden: bool,
+    limits: SearchLimits,
+) -> (Vec<Hit>, bool) {
     let started = Instant::now();
     let mut queue = VecDeque::from([(start.to_path_buf(), 0usize)]);
     let mut hits = Vec::new();
@@ -99,7 +120,7 @@ fn walk(start: &Path, query: &str, include_hidden: bool) -> (Vec<Hit>, bool) {
         };
         for entry in entries.filter_map(Result::ok) {
             visited += 1;
-            if visited > MAX_VISITED || started.elapsed() > TIME_BUDGET {
+            if visited > limits.entries || started.elapsed() > limits.budget {
                 return (hits, false);
             }
             let name = entry.file_name().to_string_lossy().into_owned();
@@ -122,7 +143,7 @@ fn walk(start: &Path, query: &str, include_hidden: bool) -> (Vec<Hit>, bool) {
                         .map(|d| d.as_secs()),
                 });
             }
-            if file_type.is_dir() && depth < MAX_DEPTH {
+            if file_type.is_dir() && depth < limits.depth {
                 queue.push_back((path, depth + 1));
             }
         }
@@ -171,6 +192,46 @@ mod tests {
         .await
         .unwrap();
         assert_eq!(res["total_matches"], 3);
+    }
+
+    #[tokio::test]
+    async fn search_limits_come_from_settings() {
+        use crate::settings::Settings;
+        use crate::tools::test_support::context_with;
+        let dir = tempfile::tempdir().unwrap();
+        let deep = dir.path().join("home/a/b/c");
+        fs::create_dir_all(&deep).unwrap();
+        fs::write(deep.join("needle.txt"), b"x").unwrap();
+
+        let shallow = context_with(
+            dir.path(),
+            Settings {
+                search_max_depth: 1,
+                ..Settings::default()
+            },
+        );
+        let res = search_files(&shallow, Some(json!({ "query": "needle" })))
+            .await
+            .unwrap();
+        assert_eq!(res["total_matches"], 0, "depth limit hides deep files");
+        let full = context_with(dir.path(), Settings::default());
+        let res = search_files(&full, Some(json!({ "query": "needle" })))
+            .await
+            .unwrap();
+        assert_eq!(res["total_matches"], 1);
+
+        // An entry budget that runs out reports an incomplete search.
+        let tiny = context_with(
+            dir.path(),
+            Settings {
+                search_max_entries: 1,
+                ..Settings::default()
+            },
+        );
+        let res = search_files(&tiny, Some(json!({ "query": "needle" })))
+            .await
+            .unwrap();
+        assert_eq!(res["search_complete"], false);
     }
 
     #[tokio::test]

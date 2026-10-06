@@ -27,7 +27,7 @@ def test_loads_a_settings_file(tmp_path: Path) -> None:
         '[local]\nmodel = "llama3.2:3b"\nurl = "http://box:11434/"\n'
         '[cloud]\nenabled = true\neffort = "low"\n'
         '[policy]\nconfirm = "all_changes"\ndeny = ["power_action"]\n'
-        "[agent]\nmax_steps = 4\n"
+        "[limits]\nmax_steps = 4\n"
     )
     cfg = config.load(path)
     assert cfg.local.model == "llama3.2:3b"
@@ -42,7 +42,7 @@ def test_loads_a_settings_file(tmp_path: Path) -> None:
     [
         '[cloud]\neffort = "turbo"\n',
         '[policy]\nconfirm = "never"\n',
-        "[agent]\nmax_steps = 0\n",
+        "[limits]\nmax_steps = 0\n",
         "local = 3\n",
         "[local\n",
     ],
@@ -77,11 +77,8 @@ def test_unannotated_tools_are_treated_as_destructive() -> None:
     assert Policy().decide(bare) is Decision.CONFIRM
 
 
-def test_audit_log_rotates_and_tails(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    import osaima_agent.audit as audit_module
-
-    monkeypatch.setattr(audit_module, "MAX_BYTES", 200)
-    log = AuditLog(tmp_path / "state" / "audit.jsonl")
+def test_audit_log_rotates_and_tails(tmp_path: Path) -> None:
+    log = AuditLog(tmp_path / "state" / "audit.jsonl", max_bytes=200)
     for i in range(20):
         log.record(tool="t", n=i)
     assert (tmp_path / "state" / "audit.jsonl.1").exists()
