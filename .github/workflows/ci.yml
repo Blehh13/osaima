@@ -151,7 +151,16 @@ jobs:
       - name: Test
         env:
           OSAIMA_DAEMON_BIN: ${{ github.workspace }}/ai-core/mcp-daemon/target/debug/mcp-daemon
+          # The tool-snapshot test writes the daemon's current tool list here.
+          OSAIMA_SNAPSHOT_OUT: ${{ runner.temp }}/tools.snapshot.json
         run: pytest -q
+      - name: Upload the current tool snapshot
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tools-snapshot
+          path: ${{ runner.temp }}/tools.snapshot.json
+          if-no-files-found: ignore
       - name: Type check
         if: success() || failure()
         run: mypy

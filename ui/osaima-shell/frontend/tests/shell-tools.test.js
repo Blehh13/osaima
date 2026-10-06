@@ -2,6 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { shellTools, LAYOUTS } from '../src/wm/shell-tools.js';
 import { ruleBasedReply } from '../src/wm/assistant-rules.js';
+import { readFileSync } from 'node:fs';
+import { exportShellTools } from '../scripts/export-shell-tools.mjs';
 
 function fakeEngine() {
   const engine = {
@@ -101,4 +103,14 @@ test('rule-based fallback still handles basic desktop commands', async () => {
 
   const failing = { ...services, invoke: async () => { throw new Error('down'); } };
   assert.match(await ruleBasedReply('stats', { wm: engine, services: failing }), /could not reach the AI Core/);
+});
+
+test('the evaluation snapshot of the shell tools is current', () => {
+  const path = new URL('../../../../ai-core/agent/evals/shell-tools.snapshot.json', import.meta.url);
+  const committed = JSON.parse(readFileSync(path, 'utf8'));
+  assert.deepEqual(
+    committed,
+    exportShellTools(),
+    'regenerate: node scripts/export-shell-tools.mjs > ../../../ai-core/agent/evals/shell-tools.snapshot.json',
+  );
 });

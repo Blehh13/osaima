@@ -25,3 +25,6 @@ __pycache__/
 .ruff_cache/
 .pytest_cache/
 *.egg-info/
+
+# Evaluation run output (copy chosen results into docs/ to keep them)
+ai-core/agent/evals/results/

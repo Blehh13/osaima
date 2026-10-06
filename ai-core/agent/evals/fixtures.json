@@ -1,0 +1,372 @@
+{
+  "get_system_stats": {
+    "ok": true,
+    "text": "{\n  \"os\": \"Interstellar OS\",\n  \"os_version\": \"0.1\",\n  \"kernel\": \"6.12.8-gentoo\",\n  \"host\": \"interstellar\",\n  \"uptime_secs\": 93784,\n  \"load_average\": [\n    0.52,\n    0.61,\n    0.58\n  ],\n  \"cpu\": {\n    \"usage_percent\": 14.2,\n    \"cores\": 8,\n    \"brand\": \"AMD Ryzen 7 5700U\"\n  },\n  \"memory\": {\n    \"total_bytes\": 17179869184,\n    \"used_bytes\": 6442450944,\n    \"available_bytes\": 10737418240,\n    \"swap_total_bytes\": 4294967296,\n    \"swap_used_bytes\": 0\n  }\n}",
+    "structured": {
+      "os": "Interstellar OS",
+      "os_version": "0.1",
+      "kernel": "6.12.8-gentoo",
+      "host": "interstellar",
+      "uptime_secs": 93784,
+      "load_average": [
+        0.52,
+        0.61,
+        0.58
+      ],
+      "cpu": {
+        "usage_percent": 14.2,
+        "cores": 8,
+        "brand": "AMD Ryzen 7 5700U"
+      },
+      "memory": {
+        "total_bytes": 17179869184,
+        "used_bytes": 6442450944,
+        "available_bytes": 10737418240,
+        "swap_total_bytes": 4294967296,
+        "swap_used_bytes": 0
+      }
+    }
+  },
+  "list_processes": {
+    "ok": true,
+    "text": "{\n  \"processes\": [\n    {\n      \"pid\": 4242,\n      \"name\": \"firefox\",\n      \"cpu_percent\": 12.4,\n      \"memory_bytes\": 1238368256,\n      \"uid\": 1000,\n      \"status\": \"Sleep\"\n    },\n    {\n      \"pid\": 5150,\n      \"name\": \"python3\",\n      \"cpu_percent\": 3.1,\n      \"memory_bytes\": 429916160,\n      \"uid\": 1000,\n      \"status\": \"Run\"\n    },\n    {\n      \"pid\": 3011,\n      \"name\": \"ollama\",\n      \"cpu_percent\": 0.4,\n      \"memory_bytes\": 985661440,\n      \"uid\": 1000,\n      \"status\": \"Sleep\"\n    },\n    {\n      \"pid\": 2201,\n      \"name\": \"osaima-shell\",\n      \"cpu_percent\": 1.8,\n      \"memory_bytes\": 220200960,\n      \"uid\": 1000,\n      \"status\": \"Sleep\"\n    },\n    {\n      \"pid\": 880,\n      \"name\": \"pipewire\",\n      \"cpu_percent\": 0.2,\n      \"memory_bytes\": 25165824,\n      \"uid\": 1000,\n      \"status\": \"Sleep\"\n    }\n  ]\n}",
+    "structured": {
+      "processes": [
+        {
+          "pid": 4242,
+          "name": "firefox",
+          "cpu_percent": 12.4,
+          "memory_bytes": 1238368256,
+          "uid": 1000,
+          "status": "Sleep"
+        },
+        {
+          "pid": 5150,
+          "name": "python3",
+          "cpu_percent": 3.1,
+          "memory_bytes": 429916160,
+          "uid": 1000,
+          "status": "Run"
+        },
+        {
+          "pid": 3011,
+          "name": "ollama",
+          "cpu_percent": 0.4,
+          "memory_bytes": 985661440,
+          "uid": 1000,
+          "status": "Sleep"
+        },
+        {
+          "pid": 2201,
+          "name": "osaima-shell",
+          "cpu_percent": 1.8,
+          "memory_bytes": 220200960,
+          "uid": 1000,
+          "status": "Sleep"
+        },
+        {
+          "pid": 880,
+          "name": "pipewire",
+          "cpu_percent": 0.2,
+          "memory_bytes": 25165824,
+          "uid": 1000,
+          "status": "Sleep"
+        }
+      ]
+    }
+  },
+  "kill_process": {
+    "ok": true,
+    "text": "{\n  \"pid\": 4242,\n  \"signalled\": true\n}",
+    "structured": {
+      "pid": 4242,
+      "signalled": true
+    }
+  },
+  "list_disks": {
+    "ok": true,
+    "text": "{\n  \"disks\": [\n    {\n      \"name\": \"/dev/nvme0n1p2\",\n      \"mount_point\": \"/\",\n      \"file_system\": \"ext4\",\n      \"total_bytes\": 500363689984,\n      \"available_bytes\": 227633266688\n    },\n    {\n      \"name\": \"/dev/nvme0n1p1\",\n      \"mount_point\": \"/boot/efi\",\n      \"file_system\": \"vfat\",\n      \"total_bytes\": 536870912,\n      \"available_bytes\": 503316480\n    }\n  ]\n}",
+    "structured": {
+      "disks": [
+        {
+          "name": "/dev/nvme0n1p2",
+          "mount_point": "/",
+          "file_system": "ext4",
+          "total_bytes": 500363689984,
+          "available_bytes": 227633266688
+        },
+        {
+          "name": "/dev/nvme0n1p1",
+          "mount_point": "/boot/efi",
+          "file_system": "vfat",
+          "total_bytes": 536870912,
+          "available_bytes": 503316480
+        }
+      ]
+    }
+  },
+  "network_status": {
+    "ok": true,
+    "text": "{\n  \"interfaces\": [\n    {\n      \"name\": \"lo\",\n      \"state\": \"unknown\",\n      \"addresses\": [\n        \"127.0.0.1\",\n        \"::1\"\n      ],\n      \"rx_bytes\": 52114,\n      \"tx_bytes\": 52114\n    },\n    {\n      \"name\": \"wlan0\",\n      \"state\": \"up\",\n      \"mac\": \"a4:5e:60:d2:11:9c\",\n      \"addresses\": [\n        \"192.168.1.5\",\n        \"fe80::a65e:60ff:fed2:119c\"\n      ],\n      \"rx_bytes\": 842113345,\n      \"tx_bytes\": 90211777\n    }\n  ],\n  \"default_route\": {\n    \"interface\": \"wlan0\",\n    \"gateway\": \"192.168.1.1\"\n  },\n  \"dns_servers\": [\n    \"192.168.1.1\",\n    \"9.9.9.9\"\n  ]\n}",
+    "structured": {
+      "interfaces": [
+        {
+          "name": "lo",
+          "state": "unknown",
+          "addresses": [
+            "127.0.0.1",
+            "::1"
+          ],
+          "rx_bytes": 52114,
+          "tx_bytes": 52114
+        },
+        {
+          "name": "wlan0",
+          "state": "up",
+          "mac": "a4:5e:60:d2:11:9c",
+          "addresses": [
+            "192.168.1.5",
+            "fe80::a65e:60ff:fed2:119c"
+          ],
+          "rx_bytes": 842113345,
+          "tx_bytes": 90211777
+        }
+      ],
+      "default_route": {
+        "interface": "wlan0",
+        "gateway": "192.168.1.1"
+      },
+      "dns_servers": [
+        "192.168.1.1",
+        "9.9.9.9"
+      ]
+    }
+  },
+  "check_connectivity": {
+    "ok": true,
+    "text": "{\n  \"host\": \"example.com\",\n  \"port\": 443,\n  \"dns_ok\": true,\n  \"dns_ms\": 18,\n  \"addresses\": [\n    \"93.184.216.34\"\n  ],\n  \"reachable\": true,\n  \"connect_ms\": 41,\n  \"error\": null\n}",
+    "structured": {
+      "host": "example.com",
+      "port": 443,
+      "dns_ok": true,
+      "dns_ms": 18,
+      "addresses": [
+        "93.184.216.34"
+      ],
+      "reachable": true,
+      "connect_ms": 41,
+      "error": null
+    }
+  },
+  "get_brightness": {
+    "ok": true,
+    "text": "{\n  \"device\": \"intel_backlight\",\n  \"percent\": 60,\n  \"raw\": 576,\n  \"max\": 960\n}",
+    "structured": {
+      "device": "intel_backlight",
+      "percent": 60,
+      "raw": 576,
+      "max": 960
+    }
+  },
+  "set_brightness": {
+    "ok": true,
+    "text": "{\n  \"device\": \"intel_backlight\",\n  \"percent\": 50,\n  \"raw\": 480,\n  \"max\": 960\n}",
+    "structured": {
+      "device": "intel_backlight",
+      "percent": 50,
+      "raw": 480,
+      "max": 960
+    }
+  },
+  "get_volume": {
+    "ok": true,
+    "text": "{\n  \"percent\": 40,\n  \"muted\": false\n}",
+    "structured": {
+      "percent": 40,
+      "muted": false
+    }
+  },
+  "set_volume": {
+    "ok": true,
+    "text": "{\n  \"percent\": 30,\n  \"muted\": false\n}",
+    "structured": {
+      "percent": 30,
+      "muted": false
+    }
+  },
+  "list_apps": {
+    "ok": true,
+    "text": "{\n  \"apps\": [\n    {\n      \"id\": \"firefox.desktop\",\n      \"name\": \"Firefox\",\n      \"generic_name\": \"Web Browser\",\n      \"comment\": \"Browse the Web\",\n      \"categories\": [\n        \"Network\",\n        \"WebBrowser\"\n      ]\n    },\n    {\n      \"id\": \"org.gnome.Calculator.desktop\",\n      \"name\": \"Calculator\",\n      \"comment\": \"Perform arithmetic\",\n      \"categories\": [\n        \"Utility\"\n      ]\n    },\n    {\n      \"id\": \"org.gnome.TextEditor.desktop\",\n      \"name\": \"Text Editor\",\n      \"comment\": \"Edit text files\",\n      \"categories\": [\n        \"Utility\",\n        \"TextEditor\"\n      ]\n    },\n    {\n      \"id\": \"vlc.desktop\",\n      \"name\": \"VLC media player\",\n      \"comment\": \"Play media\",\n      \"categories\": [\n        \"AudioVideo\"\n      ]\n    }\n  ],\n  \"total_installed\": 4\n}",
+    "structured": {
+      "apps": [
+        {
+          "id": "firefox.desktop",
+          "name": "Firefox",
+          "generic_name": "Web Browser",
+          "comment": "Browse the Web",
+          "categories": [
+            "Network",
+            "WebBrowser"
+          ]
+        },
+        {
+          "id": "org.gnome.Calculator.desktop",
+          "name": "Calculator",
+          "comment": "Perform arithmetic",
+          "categories": [
+            "Utility"
+          ]
+        },
+        {
+          "id": "org.gnome.TextEditor.desktop",
+          "name": "Text Editor",
+          "comment": "Edit text files",
+          "categories": [
+            "Utility",
+            "TextEditor"
+          ]
+        },
+        {
+          "id": "vlc.desktop",
+          "name": "VLC media player",
+          "comment": "Play media",
+          "categories": [
+            "AudioVideo"
+          ]
+        }
+      ],
+      "total_installed": 4
+    }
+  },
+  "launch_app": {
+    "ok": true,
+    "text": "{\n  \"launched\": \"firefox.desktop\",\n  \"name\": \"Firefox\"\n}",
+    "structured": {
+      "launched": "firefox.desktop",
+      "name": "Firefox"
+    }
+  },
+  "list_windows": {
+    "ok": true,
+    "text": "{\n  \"windows\": [\n    {\n      \"id\": 10,\n      \"title\": \"Mozilla Firefox\",\n      \"app\": \"firefox\",\n      \"pid\": 4242,\n      \"workspace\": \"1\",\n      \"focused\": true,\n      \"visible\": true\n    },\n    {\n      \"id\": 11,\n      \"title\": \"~ - foot\",\n      \"app\": \"foot\",\n      \"pid\": 3020,\n      \"workspace\": \"1\",\n      \"focused\": false,\n      \"visible\": true\n    },\n    {\n      \"id\": 12,\n      \"title\": \"Notes\",\n      \"app\": \"gedit\",\n      \"pid\": 3100,\n      \"workspace\": \"2\",\n      \"focused\": false,\n      \"visible\": false\n    },\n    {\n      \"id\": 13,\n      \"title\": \"Steam\",\n      \"app\": \"steam\",\n      \"pid\": 3300,\n      \"workspace\": \"2\",\n      \"focused\": false,\n      \"visible\": false\n    }\n  ]\n}",
+    "structured": {
+      "windows": [
+        {
+          "id": 10,
+          "title": "Mozilla Firefox",
+          "app": "firefox",
+          "pid": 4242,
+          "workspace": "1",
+          "focused": true,
+          "visible": true
+        },
+        {
+          "id": 11,
+          "title": "~ - foot",
+          "app": "foot",
+          "pid": 3020,
+          "workspace": "1",
+          "focused": false,
+          "visible": true
+        },
+        {
+          "id": 12,
+          "title": "Notes",
+          "app": "gedit",
+          "pid": 3100,
+          "workspace": "2",
+          "focused": false,
+          "visible": false
+        },
+        {
+          "id": 13,
+          "title": "Steam",
+          "app": "steam",
+          "pid": 3300,
+          "workspace": "2",
+          "focused": false,
+          "visible": false
+        }
+      ]
+    }
+  },
+  "focus_window": {
+    "ok": true,
+    "text": "{\n  \"window\": {\n    \"id\": 10,\n    \"title\": \"Mozilla Firefox\"\n  },\n  \"action\": \"focused\"\n}",
+    "structured": {
+      "window": {
+        "id": 10,
+        "title": "Mozilla Firefox"
+      },
+      "action": "focused"
+    }
+  },
+  "close_window": {
+    "ok": true,
+    "text": "{\n  \"window\": {\n    \"id\": 10,\n    \"title\": \"Mozilla Firefox\"\n  },\n  \"action\": \"closed\"\n}",
+    "structured": {
+      "window": {
+        "id": 10,
+        "title": "Mozilla Firefox"
+      },
+      "action": "closed"
+    }
+  },
+  "power_action": {
+    "ok": true,
+    "text": "{\n  \"action\": \"suspend\",\n  \"done\": true\n}",
+    "structured": {
+      "action": "suspend",
+      "done": true
+    }
+  },
+  "search_files": {
+    "ok": true,
+    "text": "{\n  \"results\": [\n    {\n      \"path\": \"/home/user/Documents/Resume-2026.pdf\",\n      \"is_dir\": false,\n      \"size_bytes\": 88214,\n      \"modified_unix\": 1790000000\n    }\n  ],\n  \"total_matches\": 1,\n  \"search_complete\": true\n}",
+    "structured": {
+      "results": [
+        {
+          "path": "/home/user/Documents/Resume-2026.pdf",
+          "is_dir": false,
+          "size_bytes": 88214,
+          "modified_unix": 1790000000
+        }
+      ],
+      "total_matches": 1,
+      "search_complete": true
+    }
+  },
+  "package_info": {
+    "ok": true,
+    "text": "{\n  \"packages\": [\n    {\n      \"atom\": \"app-editors/vim\",\n      \"category\": \"app-editors\",\n      \"name\": \"vim\",\n      \"version\": \"9.1.0\",\n      \"slot\": \"0\",\n      \"description\": \"Vim, an improved vi-style text editor\"\n    }\n  ],\n  \"total_matches\": 1\n}",
+    "structured": {
+      "packages": [
+        {
+          "atom": "app-editors/vim",
+          "category": "app-editors",
+          "name": "vim",
+          "version": "9.1.0",
+          "slot": "0",
+          "description": "Vim, an improved vi-style text editor"
+        }
+      ],
+      "total_matches": 1
+    }
+  },
+  "shell_open_app": {
+    "ok": true,
+    "text": "Opened the app."
+  },
+  "shell_set_layout": {
+    "ok": true,
+    "text": "Layout changed."
+  },
+  "shell_switch_workspace": {
+    "ok": true,
+    "text": "Switched workspace."
+  },
+  "shell_notify": {
+    "ok": true,
+    "text": "Notification shown."
+  }
+}

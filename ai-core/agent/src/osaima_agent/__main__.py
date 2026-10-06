@@ -12,7 +12,7 @@ from pathlib import Path
 
 import httpx
 
-from . import __version__, config, doctor
+from . import __version__, config, doctor, eval_cli
 from .agent import Agent, Conversation
 from .audit import AuditLog
 from .llm import Provider, ToolCall, ToolSpec
@@ -136,6 +136,7 @@ def main(argv: list[str] | None = None) -> int:
     serve_cmd.add_argument("--socket", type=Path, help="socket path")
     doctor_cmd = sub.add_parser("doctor", help="check the setup and fix what's missing")
     doctor_cmd.add_argument("--pull", action="store_true", help="download the local model")
+    eval_cli.add_parsers(sub)
     ask_cmd = sub.add_parser("ask", help="ask one question in the terminal")
     ask_cmd.add_argument("question", nargs="+")
     ask_cmd.add_argument("--model", choices=["auto", "local", "cloud"], default="auto")
@@ -155,6 +156,10 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "doctor":
             return asyncio.run(run_doctor(cfg, args.pull))
+        if args.command == "eval":
+            return asyncio.run(eval_cli.run_eval_command(cfg, args))
+        if args.command == "eval-tools":
+            return asyncio.run(eval_cli.run_eval_tools(cfg, args.write))
         if args.command == "ask":
             return asyncio.run(ask(cfg, " ".join(args.question), args.model, args.yes))
         socket_path = getattr(args, "socket", None) or cfg.socket_path

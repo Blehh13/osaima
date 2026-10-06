@@ -1,0 +1,107 @@
+[
+  {
+    "name": "shell_open_app",
+    "title": "Open a built-in app",
+    "description": "Open one of the shell's built-in apps in a window: terminal (Terminal), browser (Browser), monitor (System Monitor), files (Files), config (wm.lua — Config), about (About Interstellar OS), assistant (AI Assistant), taskmanager (Task Manager), knowledge (Knowledge Base (RAG)), behavior (Behavior Profile). Use launch_app instead for installed desktop applications such as Firefox.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "app": {
+          "type": "string",
+          "enum": [
+            "terminal",
+            "browser",
+            "monitor",
+            "files",
+            "config",
+            "about",
+            "assistant",
+            "taskmanager",
+            "knowledge",
+            "behavior"
+          ]
+        }
+      },
+      "required": [
+        "app"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false
+    }
+  },
+  {
+    "name": "shell_set_layout",
+    "title": "Change window layout",
+    "description": "Arrange the windows on the current workspace using a layout.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "layout": {
+          "type": "string",
+          "enum": [
+            "tile",
+            "monocle",
+            "grid",
+            "spiral",
+            "float"
+          ]
+        }
+      },
+      "required": [
+        "layout"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false
+    }
+  },
+  {
+    "name": "shell_switch_workspace",
+    "title": "Switch workspace",
+    "description": "Go to a workspace by its number, starting at 1.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "number"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false
+    }
+  },
+  {
+    "name": "shell_notify",
+    "title": "Show a notification",
+    "description": "Show a short notification on the desktop.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "maxLength": 200
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false
+    }
+  }
+]
