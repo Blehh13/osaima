@@ -1328,3 +1328,30 @@ html, body {
   transition: opacity 0.3s var(--ease-smooth);
 }
 #night-overlay.on { opacity: 0.18; }
+
+/* Browser preview without the Tauri host: make mock data impossible to miss. */
+body.demo-mode::after {
+  content: 'DEMO MODE · mock data';
+  position: fixed;
+  left: 50%;
+  bottom: 6px;
+  transform: translateX(-50%);
+  z-index: 10000;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(255, 170, 60, 0.18);
+  border: 1px solid rgba(255, 170, 60, 0.5);
+  color: #ffc98a;
+  font: 600 10px/1.4 var(--font-mono);
+  letter-spacing: 0.08em;
+  pointer-events: none;
+}
+
+.tk-status {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

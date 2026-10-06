@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Interstellar OS</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="src/style.css" />
 </head>
 <body>
@@ -146,7 +144,7 @@
 
   <!-- AI COMMAND HUB (activated by Space) -->
   <div id="launcher" class="hidden">
-    <div id="launcher-backdrop" onclick="closeLauncher()"></div>
+    <div id="launcher-backdrop"></div>
     <div id="launcher-panel">
       <div id="launcher-header">
         <div id="launcher-icon">
@@ -162,18 +160,18 @@
           autocomplete="off"
           spellcheck="false"
         />
-        <div id="launcher-close" onclick="closeLauncher()">ESC</div>
+        <div id="launcher-close">ESC</div>
       </div>
 
       <div id="launcher-suggestions">
         <div class="suggestion-group-label">QUICK ACTIONS</div>
         <div class="suggestions-grid">
-          <button class="suggestion-chip" onclick="runSuggestion(this)">Show system stats</button>
-          <button class="suggestion-chip" onclick="runSuggestion(this)">Open terminal</button>
-          <button class="suggestion-chip" onclick="runSuggestion(this)">Check AI core status</button>
-          <button class="suggestion-chip" onclick="runSuggestion(this)">List running processes</button>
-          <button class="suggestion-chip" onclick="runSuggestion(this)">Adjust display brightness</button>
-          <button class="suggestion-chip" onclick="runSuggestion(this)">Network diagnostics</button>
+          <button class="suggestion-chip">Show system stats</button>
+          <button class="suggestion-chip">Open terminal</button>
+          <button class="suggestion-chip">Check AI core status</button>
+          <button class="suggestion-chip">List running processes</button>
+          <button class="suggestion-chip">Adjust display brightness</button>
+          <button class="suggestion-chip">Network diagnostics</button>
         </div>
       </div>
 

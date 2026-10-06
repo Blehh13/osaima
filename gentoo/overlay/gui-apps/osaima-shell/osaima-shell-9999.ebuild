@@ -6,8 +6,8 @@ EAPI=8
 inherit git-r3
 
 DESCRIPTION="OSAIMA agentic desktop shell — Tauri UI with a Lua-driven tiling window manager"
-HOMEPAGE="https://github.com/akashmanjunath2505/osaima"
-EGIT_REPO_URI="https://github.com/akashmanjunath2505/osaima.git"
+HOMEPAGE="https://github.com/Blehh13/osaima"
+EGIT_REPO_URI="https://github.com/Blehh13/osaima.git"
 EGIT_CLONE_TYPE="shallow"
 # Only our code is needed — never fetch the kernel / portage submodules.
 EGIT_SUBMODULES=()
@@ -23,6 +23,8 @@ RDEPEND="
 	dev-libs/glib
 	x11-libs/gtk+:3
 	sys-apps/osaima-ai-core
+	media-fonts/inter
+	media-fonts/jetbrains-mono
 "
 DEPEND="${RDEPEND}"
 # Build: Rust/Cargo for the Tauri host, Node for the frontend assets.

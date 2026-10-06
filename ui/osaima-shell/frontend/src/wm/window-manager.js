@@ -302,7 +302,10 @@ export class WindowManager {
     try {
       app.mount(contentEl, { wm: this, win });
     } catch (err) {
-      contentEl.innerHTML = `<div class="wm-error">App failed to start: ${err.message}</div>`;
+      const msg = document.createElement('div');
+      msg.className = 'wm-error';
+      msg.textContent = 'App failed to start: ' + err.message;
+      contentEl.replaceChildren(msg);
     }
 
     this.focus(id);

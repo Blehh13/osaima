@@ -1,16 +1,25 @@
 [package]
 name = "osaima-shell"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
+rust-version = "1.77"
+description = "OSAIMA agentic desktop shell (Tauri host)"
+license = "GPL-3.0-or-later"
+repository = "https://github.com/Blehh13/osaima"
 
 [build-dependencies]
-tauri-build = { version = "2.0", features = [] }
+tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2.0", features = [] }
+libc = "0.2"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-tokio = { version = "1.35", features = ["full"] }
+tauri = { version = "2", features = [] }
+tokio = { version = "1.35", features = ["io-util", "net", "process", "time"] }
+
+[dev-dependencies]
+tempfile = "3"
+tokio = { version = "1.35", features = ["macros", "rt-multi-thread"] }
 
 [profile.release]
 panic = "abort"

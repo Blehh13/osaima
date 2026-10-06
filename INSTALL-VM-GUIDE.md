@@ -184,7 +184,7 @@ Now we layer *our* overlay on top. This part is light.
 ```bash
 # 1. Get our project
 emerge dev-vcs/git
-git clone https://github.com/akashmanjunath2505/osaima.git /root/osaima
+git clone https://github.com/Blehh13/osaima.git /root/osaima
 cd /root/osaima
 
 # 2. Install our overlay into the system
