@@ -63,6 +63,13 @@ export function createWmApi(engine) {
     engine.addBinding(binding, action);
   });
 
+  // wm.shell{ stats_poll_ms = 2000, bookmarks = { { name = "Docs", url = "https://..." } } }
+  // Tunable shell values; validated in shell-settings.js. Repeated calls merge.
+  api.set('shell', (t) => {
+    if (!(t instanceof LuaTable)) return;
+    engine.config.shell = { ...(engine.config.shell ?? {}), ...luaToJS(t) };
+  });
+
   // wm.rule{ match="terminal", floating=true, workspace=2 }
   api.set('rule', (t) => {
     if (!(t instanceof LuaTable)) return;

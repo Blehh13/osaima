@@ -13,6 +13,7 @@ import { createWmApi } from './api.js';
 import { registerApps } from './apps.js';
 import { DEFAULT_WM_LUA } from './default-config.js';
 import { AgentClient } from './agent-client.js';
+import { resolveShellSettings, DEFAULTS } from './shell-settings.js';
 
 // Candidate locations for the Lua config, tried in order. Works whether the
 // shell is served from the project root (tauri/static server) or elsewhere.
@@ -63,6 +64,7 @@ export async function initWindowManager({ surface, invoke, agentTransport, hooks
   const services = {
     invoke,
     agent: new AgentClient(agentTransport),
+    settings: () => engine.shellSettings ?? DEFAULTS,
     rag,        // RagEngine (retrieval-augmented knowledge)
     behavior,   // BehaviorStore (learned user profile)
     getConfigSource: () => currentSource,
@@ -94,6 +96,10 @@ export async function initWindowManager({ surface, invoke, agentTransport, hooks
       vm.run(source, 'wm.lua');
       currentSource = source;
       engine.applyConfig();
+      const { settings, warnings } = resolveShellSettings(engine.config.shell);
+      engine.shellSettings = settings;
+      for (const warning of warnings) console.warn('[wm.lua] wm.shell:', warning);
+      if (hooks.onConfigApplied) hooks.onConfigApplied(settings, warnings);
       if (boot) engine.bootAutostart();
       else engine.layout();
       return { ok: true };

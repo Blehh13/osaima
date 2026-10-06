@@ -13,6 +13,8 @@
  * later replace the ruleset.
  */
 
+import { DEFAULTS } from './shell-settings.js';
+
 export class AgentCore {
   /**
    * @param {object} opts
@@ -28,23 +30,36 @@ export class AgentCore {
 
     this.lastFiredAt = new Map();   // rule id -> timestamp
     this.lastAnyAt = 0;             // last time ANY suggestion fired
-    this.globalQuietMs = 12000;     // min gap between any two suggestions
+    this.settings = DEFAULTS;       // thresholds and pacing; see shell-settings.js
     this.timer = null;
 
     this.rules = this.buildRules();
   }
 
-  start(intervalMs = 8000) {
-    // A short delay so the desktop settles before the agent speaks up.
-    setTimeout(() => this.tick(), 4000);
-    this.timer = setInterval(() => this.tick(), intervalMs);
+  /** Begin watching. A short first delay lets the desktop settle before the agent speaks up. */
+  start(settings = DEFAULTS) {
+    this.configure(settings);
+    setTimeout(() => this.tick(), settings.proactiveFirstMs);
   }
 
-  stop() { if (this.timer) clearInterval(this.timer); }
+  /** Apply new settings (also used when the Lua config is reloaded). */
+  configure(settings) {
+    this.settings = settings;
+    this.stop();
+    if (settings.proactiveEnabled) {
+      this.timer = setInterval(() => this.tick(), settings.proactiveIntervalMs);
+    }
+  }
+
+  stop() {
+    if (this.timer) clearInterval(this.timer);
+    this.timer = null;
+  }
 
   async tick() {
     const now = Date.now();
-    if (now - this.lastAnyAt < this.globalQuietMs) return;
+    if (!this.settings.proactiveEnabled) return;
+    if (now - this.lastAnyAt < this.settings.proactiveQuietMs) return;
 
     // Gather the context the rules reason over.
     let stats = null;
@@ -100,7 +115,7 @@ export class AgentCore {
       {
         id: 'high-cpu',
         cooldown: 45000,
-        evaluate: (c) => c.cpu > 70 ? {
+        evaluate: (c) => c.cpu > this.settings.cpuAlertPercent ? {
           message: `AI Core: CPU is high (${c.cpu.toFixed(0)}%). Want to see what's running?`,
           actionLabel: 'Open Task Manager',
           onAction: () => w.spawn('taskmanager'),
@@ -109,7 +124,7 @@ export class AgentCore {
       {
         id: 'high-mem',
         cooldown: 60000,
-        evaluate: (c) => c.memPct > 85 ? {
+        evaluate: (c) => c.memPct > this.settings.memoryAlertPercent ? {
           message: `AI Core: memory usage is at ${c.memPct.toFixed(0)}%. I can open the monitor.`,
           actionLabel: 'Open Monitor',
           onAction: () => w.spawn('monitor'),
@@ -118,7 +133,7 @@ export class AgentCore {
       {
         id: 'suggest-grid',
         cooldown: 40000,
-        evaluate: (c) => (c.tiledCount >= 4 && c.layout === 'tile') ? {
+        evaluate: (c) => (c.tiledCount >= this.settings.gridSuggestWindows && c.layout === 'tile') ? {
           message: `AI Core: you have ${c.tiledCount} windows open — a grid layout may fit better.`,
           actionLabel: 'Use grid',
           onAction: () => w.setLayout('grid'),

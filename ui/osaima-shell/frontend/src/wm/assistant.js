@@ -13,14 +13,6 @@ import { AgentUnavailableError } from './agent-client.js';
 import { ruleBasedReply } from './assistant-rules.js';
 import { shellTools } from './shell-tools.js';
 
-const SUGGESTIONS = [
-  'What is using my memory?',
-  'How much disk space do I have?',
-  'Open the terminal',
-  'Am I connected to the internet?',
-  'Tile the windows',
-];
-
 const instances = new Set();
 
 function el(tag, className, text) {
@@ -281,7 +273,7 @@ export function makeAssistant(engine, services) {
       }
 
       // ── wiring ──
-      for (const text of SUGGESTIONS) {
+      for (const text of services.settings().assistantSuggestions) {
         const chip = el('button', 'as-chip', text);
         chip.addEventListener('click', () => ask(text));
         chips.append(chip);

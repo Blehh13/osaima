@@ -58,9 +58,17 @@ effort = "medium"        # low | medium | high | xhigh | max
 confirm = "destructive"  # or "all_changes" to approve every change
 deny = []                # tool names that may never run, e.g. ["power_action"]
 
+[limits]
+max_steps = 6            # tool calls per request
+
 [agent]
-max_steps = 6
+# system_prompt_file = "prompt.txt"   # replace the assistant's instructions
 ```
+
+Every value (temperature, timeouts, retries, limits, the model-by-RAM table,
+the audit log...) has a default and a validated range; unknown keys are
+rejected with a hint. The full list is in
+[docs/configuration.md](../../docs/configuration.md).
 
 The Claude API key is read from `ANTHROPIC_API_KEY` or an `ant auth login`
 profile. It is never stored in the settings file.

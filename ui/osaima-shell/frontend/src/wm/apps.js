@@ -18,7 +18,7 @@ import { makeAssistant } from './assistant.js';
  */
 export function registerApps(engine, services) {
   engine.registerApp(makeTerminal(services));
-  engine.registerApp(makeBrowser());
+  engine.registerApp(makeBrowser(services));
   engine.registerApp(makeMonitor(services));
   engine.registerApp(makeFiles(services));
   engine.registerApp(makeConfigEditor(engine, services));
@@ -162,16 +162,9 @@ function makeTerminal(services) {
 // ── Web Browser ───────────────────────────────────────────────────────────────
 // A real web browser inside the shell: address bar + iframe view + a start page
 // with bookmarks. It's a WebKit webview, so this is genuine web browsing.
-function makeBrowser() {
+function makeBrowser(services) {
   const HOME = 'about:home';
-  const BOOKMARKS = [
-    { name: 'Wikipedia', url: 'https://en.wikipedia.org/wiki/Linux' },
-    { name: 'Gentoo', url: 'https://www.gentoo.org' },
-    { name: 'OSAIMA · GitHub', url: 'https://github.com/Blehh13/osaima' },
-    { name: 'MDN Web Docs', url: 'https://developer.mozilla.org' },
-    { name: 'Hacker News', url: 'https://news.ycombinator.com' },
-    { name: 'archive.org', url: 'https://archive.org' },
-  ];
+  // Bookmarks and the search engine come from the Lua config (wm.shell{...}).
   return {
     id: 'browser',
     title: 'Browser',
@@ -210,7 +203,7 @@ function makeBrowser() {
           <div class="br-tiles"></div>
           <div class="br-note">Tip: some large sites (Google, YouTube) refuse to be embedded — that's their own security policy, not a shell bug. The bookmarks above load fine, and any address you type works.</div>`;
         const tiles = startPage.querySelector('.br-tiles');
-        for (const b of BOOKMARKS) {
+        for (const b of services.settings().bookmarks) {
           const t = el('button', 'br-tile', b.name);
           t.addEventListener('click', () => navigate(b.url));
           tiles.append(t);
@@ -226,7 +219,7 @@ function makeBrowser() {
         if (s === HOME) return HOME;
         if (/^https?:\/\//i.test(s)) return s;
         if (/^[\w-]+(\.[\w-]+)+(\/.*)?$/.test(s)) return 'https://' + s;
-        return 'https://en.wikipedia.org/w/index.php?search=' + encodeURIComponent(s);
+        return services.settings().searchUrl.replace('%s', encodeURIComponent(s));
       };
 
       const navigate = (raw) => {
@@ -324,7 +317,7 @@ function makeMonitor(services) {
       };
 
       tick();
-      const timer = setInterval(tick, 1500);
+      const timer = setInterval(tick, services.settings().monitorPollMs);
       ctx.win._monitorTimer = timer;
     },
     unmount(win) { if (win._monitorTimer) clearInterval(win._monitorTimer); },
@@ -555,7 +548,7 @@ function makeTaskManager(services) {
       });
 
       load();
-      const timer = setInterval(load, 2000);
+      const timer = setInterval(load, services.settings().taskPollMs);
       ctx.win._tkTimer = timer;
     },
     unmount(win) { if (win._tkTimer) clearInterval(win._tkTimer); },

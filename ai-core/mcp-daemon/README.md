@@ -62,6 +62,15 @@ Errors use the standard codes: `-32700` parse error, `-32600` invalid request,
 runs but fails (for example, permission denied) returns `isError: true` with
 the reason as text.
 
+## Settings
+
+Limits and timeouts come from `OSAIMA_*` environment variables (sampling
+interval, message size, helper and connect timeouts, search limits, process list
+sizes, volume cap, terminal). Each has a default and a validated range, and an
+invalid value stops startup naming the variable. `mcp-daemon --help` lists them;
+[docs/configuration.md](../../docs/configuration.md) explains them. Tool
+descriptions reflect the configured limits.
+
 ## Security model
 
 - The socket is created with mode `0600` inside a `0700` directory, and every
