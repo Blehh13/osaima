@@ -61,11 +61,9 @@ class AgentServer:
         self._busy: set[str] = set()
 
     async def serve(self, path: Path) -> None:
-        path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-        if path.exists():
-            if await _is_live(path):
-                raise RuntimeError(f"another agent is already listening on {path}")
-            path.unlink()
+        if await asyncio.to_thread(_prepare_socket_dir, path) and await _is_live(path):
+            raise RuntimeError(f"another agent is already listening on {path}")
+        await asyncio.to_thread(_remove_socket, path)
         old_umask = os.umask(0o177)  # socket created as 0600
         try:
             server = await asyncio.start_unix_server(
@@ -78,8 +76,7 @@ class AgentServer:
             async with server:
                 await server.serve_forever()
         finally:
-            with contextlib.suppress(FileNotFoundError):
-                path.unlink()
+            _remove_socket(path)  # synchronous on purpose: runs during shutdown
 
     async def _handle_connection(
         self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
@@ -331,6 +328,17 @@ def _same_user(sock: socket.socket) -> bool:
         return False
     _pid, uid, _gid = struct.unpack("3i", creds)
     return uid in (os.geteuid(), 0)
+
+
+def _prepare_socket_dir(path: Path) -> bool:
+    """Create the socket's directory (0700); report whether a socket file exists."""
+    path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    return path.exists()
+
+
+def _remove_socket(path: Path) -> None:
+    with contextlib.suppress(FileNotFoundError):
+        path.unlink()
 
 
 async def _is_live(path: Path) -> bool:
