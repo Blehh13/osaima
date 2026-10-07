@@ -102,10 +102,7 @@ class CommandSynthesizer:
         return ""
 
     def _voice_present(self) -> bool:
-        return (
-            Path(self._voice).is_file()
-            or (self._models_dir / f"{self._voice}.onnx").is_file()
-        )
+        return Path(self._voice).is_file() or (self._models_dir / f"{self._voice}.onnx").is_file()
 
     async def synthesize(self, text: str, out: Path) -> None:
         await asyncio.to_thread(self._models_dir.mkdir, parents=True, exist_ok=True)
@@ -125,9 +122,7 @@ class CommandSynthesizer:
         except OSError as err:
             raise AudioError(f"could not start {argv[0]}: {err}") from err
         try:
-            _out, err_bytes = await asyncio.wait_for(
-                proc.communicate(text.encode()), self._timeout
-            )
+            _out, err_bytes = await asyncio.wait_for(proc.communicate(text.encode()), self._timeout)
         except TimeoutError:
             with contextlib.suppress(ProcessLookupError):
                 proc.kill()
