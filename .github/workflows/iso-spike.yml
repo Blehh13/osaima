@@ -40,7 +40,7 @@ jobs:
           } | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Dry run in a Gentoo container
         run: |
-          docker run --rm -v "$PWD:/work" "gentoo/stage3:${{ inputs.stage3 || 'latest' }}" \
+          docker run --rm --privileged -v "$PWD:/work" "gentoo/stage3:${{ inputs.stage3 || 'latest' }}" \
             bash /work/build-tools/spike/binhost-check.sh
       - name: Show the report
         if: always()
