@@ -9,6 +9,7 @@ on:
     branches: ["spike/**"]
     paths:
       - "build-tools/spike/**"
+      - "gentoo/**"
       - ".github/workflows/iso-spike.yml"
   workflow_dispatch:
     inputs:
