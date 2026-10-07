@@ -95,6 +95,27 @@ model = "llama3.1:8b"
 | `client_tool_timeout_s` | `30` | 1 to 3600 | Wait for the shell to run a shell-side tool |
 | `core_request_timeout_s` | `30` | 1 to 3600 | Wait for the AI Core |
 
+### `[voice]`: push-to-talk speech (everything runs on this computer)
+
+| Key | Default | Range | Meaning |
+|---|---|---|---|
+| `enabled` | `true` | | Turn voice off entirely |
+| `speak_replies` | `false` | | Start with "read replies aloud" on (the speaker button toggles it) |
+| `stt_model` | `base.en` | | faster-whisper model name (`tiny.en`, `base.en`, `small.en`, `medium`...) or a folder |
+| `stt_language` | `en` | | Language code, or empty to detect it (use a multilingual model such as `base`) |
+| `stt_device` | `cpu` | `cpu`, `cuda`, `auto` | Where recognition runs |
+| `stt_compute_type` | `int8` | `int8`, `int8_float16`, `float16`, `float32` | Precision; `int8` is fastest on a CPU |
+| `stt_beam_size` | `5` | 1 to 10 | Search width; lower is faster |
+| `tts_voice` | `en_US-lessac-medium` | | Piper voice name, or the path of a `.onnx` file |
+| `tts_command` | Piper | | Speech program: `{voice}`, `{models_dir}`, `{output}` are filled in; text goes to its standard input |
+| `record_command` | auto | | Microphone program with `{output}`; empty uses `pw-record`, then `arecord` |
+| `play_command` | auto | | Speaker program with `{input}`; empty uses `pw-play`, `paplay`, then `aplay` |
+| `models_dir` | `~/.local/share/osaima/voice` | | Where speech models are kept |
+| `max_record_s` | `30` | 1 to 600 | A recording stops by itself after this long |
+| `min_record_s` | `0.4` | 0.1 to 10 | Shorter recordings are treated as accidental |
+| `max_speak_chars` | `1500` | 20 to 100000 | Longer replies are shortened before being read |
+| `command_timeout_s` | `60` | 1 to 3600 | Wait for the speech program |
+
 ### `[audit]` and `[agent]`
 
 | Key | Default | Meaning |

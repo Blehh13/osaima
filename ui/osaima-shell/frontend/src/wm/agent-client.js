@@ -31,12 +31,50 @@ export class AgentClient {
     this.transport = transport;
     this.turns = new Map();
     this.buffered = new Map();
+    this.voiceListeners = new Set();
     this.unsubscribe = transport.subscribe((event) => this.dispatch(event));
   }
 
   /** Configured models and whether they respond. Throws AgentUnavailableError if the service is down. */
   async status() {
     return this.#call('agent.status', {});
+  }
+
+  /** Whether the microphone and speaker work: `{ can_listen, can_speak, problems, speak_replies, ... }`. */
+  async voiceStatus() {
+    return this.#call('agent.voice.status', {});
+  }
+
+  /** Push-to-talk: start recording; `voiceStop()` ends it and a `voice_transcript` event follows. */
+  async voiceListen() {
+    await this.#call('agent.voice.listen', {});
+  }
+
+  async voiceStop() {
+    await this.#call('agent.voice.stop', {});
+  }
+
+  /** Stop recording and throw the audio away. */
+  async voiceCancel() {
+    await this.#call('agent.voice.cancel', {});
+  }
+
+  /** Read `text` aloud. Resolves when speech has started; `voice_state` events report the rest. */
+  async speak(text) {
+    await this.#call('agent.voice.speak', { text });
+  }
+
+  async silence() {
+    await this.#call('agent.voice.silence', {});
+  }
+
+  /**
+   * Listen for `voice_state` ({state}), `voice_transcript` ({text}) and `voice_error` ({message}).
+   * @returns {Function} stop listening
+   */
+  onVoice(listener) {
+    this.voiceListeners.add(listener);
+    return () => this.voiceListeners.delete(listener);
   }
 
   async reset(conversationId) {
@@ -93,7 +131,12 @@ export class AgentClient {
   }
 
   dispatch(event) {
+    if (event.type?.startsWith('voice_')) {
+      for (const listener of [...this.voiceListeners]) listener(event);
+      return;
+    }
     if (event.type === 'disconnected') {
+      for (const listener of [...this.voiceListeners]) listener({ type: 'voice_state', state: 'idle' });
       this.#failAll(new AgentUnavailableError('The assistant service disconnected.'));
       return;
     }

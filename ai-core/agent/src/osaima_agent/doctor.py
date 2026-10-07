@@ -11,8 +11,10 @@ from typing import Literal
 
 import httpx
 
+from . import config
 from .config import AgentConfig, config_path
 from .mcp_client import McpClient, McpError
+from .voice import VoiceService
 
 Status = Literal["ok", "warn", "fail", "off"]
 ICONS: dict[Status, str] = {"ok": "✓", "warn": "!", "fail": "✗", "off": "-"}
@@ -91,6 +93,20 @@ def check_cloud(cfg: AgentConfig) -> Check:
     )
 
 
+def check_voice(cfg: AgentConfig) -> list[Check]:
+    if not cfg.voice.enabled:
+        return [Check("Voice", "off", "disabled in the settings")]
+    voice = VoiceService(cfg.voice, cfg.voice_models_dir, config.runtime_dir() / "voice")
+    fix = "install pipewire (or alsa-utils), and `pip install faster-whisper piper-tts`"
+    checks = []
+    for name, problem, ok in (
+        ("Voice input", voice.listen_problem(), f"microphone and {cfg.voice.stt_model}"),
+        ("Voice output", voice.speak_problem(), f"speaker and {cfg.voice.tts_voice}"),
+    ):
+        checks.append(Check(name, "warn", problem, fix) if problem else Check(name, "ok", ok))
+    return checks
+
+
 async def run_checks(
     cfg: AgentConfig,
     mcp: McpClient,
@@ -100,6 +116,7 @@ async def run_checks(
         await check_ai_core(mcp),
         *await check_local(cfg, ollama),
         check_cloud(cfg),
+        *check_voice(cfg),
         Check("Settings file", "ok" if config_path().exists() else "off", str(config_path())),
     ]
 

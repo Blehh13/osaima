@@ -254,3 +254,53 @@ test('demo: client tools round-trip through the shell', async () => {
   assert.equal(result.status, 'done');
   assert.deepEqual(opened, ['files']);
 });
+
+test('voice calls map to the service methods', async () => {
+  const { agent, client } = setup(() => ({ turn_id: 't', conversation_id: 'c' }));
+  for (const method of ['status', 'listen', 'stop', 'cancel', 'speak', 'silence']) {
+    agent.handlers[`agent.voice.${method}`] = () => (method === 'status' ? { can_listen: true } : {});
+  }
+  assert.deepEqual(await client.voiceStatus(), { can_listen: true });
+  await client.voiceListen();
+  await client.voiceStop();
+  await client.voiceCancel();
+  await client.speak('Hello there');
+  await client.silence();
+  assert.deepEqual(agent.calls.map(([m]) => m), [
+    'agent.voice.status', 'agent.voice.listen', 'agent.voice.stop',
+    'agent.voice.cancel', 'agent.voice.speak', 'agent.voice.silence',
+  ]);
+  assert.deepEqual(agent.callsTo('agent.voice.speak'), [{ text: 'Hello there' }]);
+});
+
+test('voice events go to voice listeners, not to chat turns', async () => {
+  const { agent, client } = setup(() => ({ turn_id: 't1', conversation_id: 'c' }));
+  const heard = [];
+  const stop = client.onVoice((event) => heard.push(event));
+  const turn = await client.start('hi', {});
+  agent.emit({ type: 'voice_state', state: 'listening' });
+  agent.emit({ type: 'voice_transcript', text: 'open the terminal' });
+  agent.emit({ type: 'done', turn_id: 't1', text: 'ok' });
+  assert.equal((await turn.done).status, 'done');
+  assert.deepEqual(heard.map((e) => e.type), ['voice_state', 'voice_transcript']);
+  stop();
+  agent.emit({ type: 'voice_error', message: 'x' });
+  assert.equal(heard.length, 2);
+});
+
+test('losing the service tells voice listeners it is idle', async () => {
+  const { agent, client } = setup(() => ({ turn_id: 't', conversation_id: 'c' }));
+  const states = [];
+  client.onVoice((event) => states.push(event.state));
+  agent.emit({ type: 'disconnected' });
+  assert.deepEqual(states, ['idle']);
+});
+
+test('demo: voice reports that it needs the real OS', async () => {
+  const client = new AgentClient(demoTransport());
+  const status = await client.voiceStatus();
+  assert.equal(status.can_listen, false);
+  assert.equal(status.can_speak, false);
+  assert.match(status.problems[0], /real Interstellar OS/);
+  client.close();
+});

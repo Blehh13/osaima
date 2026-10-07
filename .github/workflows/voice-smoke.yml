@@ -1,0 +1,39 @@
+name: Voice smoke test
+
+# Runs the real speech engines (Piper and faster-whisper) on a free runner: Piper
+# says a sentence, faster-whisper has to hear it. It downloads about 250 MB of
+# models, so it runs by hand or when the voice code changes, not on every push.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "ai-core/agent/src/osaima_agent/voice/**"
+      - "ai-core/agent/tests/test_voice_real.py"
+      - ".github/workflows/voice-smoke.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: ai-core/agent
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install the agent with voice
+        run: pip install -e ".[dev,voice]"
+      - name: Download a Piper voice
+        run: python -m piper.download_voices en_US-lessac-medium --data-dir "$RUNNER_TEMP/voice"
+      - name: Test the real engines
+        env:
+          OSAIMA_VOICE_SMOKE: "1"
+          OSAIMA_VOICE_MODELS: ${{ runner.temp }}/voice
+          OSAIMA_VOICE_STT: tiny.en
+        run: pytest tests/test_voice_real.py -v

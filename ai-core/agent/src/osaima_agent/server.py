@@ -10,6 +10,10 @@ Requests (newline-delimited JSON-RPC 2.0):
 - ``agent.client_tool_result {turn_id, call_id, ok, output}`` answers a
   ``client_tool_call`` event
 - ``agent.cancel {turn_id}``, ``agent.reset {conversation_id}``, ``agent.audit {limit?}``
+- ``agent.voice.status``, ``agent.voice.listen`` / ``agent.voice.stop`` /
+  ``agent.voice.cancel`` (push-to-talk), ``agent.voice.speak {text}`` and
+  ``agent.voice.silence``. Voice progress arrives as ``agent.event`` notifications
+  of type ``voice_state``, ``voice_transcript`` and ``voice_error`` (no ``turn_id``).
 
 Only processes of the same user may connect (checked with SO_PEERCRED).
 """
@@ -34,6 +38,7 @@ from .audit import AuditLog
 from .config import LimitsConfig
 from .llm import ToolCall, ToolSpec
 from .mcp_client import McpError, ToolOutcome
+from .voice import VoiceError, VoiceService
 
 log = logging.getLogger(__name__)
 
@@ -51,9 +56,16 @@ class RpcError(Exception):
 
 
 class AgentServer:
-    def __init__(self, agent: Agent, audit: AuditLog, limits: LimitsConfig | None = None) -> None:
+    def __init__(
+        self,
+        agent: Agent,
+        audit: AuditLog,
+        limits: LimitsConfig | None = None,
+        voice: VoiceService | None = None,
+    ) -> None:
         self._agent = agent
         self._audit = audit
+        self._voice = voice
         self._limits = limits or LimitsConfig()
         self._conversations: OrderedDict[str, Conversation] = OrderedDict()
         self._busy: set[str] = set()
@@ -116,6 +128,7 @@ class _Session:
         self._write_lock = asyncio.Lock()
         self._turns: dict[str, asyncio.Task[None]] = {}
         self._pending: dict[tuple[str, str], asyncio.Future[Any]] = {}
+        self._listening = False  # this connection holds the microphone
 
     async def send(self, message: dict[str, Any]) -> None:
         data = json.dumps(message, default=str).encode() + b"\n"
@@ -159,6 +172,8 @@ class _Session:
             return {**status, "cloud_enabled": self._server._agent.cloud_enabled}
         if method == "agent.chat":
             return await self._chat(params)
+        if method.startswith("agent.voice."):
+            return await self._voice_call(method.removeprefix("agent.voice."), params)
         if method == "agent.approve":
             self._resolve(params, bool(_require(params, "approved", bool)))
             return {}
@@ -181,6 +196,38 @@ class _Session:
                 raise RpcError(INVALID_PARAMS, "limit must be an integer between 1 and 500")
             return {"entries": self._server._audit.tail(limit)}
         raise RpcError(METHOD_NOT_FOUND, f"method not found: {method}")
+
+    async def _emit_voice(self, event: dict[str, Any]) -> None:
+        await self.send({"jsonrpc": "2.0", "method": "agent.event", "params": event})
+
+    async def _voice_call(self, name: str, params: dict[str, Any]) -> Any:
+        voice = self._server._voice
+        if voice is None:
+            if name == "status":
+                return {"enabled": False, "can_listen": False, "can_speak": False, "problems": []}
+            raise RpcError(UNAVAILABLE, "voice is not available")
+        try:
+            match name:
+                case "status":
+                    return voice.status()
+                case "listen":
+                    await voice.start_listening(self._emit_voice)
+                    self._listening = True
+                case "stop":
+                    self._listening = False
+                    await voice.stop_listening(self._emit_voice)
+                case "cancel":
+                    self._listening = False
+                    await voice.cancel_listening()
+                case "speak":
+                    await voice.speak(_require(params, "text", str), self._emit_voice)
+                case "silence":
+                    await voice.stop_speaking()
+                case _:
+                    raise RpcError(METHOD_NOT_FOUND, f"method not found: agent.voice.{name}")
+        except VoiceError as err:
+            raise RpcError(BUSY if err.busy else UNAVAILABLE, str(err)) from err
+        return {}
 
     async def _chat(self, params: dict[str, Any]) -> dict[str, Any]:
         text = _require(params, "message", str).strip()
@@ -288,6 +335,8 @@ class _Session:
         future.set_result(value)
 
     async def close(self) -> None:
+        if self._listening and self._server._voice is not None:
+            await self._server._voice.cancel_listening()  # never leave the microphone open
         for task in list(self._turns.values()):
             task.cancel()
         for future in self._pending.values():

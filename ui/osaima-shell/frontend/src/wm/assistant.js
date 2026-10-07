@@ -66,8 +66,12 @@ export function makeAssistant(engine, services) {
       for (const [value, label] of [['auto', 'Auto'], ['local', 'Local only'], ['cloud', 'Cloud only']]) {
         modelSelect.append(new Option(label, value));
       }
+      const speaker = el('button', 'as-speak', '🔈');
+      speaker.setAttribute('aria-label', 'Read replies aloud');
+      speaker.setAttribute('aria-pressed', 'false');
+      speaker.disabled = true;
       const newChat = el('button', 'as-new', 'New chat');
-      header.append(statusDot, statusText, modelSelect, newChat);
+      header.append(statusDot, statusText, modelSelect, speaker, newChat);
 
       const log = el('div', 'as-log');
       log.setAttribute('role', 'log');
@@ -81,7 +85,10 @@ export function makeAssistant(engine, services) {
       input.setAttribute('aria-label', 'Message');
       const send = el('button', 'as-send', '➤');
       send.setAttribute('aria-label', 'Send');
-      inputWrap.append(input, send);
+      const mic = el('button', 'as-mic', '🎤');
+      mic.setAttribute('aria-label', 'Talk');
+      mic.disabled = true;
+      inputWrap.append(input, mic, send);
       root.append(header, log, chips, inputWrap);
 
       // ── state ──
@@ -91,6 +98,12 @@ export function makeAssistant(engine, services) {
       let agentOnline = null; // null = unknown
       const approvals = new Set(); // functions that settle a pending approval card
       const cards = new Map();
+      // Voice: the service says what works; the shell just starts and stops it.
+      let canListen = false;
+      let canSpeak = false;
+      let voiceState = 'idle';
+      let speakReplies = false;
+      let voiceInitialised = false;
 
       const scroll = () => { log.scrollTop = log.scrollHeight; };
       const add = (text, kind) => {
@@ -105,7 +118,61 @@ export function makeAssistant(engine, services) {
         statusText.textContent = text;
       }
 
+      function updateMic() {
+        mic.disabled = !canListen || Boolean(turn) || voiceState === 'transcribing';
+        mic.dataset.state = voiceState;
+        mic.textContent = { listening: '■', transcribing: '…' }[voiceState] ?? '🎤';
+        mic.setAttribute('aria-label', voiceState === 'listening' ? 'Stop and send' : 'Talk');
+      }
+
+      function setSpeakReplies(on) {
+        speakReplies = on;
+        speaker.setAttribute('aria-pressed', String(on));
+        speaker.textContent = on ? '🔊' : '🔈';
+      }
+
+      async function refreshVoice() {
+        let status = null;
+        try {
+          status = await client.voiceStatus();
+        } catch { /* the service is down: voice is off */ }
+        canListen = Boolean(status?.can_listen);
+        canSpeak = Boolean(status?.can_speak);
+        const why = status?.problems?.[0] ?? 'Voice is not available';
+        mic.title = canListen ? 'Talk to the assistant' : why;
+        speaker.title = canSpeak ? 'Read replies aloud' : why;
+        speaker.disabled = !canSpeak;
+        if (!voiceInitialised && status) {
+          voiceInitialised = true;
+          setSpeakReplies(canSpeak && Boolean(status.speak_replies));
+        }
+        if (!canSpeak) setSpeakReplies(false);
+        updateMic();
+      }
+
+      function onVoiceEvent(event) {
+        if (event.type === 'voice_state') {
+          voiceState = event.state;
+          updateMic();
+        } else if (event.type === 'voice_transcript') {
+          ask(event.text);
+        } else if (event.type === 'voice_error') {
+          add(event.message, 'notice');
+        }
+      }
+      const stopVoiceEvents = client.onVoice(onVoiceEvent);
+
+      async function toggleListening() {
+        try {
+          if (voiceState === 'listening') await client.voiceStop();
+          else await client.voiceListen();
+        } catch (err) {
+          add(`Voice: ${err.message}`, 'notice');
+        }
+      }
+
       async function refreshStatus() {
+        refreshVoice();
         try {
           const s = await client.status();
           agentOnline = true;
@@ -199,12 +266,14 @@ export function makeAssistant(engine, services) {
         send.setAttribute('aria-label', running ? 'Stop' : 'Send');
         send.dataset.running = running ? '1' : '';
         input.disabled = running;
+        updateMic();
         if (!running) input.focus();
       }
 
       async function ask(text) {
         text = text.trim();
         if (!text || turn) return;
+        if (voiceState === 'speaking') client.silence().catch(() => {});
         services.behavior?.recordAssistantQuery(text);
         chips.hidden = true;
         add(text, 'user');
@@ -235,6 +304,7 @@ export function makeAssistant(engine, services) {
           } else if (result.status === 'cancelled') {
             add('Stopped.', 'notice');
           } else if (result.provider) {
+            if (speakReplies && result.text) client.speak(result.text).catch(() => {});
             const cloud = result.provider === 'claude';
             const meta = el('div', 'as-meta', `${cloud ? '☁ Cloud' : 'Local'} · ${result.model}`);
             if (cloud) meta.dataset.cloud = '1';
@@ -259,6 +329,7 @@ export function makeAssistant(engine, services) {
 
       function resetConversation() {
         turn?.cancel();
+        if (voiceState === 'speaking') client.silence().catch(() => {});
         client.reset(conversationId).catch(() => {});
         conversationId = null;
         log.replaceChildren();
@@ -286,6 +357,11 @@ export function makeAssistant(engine, services) {
         if (e.key === 'Enter' && !e.isComposing) { const v = input.value; input.value = ''; ask(v); }
       });
       newChat.addEventListener('click', resetConversation);
+      mic.addEventListener('click', toggleListening);
+      speaker.addEventListener('click', () => {
+        setSpeakReplies(!speakReplies);
+        if (!speakReplies && voiceState === 'speaking') client.silence().catch(() => {});
+      });
       root.addEventListener('mousedown', (e) => {
         if (!e.target.closest('button, select')) setTimeout(() => input.focus(), 0);
       });
@@ -294,11 +370,17 @@ export function makeAssistant(engine, services) {
       refreshStatus();
       setTimeout(() => input.focus(), 30);
 
-      const instance = { win: ctx.win, ask };
+      const dispose = () => {
+        stopVoiceEvents();
+        if (voiceState === 'listening') client.voiceCancel().catch(() => {});
+        if (voiceState === 'speaking') client.silence().catch(() => {});
+      };
+      const instance = { win: ctx.win, ask, dispose };
       instances.add(instance);
       ctx.win._assistantInstance = instance;
     },
     unmount(win) {
+      win._assistantInstance?.dispose?.();
       instances.delete(win._assistantInstance);
     },
   };
