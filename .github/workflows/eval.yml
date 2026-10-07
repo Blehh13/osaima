@@ -49,6 +49,9 @@ jobs:
           MODEL: ${{ inputs.model }}
           LIMIT: ${{ inputs.limit }}
         run: |
+          # A CPU-only runner can take a while on the first request.
+          printf '[local]\ntimeout_s = 300\n' > "$RUNNER_TEMP/agent.toml"
+          export OSAIMA_AGENT_CONFIG="$RUNNER_TEMP/agent.toml"
           args=(--provider local --model "$MODEL" --out results)
           if [ -n "$LIMIT" ]; then args+=(--limit "$LIMIT"); fi
           python -m osaima_agent eval "${args[@]}"
