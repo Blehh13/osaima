@@ -1,0 +1,11 @@
+# Install as /etc/portage/package.accept_keywords/osaima.
+# Only these packages need testing (~amd64) or live (**) keywords; everything
+# else stays on stable so Gentoo's binary packages can be used.
+app-misc/interstellar-meta ~amd64
+app-misc/interstellar-release ~amd64
+gui-apps/osaima-shell **
+sys-apps/osaima-ai-core **
+sys-apps/osaima-agent **
+sci-ml/ollama ~amd64
+# Required by Ollama; only the testing branch has it. Portage names any others.
+sci-ml/ggml ~amd64

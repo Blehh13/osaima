@@ -30,7 +30,7 @@ RDEPEND="
 	gui-wm/sway
 	sys-apps/osaima-ai-core
 	sys-apps/osaima-agent
-	media-fonts/inter
+	media-fonts/noto
 	media-fonts/jetbrains-mono
 "
 DEPEND="${RDEPEND}"

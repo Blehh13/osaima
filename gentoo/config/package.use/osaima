@@ -1,0 +1,4 @@
+# Install as /etc/portage/package.use/osaima.
+# Match the official binary package for WebKitGTK. Building it takes hours; with
+# keyring on, the prebuilt package is used.
+net-libs/webkit-gtk keyring
