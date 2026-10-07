@@ -28,6 +28,7 @@ PACKAGES=(
 	dev-libs/libisoburn
 	sys-fs/mtools
 )
+CONFIGS=(A-stock B-ours-stable C-ours-testing)
 
 log() { printf '\n==> %s\n' "$*"; }
 
@@ -59,17 +60,44 @@ sci-ml/ollama ~amd64
 EOF
 eselect profile list | grep -i interstellar || echo "(the overlay's profiles are not listed)"
 
+# Packages that stable Gentoo doesn't have (only ~amd64 does) make emerge stop at
+# the first one. Unmask them as they turn up and record which ones, because each
+# is something the image can't take from the stable binary host.
+KEYWORDS_FILE=/etc/portage/package.accept_keywords/zz-spike
+
+# Prints the atoms of packages masked only by the ~amd64 keyword.
+masked_atoms() {
+	grep -E '^- [^ ]+::[^ ]+ \(masked by: ~amd64 keyword\)' "$1" |
+		sed -E 's/^- ([^ ]+)-[0-9][^ ]*::.*$/\1/' | sort -u
+}
+
 # name | profile | ACCEPT_KEYWORDS
 run() {
-	local name=$1 profile=$2 keywords=$3
+	local name=$1 profile=$2 keywords=$3 attempt atom
 	log "Experiment $name: profile=$profile keywords=$keywords"
-	eselect profile set "$profile" || { echo "could not select $profile" > "$OUT/$name.txt"; return; }
-	ACCEPT_KEYWORDS="$keywords" emerge --pretend --verbose --getbinpkg --usepkg \
-		--with-bdeps=n --color=n --quiet-build=y "${PACKAGES[@]}" > "$OUT/$name.txt" 2>&1
-	echo $? > "$OUT/$name.rc"
+	if ! eselect profile set "$profile"; then
+		echo "could not select the profile $profile" > "$OUT/$name.txt"
+		echo 1 > "$OUT/$name.rc"
+		: > "$OUT/$name.unmasked"
+		return
+	fi
+	: > "$KEYWORDS_FILE"
+	: > "$OUT/$name.unmasked"
+	for attempt in $(seq 1 15); do
+		ACCEPT_KEYWORDS="$keywords" emerge --pretend --verbose --getbinpkg --usepkg \
+			--with-bdeps=n --color=n --quiet-build=y "${PACKAGES[@]}" > "$OUT/$name.txt" 2>&1
+		echo $? > "$OUT/$name.rc"
+		new=$(masked_atoms "$OUT/$name.txt")
+		[ -z "$new" ] && break
+		for atom in $new; do
+			echo "$atom ~amd64" >> "$KEYWORDS_FILE"
+			echo "$atom" >> "$OUT/$name.unmasked"
+		done
+	done
 	echo "emerge exit code: $(cat "$OUT/$name.rc")"
-	grep -c '^\[binary' "$OUT/$name.txt" | sed 's/^/binary packages: /'
-	grep -c '^\[ebuild' "$OUT/$name.txt" | sed 's/^/to compile:     /'
+	echo "needed testing keywords: $(sort -u "$OUT/$name.unmasked" | paste -sd' ' -)"
+	echo "binary packages: $(grep -c '^\[binary' "$OUT/$name.txt")"
+	echo "to compile:      $(grep -c '^\[ebuild' "$OUT/$name.txt")"
 }
 
 run A-stock "$ORIGINAL_PROFILE" amd64
@@ -84,7 +112,7 @@ log "Writing the summary"
 	echo
 	echo "| Configuration | emerge exit | From binary packages | Must be compiled | Download |"
 	echo "|---|---|---|---|---|"
-	for name in A-stock B-ours-stable C-ours-testing; do
+	for name in "${CONFIGS[@]}"; do
 		bin=$(grep -c '^\[binary' "$OUT/$name.txt")
 		src=$(grep -c '^\[ebuild' "$OUT/$name.txt")
 		rc=$(cat "$OUT/$name.rc" 2>/dev/null || echo "-")
@@ -95,7 +123,12 @@ log "Writing the summary"
 	echo "- A-stock: Gentoo's default amd64 profile, stable keywords (what the binary host is built for)"
 	echo "- B-ours-stable: our agentic profile, stable keywords"
 	echo "- C-ours-testing: our agentic profile with ~amd64, as gentoo/config/make.conf.example does today"
-	for name in A-stock B-ours-stable C-ours-testing; do
+	echo
+	echo "Packages that only exist in the testing branch (~amd64), so they can never come from the stable binary host:"
+	for name in "${CONFIGS[@]}"; do
+		echo "- $name: $(sort -u "$OUT/$name.unmasked" | paste -sd' ' -)"
+	done
+	for name in "${CONFIGS[@]}"; do
 		echo
 		echo "## $name: packages that would be compiled"
 		echo
