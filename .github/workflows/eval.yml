@@ -39,16 +39,31 @@ jobs:
         env:
           MODEL: ${{ inputs.model }}
         run: |
+          # The installer only starts a service when systemd is running, which a
+          # runner may not have, so start the server ourselves if it isn't up.
+          up() { curl -fs http://127.0.0.1:11434/api/version > /dev/null; }
+          sleep 3
+          if ! up; then
+            nohup ollama serve > "$RUNNER_TEMP/ollama.log" 2>&1 &
+          fi
           for _ in $(seq 1 30); do
-            curl -fs http://127.0.0.1:11434/api/version && break
+            up && break
             sleep 2
           done
+          if ! up; then
+            echo "Ollama did not start:"
+            cat "$RUNNER_TEMP/ollama.log" 2>/dev/null
+            exit 1
+          fi
           ollama pull "$MODEL"
       - name: Run the evaluation
         env:
           MODEL: ${{ inputs.model }}
           LIMIT: ${{ inputs.limit }}
         run: |
+          # A CPU-only runner can take a while on the first request.
+          printf '[local]\ntimeout_s = 300\n' > "$RUNNER_TEMP/agent.toml"
+          export OSAIMA_AGENT_CONFIG="$RUNNER_TEMP/agent.toml"
           args=(--provider local --model "$MODEL" --out results)
           if [ -n "$LIMIT" ]; then args+=(--limit "$LIMIT"); fi
           python -m osaima_agent eval "${args[@]}"
