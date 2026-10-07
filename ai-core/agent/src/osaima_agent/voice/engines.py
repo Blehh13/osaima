@@ -18,7 +18,6 @@ from typing import Any, Protocol
 from ..config import VoiceConfig
 from .audio import AudioError, Which, fill
 
-
 SAMPLE_RATE = 16000  # what speech recognition expects
 
 
