@@ -19,8 +19,6 @@ ACCEPT_LICENSE="*"
 ACCEPT_KEYWORDS="~amd64"
 
 # Language targets used by the AI core.
-PYTHON_TARGETS="python3_12"
-PYTHON_SINGLE_TARGET="python3_12"
 
 VIDEO_CARDS="intel amdgpu radeonsi"
 INPUT_DEVICES="libinput"

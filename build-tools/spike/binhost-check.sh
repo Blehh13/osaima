@@ -121,7 +121,7 @@ run C-ours-testing interstellar:interstellar/agentic '~amd64'
 log "Why are some packages not taken from the binary host?"
 # For every package A2 would compile, look it up in the host's index: is it
 # there at all, in which versions, and which USE flags differ from what we want?
-index=$(find /var/cache/binhost -name Packages 2>/dev/null | head -1)
+index=$(find /var/cache -path '*binhost*' -name Packages 2>/dev/null | head -1)
 echo "index: ${index:-not found}"
 if [ -n "$index" ]; then
 	python3 - "$index" "$OUT/A2-desktop.txt" > "$OUT/binhost-diagnosis.txt" <<'PY'
