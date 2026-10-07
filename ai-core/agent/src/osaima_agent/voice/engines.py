@@ -10,12 +10,44 @@ import asyncio
 import contextlib
 import importlib.util
 import threading
+import wave
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any, Protocol
 
 from ..config import VoiceConfig
 from .audio import AudioError, Which, fill
+
+
+SAMPLE_RATE = 16000  # what speech recognition expects
+
+
+def load_audio(path: Path) -> Any:
+    """Samples (float32, 16 kHz, mono) from a 16-bit PCM WAV file.
+
+    Read here instead of by faster-whisper's own decoder (PyAV), whose newest
+    releases don't work with it. Recordings are already 16 kHz mono; other
+    files are mixed down and resampled.
+    """
+    import numpy as np  # installed with faster-whisper
+
+    try:
+        with wave.open(str(path), "rb") as wav:
+            channels, width, rate = wav.getnchannels(), wav.getsampwidth(), wav.getframerate()
+            frames = wav.readframes(wav.getnframes())
+    except (wave.Error, EOFError) as err:
+        raise AudioError(f"not a readable WAV file: {err}") from err
+    if width != 2:
+        raise AudioError("the recording is not 16-bit audio")
+    samples = np.frombuffer(frames, dtype="<i2").astype(np.float32) / 32768.0
+    if channels > 1:
+        usable = len(samples) // channels * channels
+        samples = samples[:usable].reshape(-1, channels).mean(axis=1)
+    if rate != SAMPLE_RATE and len(samples) > 1:
+        count = round(len(samples) * SAMPLE_RATE / rate)
+        positions = np.linspace(0, len(samples) - 1, count)
+        samples = np.interp(positions, np.arange(len(samples)), samples).astype(np.float32)
+    return samples
 
 
 class Transcriber(Protocol):
@@ -64,7 +96,7 @@ class WhisperTranscriber:
     def transcribe(self, wav: Path) -> str:
         model = self._load()
         segments, _info = model.transcribe(
-            str(wav),
+            load_audio(wav),
             language=self._cfg.stt_language or None,
             beam_size=self._cfg.stt_beam_size,
             vad_filter=True,

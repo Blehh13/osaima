@@ -8,6 +8,7 @@ import json
 import sys
 import tempfile
 import textwrap
+import wave
 from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Any
@@ -23,7 +24,7 @@ from osaima_agent.policy import Policy
 from osaima_agent.server import AgentServer
 from osaima_agent.voice import VoiceError, VoiceService
 from osaima_agent.voice.audio import AudioError, fill, recorded_seconds, resolve_command
-from osaima_agent.voice.engines import CommandSynthesizer
+from osaima_agent.voice.engines import CommandSynthesizer, load_audio
 from osaima_agent.voice.service import speakable
 
 RECORDER = textwrap.dedent(
@@ -164,6 +165,35 @@ def test_recorded_length_comes_from_the_file_size(tmp_path: Path) -> None:
     wav.write_bytes(bytes(44 + 32000))
     assert recorded_seconds(wav) == pytest.approx(1.0)
     assert recorded_seconds(tmp_path / "missing.wav") == 0.0
+
+
+def write_wav(path: Path, rate: int, channels: int, seconds: float, width: int = 2) -> None:
+    with wave.open(str(path), "wb") as out:
+        out.setnchannels(channels)
+        out.setsampwidth(width)
+        out.setframerate(rate)
+        out.writeframes(bytes(int(rate * seconds) * channels * width))
+
+
+def test_audio_is_loaded_as_16k_mono(tmp_path: Path) -> None:
+    np = pytest.importorskip("numpy")
+    plain = tmp_path / "plain.wav"
+    write_wav(plain, 16000, 1, 1.0)
+    samples = load_audio(plain)
+    assert samples.dtype == np.float32 and len(samples) == 16000
+
+    other = tmp_path / "other.wav"  # what Piper writes: 22.05 kHz; and a stereo file
+    write_wav(other, 22050, 2, 1.0)
+    converted = load_audio(other)
+    assert len(converted) == 16000
+    assert float(np.abs(converted).max()) <= 1.0
+
+    write_wav(tmp_path / "eight.wav", 16000, 1, 0.1, width=1)
+    with pytest.raises(AudioError, match="16-bit"):
+        load_audio(tmp_path / "eight.wav")
+    (tmp_path / "junk.wav").write_bytes(b"not audio")
+    with pytest.raises(AudioError, match="not a readable"):
+        load_audio(tmp_path / "junk.wav")
 
 
 # ── settings ─────────────────────────────────────────────────────────────────
