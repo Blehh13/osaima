@@ -15,8 +15,10 @@ EMERGE_DEFAULT_OPTS="--jobs=2 --load-average=$(nproc)"
 PORTAGE_NICENESS="10"
 ACCEPT_LICENSE="*"
 
-# Accept live (9999) ebuilds for the OSAIMA components.
-ACCEPT_KEYWORDS="~amd64"
+# Stable keywords on purpose: Gentoo's official binary packages are built for
+# stable, so ACCEPT_KEYWORDS="~amd64" turns most of them into compiles. The few
+# packages that need testing keywords (the OSAIMA live ebuilds, Ollama) are listed
+# in package.accept_keywords/osaima next to this file.
 
 # Language targets used by the AI core.
 
