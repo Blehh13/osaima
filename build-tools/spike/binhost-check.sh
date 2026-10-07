@@ -28,7 +28,7 @@ PACKAGES=(
 	dev-libs/libisoburn
 	sys-fs/mtools
 )
-CONFIGS=(A-stock B-ours-stable C-ours-testing)
+CONFIGS=(A-stock A2-desktop B-ours-stable C-ours-testing)
 
 log() { printf '\n==> %s\n' "$*"; }
 
@@ -71,11 +71,24 @@ masked_atoms() {
 		sed -E 's/^- ([^ ]+)-[0-9][^ ]*::.*$/\1/' | sort -u
 }
 
+# Select a profile: Gentoo's with eselect, ours by linking the overlay's directory.
+select_profile() {
+	local profile=$1
+	if [[ $profile == interstellar:* ]]; then
+		ln -sfn "/var/db/repos/interstellar/profiles/${profile#interstellar:}" /etc/portage/make.profile
+	else
+		eselect profile set "$profile"
+	fi
+	ls -l /etc/portage/make.profile
+	# Show the profile's real parse error, if it has one.
+	portageq envvar ARCH > /dev/null 2> "$OUT/profile-error.txt" || cat "$OUT/profile-error.txt"
+}
+
 # name | profile | ACCEPT_KEYWORDS
 run() {
 	local name=$1 profile=$2 keywords=$3 attempt atom
 	log "Experiment $name: profile=$profile keywords=$keywords"
-	if ! eselect profile set "$profile"; then
+	if ! select_profile "$profile"; then
 		echo "could not select the profile $profile" > "$OUT/$name.txt"
 		echo 1 > "$OUT/$name.rc"
 		: > "$OUT/$name.unmasked"
@@ -101,6 +114,7 @@ run() {
 }
 
 run A-stock "$ORIGINAL_PROFILE" amd64
+run A2-desktop "${ORIGINAL_PROFILE}/desktop" amd64
 run B-ours-stable interstellar:interstellar/agentic amd64
 run C-ours-testing interstellar:interstellar/agentic '~amd64'
 
@@ -121,6 +135,7 @@ log "Writing the summary"
 	done
 	echo
 	echo "- A-stock: Gentoo's default amd64 profile, stable keywords (what the binary host is built for)"
+	echo "- A2-desktop: Gentoo's desktop profile, stable keywords"
 	echo "- B-ours-stable: our agentic profile, stable keywords"
 	echo "- C-ours-testing: our agentic profile with ~amd64, as gentoo/config/make.conf.example does today"
 	echo
