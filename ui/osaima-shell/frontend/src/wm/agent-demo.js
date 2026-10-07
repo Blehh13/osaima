@@ -89,6 +89,11 @@ export function demoTransport({ speed = 1 } = {}) {
             cloud: null,
             cloud_enabled: false,
           };
+        case 'agent.voice.status':
+          return {
+            enabled: false, can_listen: false, can_speak: false,
+            problems: ['Voice needs the real Interstellar OS (this is the demo).'],
+          };
         case 'agent.chat': {
           const turn = id('turn_');
           const conversation = params.conversation_id ?? id('convo_');

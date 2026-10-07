@@ -21,6 +21,7 @@ from .llm.ollama import OllamaProvider
 from .mcp_client import McpClient, McpError
 from .policy import Policy
 from .server import AgentServer
+from .voice import VoiceService
 
 
 def build_agent(cfg: config.AgentConfig, mcp: McpClient) -> tuple[Agent, AuditLog]:
@@ -43,9 +44,15 @@ def build_agent(cfg: config.AgentConfig, mcp: McpClient) -> tuple[Agent, AuditLo
 async def serve(cfg: config.AgentConfig, socket_path: Path) -> None:
     mcp = McpClient(cfg.mcp_socket_path, cfg.limits.core_request_timeout_s)
     agent, audit = build_agent(cfg, mcp)
+    voice = None
+    if cfg.voice.enabled:
+        work_dir = config.runtime_dir() / "voice"
+        voice = VoiceService(cfg.voice, cfg.voice_models_dir, work_dir)
     try:
-        await AgentServer(agent, audit, cfg.limits).serve(socket_path)
+        await AgentServer(agent, audit, cfg.limits, voice).serve(socket_path)
     finally:
+        if voice is not None:
+            await voice.aclose()
         await mcp.aclose()
 
 
