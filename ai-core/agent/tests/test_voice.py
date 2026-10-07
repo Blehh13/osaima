@@ -65,7 +65,7 @@ class FakeTts:
 
     async def synthesize(self, text: str, out: Path) -> None:
         self.said.append(text)
-        out.write_bytes(b"RIFF" + bytes(40))
+        await asyncio.to_thread(out.write_bytes, b"RIFF" + bytes(40))
 
 
 class Events:
@@ -171,7 +171,13 @@ def test_recorded_length_comes_from_the_file_size(tmp_path: Path) -> None:
 
 def test_voice_settings_are_validated() -> None:
     cfg = config.from_dict(
-        {"voice": {"stt_model": "small.en", "max_record_s": 12, "record_command": ["rec", "{output}"]}}
+        {
+            "voice": {
+                "stt_model": "small.en",
+                "max_record_s": 12,
+                "record_command": ["rec", "{output}"],
+            }
+        }
     )
     assert cfg.voice.stt_model == "small.en"
     assert cfg.voice.max_record_s == 12.0
@@ -439,7 +445,8 @@ async def test_voice_over_the_socket(
         while not any(e["type"] == "voice_transcript" for e in seen):
             message = json.loads(await asyncio.wait_for(reader.readline(), 5))
             seen.append(message["params"])
-        assert [e for e in seen if e["type"] == "voice_transcript"][0]["text"] == "close firefox"
+        transcript = next(e for e in seen if e["type"] == "voice_transcript")
+        assert transcript["text"] == "close firefox"
 
         again, _ = await rpc(reader, writer, 4, "agent.voice.stop")
         assert again["error"]["code"] == -32002  # not listening

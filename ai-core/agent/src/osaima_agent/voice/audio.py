@@ -17,7 +17,10 @@ from pathlib import Path
 # (program, command). Recording is 16 kHz mono, which is what speech models expect.
 RECORDERS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("pw-record", ("pw-record", "--rate", "16000", "--channels", "1", "{output}")),
-    ("arecord", ("arecord", "-q", "-t", "wav", "-f", "S16_LE", "-r", "16000", "-c", "1", "{output}")),
+    (
+        "arecord",
+        ("arecord", "-q", "-t", "wav", "-f", "S16_LE", "-r", "16000", "-c", "1", "{output}"),
+    ),
 )
 PLAYERS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("pw-play", ("pw-play", "{input}")),
