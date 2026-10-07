@@ -118,6 +118,51 @@ run A2-desktop "${ORIGINAL_PROFILE}/desktop" amd64
 run B-ours-stable interstellar:interstellar/agentic amd64
 run C-ours-testing interstellar:interstellar/agentic '~amd64'
 
+log "Why are some packages not taken from the binary host?"
+# For every package A2 would compile, look it up in the host's index: is it
+# there at all, in which versions, and which USE flags differ from what we want?
+index=$(find /var/cache/binhost -name Packages 2>/dev/null | head -1)
+echo "index: ${index:-not found}"
+if [ -n "$index" ]; then
+	python3 - "$index" "$OUT/A2-desktop.txt" > "$OUT/binhost-diagnosis.txt" <<'PY'
+import re
+import sys
+
+index, listing = sys.argv[1:3]
+by_pkg = {}
+for block in open(index, encoding="utf-8", errors="replace").read().split("\n\n"):
+    fields = dict(line.split(": ", 1) for line in block.splitlines() if ": " in line)
+    cpv = fields.get("CPV")
+    if cpv:
+        by_pkg.setdefault(re.sub(r"-[0-9][^/]*$", "", cpv), []).append(fields)
+
+print("| Package | Version we would build | On the binary host | USE flags that differ |")
+print("|---|---|---|---|")
+for line in open(listing, encoding="utf-8", errors="replace"):
+    m = re.match(r"\[ebuild[^\]]*\] (\S+)(.*)", line)
+    if not m:
+        continue
+    cpv = m.group(1).split("::")[0].split(":")[0]
+    pkg = re.sub(r"-[0-9][^/]*$", "", cpv)
+    version = cpv[len(pkg) + 1:]
+    if pkg.endswith("-9999") or "/osaima-" in pkg or "/interstellar-" in pkg:
+        continue
+    offered = by_pkg.get(pkg, [])
+    if not offered:
+        print(f"| {pkg} | {version} | not on the host | |")
+        continue
+    versions = sorted({o["CPV"][len(pkg) + 1:] for o in offered})
+    use = re.search(r'USE="([^"]*)"', m.group(2))
+    wanted = {t.strip("()%*") for t in (use.group(1).split() if use else []) if not t.startswith("-")}
+    last = offered[-1]
+    have = set(last.get("USE", "").split())
+    known = {f.lstrip("+-") for f in last.get("IUSE", "").split()}
+    diff = sorted(f"+{f}" for f in (wanted - have) & known) + sorted(f"-{f}" for f in (have - wanted) & known)
+    print(f"| {pkg} | {version} | {', '.join(versions)} | {' '.join(diff) or 'none (version differs)'} |")
+PY
+	cat "$OUT/binhost-diagnosis.txt"
+fi
+
 log "Writing the summary"
 {
 	echo "# Binary host check"
@@ -143,6 +188,12 @@ log "Writing the summary"
 	for name in "${CONFIGS[@]}"; do
 		echo "- $name: $(sort -u "$OUT/$name.unmasked" | paste -sd' ' -)"
 	done
+	if [ -f "$OUT/binhost-diagnosis.txt" ]; then
+		echo
+		echo "## A2-desktop: why these were not taken from the binary host"
+		echo
+		cat "$OUT/binhost-diagnosis.txt"
+	fi
 	for name in "${CONFIGS[@]}"; do
 		echo
 		echo "## $name: packages that would be compiled"
