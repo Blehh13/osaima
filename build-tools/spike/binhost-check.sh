@@ -28,7 +28,7 @@ PACKAGES=(
 	dev-libs/libisoburn
 	sys-fs/mtools
 )
-CONFIGS=(A-stock A2-desktop B-ours-stable C-ours-testing)
+CONFIGS=(A-stock A2-desktop B-ours-stable C-ours-testing D-ours-tuned)
 
 log() { printf '\n==> %s\n' "$*"; }
 
@@ -84,9 +84,9 @@ select_profile() {
 	portageq envvar ARCH > /dev/null 2> "$OUT/profile-error.txt" || cat "$OUT/profile-error.txt"
 }
 
-# name | profile | ACCEPT_KEYWORDS
+# name | profile | ACCEPT_KEYWORDS | extra package.use lines (optional)
 run() {
-	local name=$1 profile=$2 keywords=$3 attempt atom
+	local name=$1 profile=$2 keywords=$3 use_lines=${4:-} attempt atom
 	log "Experiment $name: profile=$profile keywords=$keywords"
 	if ! select_profile "$profile"; then
 		echo "could not select the profile $profile" > "$OUT/$name.txt"
@@ -96,6 +96,9 @@ run() {
 	fi
 	: > "$KEYWORDS_FILE"
 	: > "$OUT/$name.unmasked"
+	mkdir -p /etc/portage/package.use
+	printf '%s
+' "$use_lines" > /etc/portage/package.use/zz-spike
 	for attempt in $(seq 1 15); do
 		ACCEPT_KEYWORDS="$keywords" emerge --pretend --verbose --getbinpkg --usepkg \
 			--with-bdeps=n --color=n --quiet-build=y "${PACKAGES[@]}" > "$OUT/$name.txt" 2>&1
@@ -117,6 +120,9 @@ run A-stock "$ORIGINAL_PROFILE" amd64
 run A2-desktop "${ORIGINAL_PROFILE}/desktop" amd64
 run B-ours-stable interstellar:interstellar/agentic amd64
 run C-ours-testing interstellar:interstellar/agentic '~amd64'
+# The official WebKitGTK package is built with keyring on; matching it avoids a
+# multi-hour compile. Nothing else is changed.
+run D-ours-tuned interstellar:interstellar/agentic amd64 "net-libs/webkit-gtk keyring"
 
 log "Why are some packages not taken from the binary host?"
 # For every package A2 would compile, look it up in the host's index: is it
@@ -182,7 +188,8 @@ log "Writing the summary"
 	echo "- A-stock: Gentoo's default amd64 profile, stable keywords (what the binary host is built for)"
 	echo "- A2-desktop: Gentoo's desktop profile, stable keywords"
 	echo "- B-ours-stable: our agentic profile, stable keywords"
-	echo "- C-ours-testing: our agentic profile with ~amd64, as gentoo/config/make.conf.example does today"
+	echo "- C-ours-testing: our agentic profile with ~amd64, as gentoo/config/make.conf.example did before this spike"
+	echo "- D-ours-tuned: B plus USE=keyring for webkit-gtk, to match the official binary package"
 	echo
 	echo "Packages that only exist in the testing branch (~amd64), so they can never come from the stable binary host:"
 	for name in "${CONFIGS[@]}"; do
