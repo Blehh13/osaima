@@ -111,15 +111,47 @@ Newline-delimited JSON-RPC 2.0 on the socket. Only the same user can connect.
 | `agent.cancel` | `turn_id` | `{cancelled}` |
 | `agent.reset` | `conversation_id` | `{}` |
 | `agent.audit` | `limit?` | `{entries}` |
+| `agent.voice.status` | | what works (`can_listen`, `can_speak`, `problems`, `state`) |
+| `agent.voice.listen` / `stop` / `cancel` | | `{}`: start, finish (and transcribe) or discard a recording |
+| `agent.voice.speak` | `text` | `{}`: read it aloud |
+| `agent.voice.silence` | | `{}`: stop speaking |
 
 Progress arrives as `agent.event` notifications with a `turn_id` and a `type`:
 `text` (`delta`), `tool_call`, `approval_required`, `client_tool_call`,
 `tool_result`, `notice`, `error`, `cancelled`, and finally `done` (`text`,
 `provider`, `model`, `steps`).
 
+Voice progress arrives as `agent.event` notifications without a `turn_id`:
+`voice_state` (`state`: `idle`, `listening`, `transcribing`, `speaking`),
+`voice_transcript` (`text`) and `voice_error` (`message`).
+
 `client_tools` (sent with a conversation's first message) are tools the shell
 implements itself, such as opening a built-in app. When the model calls one,
 the agent emits `client_tool_call` and waits for `agent.client_tool_result`.
+
+## Voice
+
+Push-to-talk, entirely on this computer: the shell's microphone button calls
+`agent.voice.listen`, then `agent.voice.stop`; the agent transcribes the
+recording with [faster-whisper](https://github.com/SYSTRAN/faster-whisper) and
+returns the words as a `voice_transcript` event, which the chat sends like any
+typed message. Replies can be read aloud with [Piper](https://github.com/OHF-Voice/piper1-gpl).
+Recordings are made with PipeWire (`pw-record`) or ALSA (`arecord`), kept in a
+private temporary folder, and deleted as soon as they are transcribed. Nothing
+is sent over the network, except the one-time download of the models.
+
+Set up (text chat works without any of this):
+
+```bash
+pip install "osaima-agent[voice]"            # faster-whisper and Piper
+python -m piper.download_voices en_US-lessac-medium --data-dir ~/.local/share/osaima/voice
+osaima-agent doctor                          # shows what is missing
+```
+
+faster-whisper downloads its speech model (`base.en`, about 150 MB) the first
+time it is used. Every setting is in the `[voice]` table of `agent.toml`; see
+`docs/configuration.md`. Voice is verified in CI with fake engines and real
+helper processes; it has not yet been tried with a real microphone.
 
 ## Development
 

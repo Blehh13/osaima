@@ -17,7 +17,7 @@ EGIT_SUBMODULES=()
 LICENSE="GPL-3+"
 SLOT="0"
 KEYWORDS=""  # live ebuild
-IUSE=""
+IUSE="voice"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 # The Anthropic SDK is not packaged in Gentoo, so its Python dependencies are
@@ -30,6 +30,7 @@ QA_PREBUILT="usr/lib/${PN}/*"
 RDEPEND="
 	${PYTHON_DEPS}
 	sys-apps/osaima-ai-core
+	voice? ( || ( media-video/pipewire media-sound/alsa-utils ) )
 "
 BDEPEND="
 	${PYTHON_DEPS}
@@ -40,10 +41,13 @@ S="${WORKDIR}/${P}/ai-core/agent"
 
 src_install() {
 	local site="/usr/lib/${PN}/site"
+	# faster-whisper and Piper are not packaged in Gentoo either.
+	local target="."
+	use voice && target=".[voice]"
 
 	"${EPYTHON}" -m pip install \
 		--no-cache-dir --disable-pip-version-check --no-compile \
-		--target "${ED}${site}" . || die "pip install failed"
+		--target "${ED}${site}" "${target}" || die "pip install failed"
 	python_optimize "${ED}${site}"
 
 	# Run from the private directory; nothing is installed system-wide.
@@ -63,4 +67,9 @@ pkg_postinst() {
 	elog "  osaima-agent doctor --pull"
 	elog "The Interstellar desktop session starts the assistant automatically."
 	elog "Settings (optional): ~/.config/osaima/agent.toml"
+	if use voice; then
+		elog "Voice: download a speaking voice once (needs the network):"
+		elog "  python -m piper.download_voices en_US-lessac-medium --data-dir ~/.local/share/osaima/voice"
+		elog "Speech recognition downloads its model the first time you use the microphone."
+	fi
 }
