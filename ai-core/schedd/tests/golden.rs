@@ -43,6 +43,9 @@ fn rust_agrees_with_the_trained_model() {
 fn every_class_appears_in_the_examples() {
     let (_, examples) = load();
     for class in Class::ALL {
-        assert!(examples.iter().any(|ex| ex.class == class), "no example of {class}");
+        assert!(
+            examples.iter().any(|ex| ex.class == class),
+            "no example of {class}"
+        );
     }
 }
