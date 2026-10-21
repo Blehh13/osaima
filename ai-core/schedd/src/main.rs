@@ -42,6 +42,7 @@ extern "C" fn on_signal(_: libc::c_int) {
     STOP.store(true, Ordering::SeqCst);
 }
 
+#[derive(Debug)]
 struct Opts {
     command: String,
     interval: f64,

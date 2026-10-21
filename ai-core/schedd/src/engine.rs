@@ -96,7 +96,7 @@ impl<C: Collector, A: Actuator> Engine<C, A> {
     }
 
     fn skip(&self, s: &Sample) -> bool {
-        s.kernel_thread || s.pid <= 1 || s.pid == self.own_pid || s.uid < self.cfg.min_uid || self.cfg.ignore.iter().any(|n| *n == s.comm)
+        s.kernel_thread || s.pid <= 1 || s.pid == self.own_pid || s.uid < self.cfg.min_uid || self.cfg.ignore.contains(&s.comm)
     }
 
     /// Measure every process, judge those with a baseline, and change priorities that need it.
@@ -255,7 +255,7 @@ mod tests {
         proc(pid, n, 40, 100, 100, 0)
     }
 
-    fn engine<'a>(rounds: Vec<Vec<Sample>>, rec: &'a mut Recorder, cfg: Config) -> Engine<Script, &'a mut Recorder> {
+    fn engine(rounds: Vec<Vec<Sample>>, rec: &mut Recorder, cfg: Config) -> Engine<Script, &mut Recorder> {
         Engine::new(Script(rounds.into()), rec, Classifier::Rules, Policy::default(), cfg)
     }
 
