@@ -26,7 +26,15 @@ OUT=$(mktemp -d)
 
 [ "$(id -u)" = 0 ] || { echo "run as root" >&2; exit 1; }
 id "$USER_NAME" > /dev/null 2>&1 || useradd -u "$UID_BENCH" -M -s /usr/sbin/nologin "$USER_NAME"
-as_bench() { setpriv --reuid="$UID_BENCH" --regid="$UID_BENCH" --clear-groups "$@"; }
+# Started with `as_bench ... &`: exec, so that $! is the program itself and killing it works.
+as_bench() { exec setpriv --reuid="$UID_BENCH" --regid="$UID_BENCH" --clear-groups "$@"; }
+# Nothing of one run may live on into the next (or hold the output open after the end).
+reap() {
+	pkill -KILL -u "$UID_BENCH" 2> /dev/null || true
+	wait 2> /dev/null || true
+	for _ in $(seq 50); do pgrep -u "$UID_BENCH" > /dev/null || return 0; sleep 0.1; done
+}
+trap reap EXIT
 
 # The checkout may sit in a home folder the benchmark user cannot read, so run copies.
 WORK=$OUT/scripts
@@ -38,21 +46,27 @@ cd "$WORK"
 
 one_run() {
 	local label=$1 mode=$2
-	local hog_pids=() daemon=""
+	local daemon=""
 	if [ "$mode" != idle ]; then
 		for i in $(seq 1 "$HOGS"); do
 			as_bench python3 "$WORK/workload.py" batch --seed "$i" &
-			hog_pids+=("$!")
 		done
 	fi
 	case "$mode" in
 		rules) "$SCHEDD" run --min-uid "$UID_BENCH" --interval 1 --hysteresis 2 --source proc > "$OUT/$label.daemon.log" 2>&1 & daemon=$! ;;
 		model) "$SCHEDD" run --min-uid "$UID_BENCH" --interval 1 --hysteresis 2 --source proc --model "$MODEL" > "$OUT/$label.daemon.log" 2>&1 & daemon=$! ;;
 	esac
-	as_bench python3 "$WORK/frames.py" --label "$label" > "$OUT/$label.json"
+	as_bench python3 "$WORK/frames.py" --label "$label" > "$OUT/$label.json" &
+	local frames=$!
+	wait "$frames"
 	if [ -n "$daemon" ]; then kill -TERM "$daemon"; wait "$daemon" || true; fi
-	if [ "${#hog_pids[@]}" -gt 0 ]; then kill -KILL "${hog_pids[@]}" 2> /dev/null || true; wait "${hog_pids[@]}" 2> /dev/null || true; fi
+	reap
 	cat "$OUT/$label.json"
+	if [ -n "$daemon" ]; then
+		local log=$OUT/$label.daemon.log
+		echo "  daemon, frame task: $(grep -E "^$frames " "$log" | tail -1 | cut -d' ' -f2- || true)" >&2
+		echo "  daemon, hogs (last verdict each): $(grep -vE "^$frames " "$log" | grep -E '^[0-9]+ .*->' | awk '{last[$1]=$4} END {for (p in last) n[last[p]]++; for (c in n) printf "%s %d  ", c, n[c]}')" >&2
+	fi
 }
 
 echo "$(nproc) CPUs, $HOGS CPU hogs, a $(python3 -c 'print(round(6/16.67*100))')% frame task (6 ms of work every 16.7 ms)" >&2
@@ -70,6 +84,3 @@ for r in rows:
     print(f"| {r['label']} | {r['frames']} | {r['p50_ms']} ms | {r['p95_ms']} ms | {r['p99_ms']} ms | {r['max_ms']} ms | {r['late_percent']}% |")
 print("\nA frame is late when it finishes more than %s ms after it was due." % rows[0]["period_ms"])
 PY
-echo
-echo "what the daemon did (rules run):"
-grep -E "set|judged" "$OUT"/*rules*.daemon.log | head -12 || true
