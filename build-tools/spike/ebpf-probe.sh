@@ -98,7 +98,7 @@ fence
 
 section "C eBPF toolchain (clang + libbpf + bpftool): can a CO-RE program be built and loaded?"
 fence
-sudo apt-get install -y -qq clang llvm libbpf-dev bpftool linux-libc-dev libelf-dev zlib1g-dev > /tmp/apt.log 2>&1 || tail -5 /tmp/apt.log
+sudo apt-get install -y -qq clang llvm libbpf-dev linux-libc-dev libelf-dev zlib1g-dev > /tmp/apt.log 2>&1 || tail -5 /tmp/apt.log
 clang --version | head -1
 bpftool --version 2>&1 | head -2
 mkdir -p /tmp/bpfprobe && cd /tmp/bpfprobe
@@ -120,14 +120,22 @@ int BPF_PROG(on_switch, bool preempt, struct task_struct *prev, struct task_stru
 }
 char LICENSE[] SEC("license") = "GPL";
 EOF
-if clang -g -O2 -target bpf -D__TARGET_ARCH_x86 -c probe.bpf.c -o probe.bpf.o; then
+if clang -g -O2 -target bpf -D__TARGET_ARCH_x86 -c probe.bpf.c -o probe.bpf.o 2> clang.log; then
 	echo "compiled probe.bpf.o ($(stat -c %s probe.bpf.o) bytes)"
-	sudo bpftool prog loadall probe.bpf.o /sys/fs/bpf/probe autoattach 2>&1 | head -3
+	sudo mkdir -p /sys/fs/bpf/osaima-probe/maps
+	sudo bpftool prog loadall probe.bpf.o /sys/fs/bpf/osaima-probe/progs autoattach pinmaps /sys/fs/bpf/osaima-probe/maps 2>&1 | head -5
+	echo "pinned:"; sudo find /sys/fs/bpf/osaima-probe | head
 	sleep 1
-	sudo bpftool map dump name count 2>&1 | head -6
-	sudo rm -rf /sys/fs/bpf/probe
+	echo "map dump (json):"
+	sudo bpftool -j map dump pinned /sys/fs/bpf/osaima-probe/maps/count 2>&1 | head -c 600; echo
+	echo "after the loader has exited, is the program still attached?"
+	sudo bpftool -j prog show 2>/dev/null | python3 -c "import sys,json; print([p['name'] for p in json.load(sys.stdin) if p.get('name') in ('on_switch',)])"
+	sudo bpftool link show 2>&1 | head -4
+	sudo rm -rf /sys/fs/bpf/osaima-probe && echo "unpinned"
+	sleep 1
+	sudo bpftool -j prog show 2>/dev/null | python3 -c "import sys,json; print('still loaded:', [p['name'] for p in json.load(sys.stdin) if p.get('name') in ('on_switch',)])"
 else
-	echo "BPF C compile failed"
+	echo "BPF C compile failed"; grep -E "error" clang.log | head -5
 fi
 fence
 
