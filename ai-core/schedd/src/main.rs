@@ -190,20 +190,34 @@ fn run(o: &Opts) -> Result<(), String> {
         ..Config::default()
     };
     cfg.ignore.extend(o.ignore.iter().cloned());
-    let use_bpf = match o.source.as_str() {
+    let want_bpf = match o.source.as_str() {
         "bpf" => true,
         "proc" => false,
         _ => std::path::Path::new(&o.bpf_object).exists(),
     };
-    if use_bpf {
-        let collector = BpfCollector::attach(
+    let collector = if want_bpf {
+        match BpfCollector::attach(
             &o.bpftool,
             std::path::Path::new(&o.bpf_object),
             std::path::Path::new(PIN_DIR),
-        )
-        .map_err(|e| {
-            format!("cannot start the eBPF telemetry: {e} (use --source proc to go without)")
-        })?;
+        ) {
+            Ok(c) => Some(c),
+            // asked for by name: say so and stop
+            Err(e) if o.source == "bpf" => {
+                return Err(format!(
+                    "cannot start the eBPF telemetry: {e} (use --source proc to go without)"
+                ));
+            }
+            // chosen automatically: a missing bpftool or an old kernel must not stop the service
+            Err(e) => {
+                eprintln!("osaima-schedd: no eBPF telemetry ({e}); reading /proc instead");
+                None
+            }
+        }
+    } else {
+        None
+    };
+    if let Some(collector) = collector {
         drive(
             Engine::new(collector, KernelActuator, classifier, policy, cfg),
             o,

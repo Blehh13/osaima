@@ -129,7 +129,7 @@ chroot "$ROOTFS" /bin/bash -e <<CHROOT
 	eselect profile set "$PROFILE"
 	emerge --noreplace --update \
 		sys-kernel/gentoo-kernel-bin \
-		sys-apps/bubblewrap \
+		sys-apps/bubblewrap 		dev-util/bpftool \
 		net-misc/openssh \
 		gui-wm/sway gui-apps/swaybg gui-apps/foot media-fonts/dejavu \
 		gui-apps/waybar gui-apps/mako gui-apps/wl-clipboard gui-apps/grim x11-libs/libnotify \
