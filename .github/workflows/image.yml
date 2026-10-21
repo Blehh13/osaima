@@ -105,7 +105,7 @@ jobs:
           ls -lh intent_embed
 
       - name: Python packages the image script runs on the host
-        run: sudo pip install --quiet --break-system-packages onnxruntime tokenizers numpy
+        run: sudo /usr/bin/python3 -m pip install --quiet --break-system-packages onnxruntime tokenizers numpy
 
       # ── 2. The image ───────────────────────────────────────────────────────
       - name: Build the root filesystem
