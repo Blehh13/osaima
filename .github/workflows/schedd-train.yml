@@ -9,8 +9,8 @@ on:
   workflow_dispatch:
     inputs:
       rounds:
-        description: "Groups of programs to measure (about 30 s each)"
-        default: "10"
+        description: "Groups of programs to measure (about 30 s each; the load cycles quiet, busy, crowded)"
+        default: "12"
   push:
     branches: ["feat/m4-sched"]
     paths:
@@ -42,7 +42,7 @@ jobs:
         run: |
           nproc
           python train/collect.py --schedd target/release/osaima-schedd --out dataset.csv \
-            --rounds "${{ inputs.rounds || '10' }}"
+            --rounds "${{ inputs.rounds || '12' }}"
       - name: Train
         run: python train/train.py --data dataset.csv --out model-out
       - name: Report

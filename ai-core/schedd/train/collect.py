@@ -58,9 +58,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--schedd", required=True, help="the osaima-schedd binary")
     parser.add_argument("--out", required=True)
-    parser.add_argument("--rounds", type=int, default=8)
+    parser.add_argument("--rounds", type=int, default=12)
     parser.add_argument("--per-kind", type=int, default=3)
-    parser.add_argument("--hogs", type=int, default=3)
+    parser.add_argument(
+        "--hogs-per-cpu",
+        default="0,1,3",
+        help="extra CPU hogs per CPU, one value per round in turn: a quiet machine, a busy one, a crowded one",
+    )
     parser.add_argument("--seconds", type=float, default=20.0)
     parser.add_argument("--interval", type=float, default=2.0)
     args = parser.parse_args()
@@ -69,12 +73,14 @@ def main() -> int:
     with open(args.out, "w", newline="") as handle:
         writer = csv.writer(handle)
         writer.writerow(["label", *FEATURES])
+        loads = [int(v) for v in args.hogs_per_cpu.split(",")]
         for round_number in range(args.rounds):
-            rows = run_round(args.schedd, round_number + 1, args.per_kind, args.hogs, args.seconds, args.interval)
+            hogs = loads[round_number % len(loads)] * (os.cpu_count() or 1)
+            rows = run_round(args.schedd, round_number + 1, args.per_kind, hogs, args.seconds, args.interval)
             for label, values in rows:
                 writer.writerow([label, *values])
             total += len(rows)
-            print(f"round {round_number + 1}/{args.rounds}: {len(rows)} rows", flush=True)
+            print(f"round {round_number + 1}/{args.rounds} ({hogs} extra hogs): {len(rows)} rows", flush=True)
     print(f"{total} rows written to {args.out}")
     return 0 if total else 1
 

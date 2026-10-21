@@ -51,12 +51,17 @@ impl fmt::Display for Class {
 
 /// Hand-written rules, used when there is no trained model. Thresholds are in cores of
 /// CPU, switches per second and milliseconds (see [`Features`]).
+///
+/// They judge by demand, the CPU a process would use if it never had to wait, not by what
+/// it got: on a crowded machine a compiler gets a third of a core and would otherwise look
+/// like light work.
 pub fn rules(f: &Features) -> Class {
-    if f.cpu_util < 0.02 {
+    let demand = f.cpu_util * (1.0 + f.wait_ratio);
+    if demand < 0.02 {
         Class::Background
-    } else if f.cpu_util >= 0.6 && f.vol_rate < 30.0 {
+    } else if demand >= 0.6 && f.vol_rate < 30.0 {
         Class::Batch
-    } else if f.cpu_util < 0.25 && f.slice_ms < 4.0 {
+    } else if demand < 0.25 && f.slice_ms < 4.0 {
         Class::Interactive
     } else {
         Class::Media
@@ -213,6 +218,22 @@ mod tests {
         assert_eq!(rules(&f(1.0, 1.0, 80.0, 90.0)), Class::Batch);
         assert_eq!(rules(&f(0.05, 120.0, 0.0, 0.3)), Class::Interactive);
         assert_eq!(rules(&f(0.4, 60.0, 5.0, 6.0)), Class::Media);
+    }
+
+    #[test]
+    fn rules_see_a_compiler_on_a_crowded_machine() {
+        // a third of a core, waiting twice as long as it runs, never blocking by itself
+        let crowded = Features {
+            wait_ratio: 2.0,
+            ..f(0.33, 0.0, 170.0, 2.0)
+        };
+        assert_eq!(rules(&crowded), Class::Batch);
+        // a frame loop that waits as long, but blocks 60 times a second, is not batch
+        let frames = Features {
+            wait_ratio: 2.0,
+            ..f(0.33, 60.0, 30.0, 5.0)
+        };
+        assert_eq!(rules(&frames), Class::Media);
     }
 
     /// A model that scores "batch" by cpu_util and "background" by its absence.
