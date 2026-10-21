@@ -1,0 +1,27 @@
+[Unit]
+Description=OSAIMA scheduler (sets CPU priorities from what each program is doing)
+Documentation=https://github.com/Blehh13/osaima
+After=local-fs.target sys-fs-bpf.mount
+
+[Service]
+# Source is chosen automatically: eBPF telemetry when its object is installed, else /proc.
+ExecStart=/usr/bin/osaima-schedd run --model /usr/share/osaima/schedd/model.json
+Restart=on-failure
+# SIGTERM makes the daemon put every priority back before it exits.
+KillSignal=SIGTERM
+TimeoutStopSec=15
+
+# It runs as root because it raises priorities and loads eBPF, so keep it narrow.
+NoNewPrivileges=yes
+CapabilityBoundingSet=CAP_SYS_NICE CAP_BPF CAP_PERFMON CAP_SYS_ADMIN CAP_SYS_RESOURCE CAP_DAC_READ_SEARCH
+ProtectHome=yes
+PrivateTmp=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+RestrictRealtime=no
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+
+[Install]
+WantedBy=multi-user.target
