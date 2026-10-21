@@ -156,7 +156,10 @@ jobs:
           # Ubuntu's own bpftool is a stub that needs tools for the exact running kernel;
           # the generic package's works on any
           sudo apt-get install -y --no-install-recommends clang llvm libbpf-dev libelf-dev zlib1g-dev             linux-libc-dev linux-tools-common linux-tools-generic
-          echo "BPFTOOL=$(find /usr/lib/linux-tools -name bpftool -type f | head -1)" >> "$GITHUB_ENV"
+          tool=$(find /usr/lib -maxdepth 3 -name bpftool -type f | head -1)
+          echo "bpftool: ${tool:-not found}"
+          [ -n "$tool" ]
+          echo "BPFTOOL=$tool" >> "$GITHUB_ENV"
       - name: Build the eBPF telemetry
         working-directory: ai-core/schedd/bpf
         run: |
