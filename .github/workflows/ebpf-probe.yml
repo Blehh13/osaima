@@ -1,0 +1,25 @@
+name: eBPF scheduler probe
+
+# What can a free runner's kernel do for the scheduler work? Writes a report to the
+# job summary. See build-tools/spike/ebpf-probe.sh.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["spike/ebpf**"]
+    paths:
+      - "build-tools/spike/ebpf-probe.sh"
+      - ".github/workflows/ebpf-probe.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Probe
+        run: bash build-tools/spike/ebpf-probe.sh 2>&1 | tee "$GITHUB_STEP_SUMMARY"
