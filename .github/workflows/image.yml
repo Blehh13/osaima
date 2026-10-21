@@ -68,9 +68,10 @@ jobs:
         run: |
           dest="$HOME/.local/share/osaima/llama"
           mkdir -p "$dest"
-          url=$(gh api repos/ggml-org/llama.cpp/releases/latest --jq '[.assets[].browser_download_url | select(test("bin-ubuntu-x64\\.(zip|tar\\.gz)$"))][0]')
+          # the newest releases; the plain CPU build for Ubuntu (not the CUDA, Vulkan or ROCm ones)
+          url=$(gh api repos/ggml-org/llama.cpp/releases --jq '[.[0:5][].assets[].browser_download_url | select(test("llama-b[0-9]+-bin-ubuntu-x64[.](zip|tar[.]gz)$"))][0]')
           echo "llama.cpp: $url"
-          [ -n "$url" ] && [ "$url" != null ]
+          if [ -z "$url" ] || [ "$url" = null ]; then echo "no llama.cpp CPU build found"; exit 1; fi
           curl -fL --retry 3 -o "$RUNNER_TEMP/llama.pkg" "$url"
           case "$url" in
             *.zip) unzip -q "$RUNNER_TEMP/llama.pkg" -d "$dest" ;;
