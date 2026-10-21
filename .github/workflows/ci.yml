@@ -141,6 +141,9 @@ jobs:
           for f in $(find src -name '*.js'); do
             node --input-type=module --check < "$f" || { echo "::error file=$f::syntax error"; exit 1; }
           done
+      - name: Unit tests
+        if: success() || failure()
+        run: node --test tests/*.test.js
 
   agent:
     name: AI agent (Python)

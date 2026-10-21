@@ -10,6 +10,8 @@
  * varied windows to tile, float, and move across workspaces during a demo.
  */
 
+import { createVoice } from './voice-ui.js';
+
 /**
  * @param {import('./window-manager.js').WindowManager} engine
  * @param {object} services  { invoke, getConfigSource, setConfigSource, reloadConfig }
@@ -549,6 +551,10 @@ function makeAbout(engine) {
 // A side rail shows the computer's state, learned suggestions and the audit log.
 const SVG_SEND = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>';
 
+const SVG_MIC = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>';
+const SVG_STOP = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
+const SVG_SPEAKER = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>';
+
 // Examples of what the system is for, worded the way a person would say them.
 const STARTERS = [
   'Find PDFs bigger than 10 MB in my home folder',
@@ -589,8 +595,53 @@ function makeAssistant(engine, services) {
       send.type = 'submit';
       send.innerHTML = SVG_SEND;
       send.setAttribute('aria-label', 'Send');
-      composer.append(input, send);
+      const speaker = el('button', 'as-speak');
+      speaker.type = 'button';
+      speaker.innerHTML = SVG_SPEAKER;
+      const mic = el('button', 'as-mic');
+      mic.type = 'button';
+      mic.innerHTML = SVG_MIC;
+      composer.append(input, speaker, mic, send);
       const note = el('p', 'as-note', 'Nothing on this computer changes until you approve it.');
+
+      // ── Voice: push to talk, and (optionally) replies read aloud ──
+      const noteDefault = note.textContent;
+      let noteTimer = null;
+      const showNote = (message) => {
+        note.textContent = message;
+        clearTimeout(noteTimer);
+        noteTimer = setTimeout(() => { note.textContent = noteDefault; }, 6000);
+      };
+      const renderVoice = () => {
+        const s = voice.view;
+        const listening = s.state === 'listening';
+        mic.disabled = !s.canListen || s.state === 'transcribing';
+        mic.dataset.state = s.state;
+        mic.innerHTML = listening ? SVG_STOP : SVG_MIC;
+        mic.setAttribute('aria-label', listening ? 'Stop and send' : 'Talk to your computer');
+        mic.title = !s.canListen ? (s.why || 'Voice is not available') : listening ? 'Stop and send' : 'Talk to your computer';
+        speaker.disabled = !s.canSpeak;
+        speaker.setAttribute('aria-pressed', String(s.speakReplies));
+        speaker.setAttribute('aria-label', 'Read replies aloud');
+        speaker.title = !s.canSpeak ? (s.why || 'Voice is not available') : s.speakReplies ? 'Replies are read aloud (click to turn off)' : 'Read replies aloud';
+      };
+      const voice = createVoice({
+        invoke: services.invoke,
+        onText: (text) => run(text),
+        onNotice: showNote,
+        onChange: renderVoice,
+        alive: () => root.isConnected,
+      });
+      mic.addEventListener('click', () => voice.toggle());
+      speaker.addEventListener('click', () => voice.setSpeakReplies(!voice.view.speakReplies));
+      renderVoice();
+      voice.refresh();
+      // The voice service may start after the window opens; look again until it is there.
+      const voiceTimer = setInterval(() => {
+        if (!root.isConnected) { clearInterval(voiceTimer); voice.dispose(); return; }
+        if (!voice.view.canListen && voice.view.state === 'idle') voice.refresh();
+      }, 15000);
+      window.addEventListener('beforeunload', () => voice.dispose());
       // Files handed over from the file manager ("Ask OSAIMA"); they go with
       // each request until the user removes them.
       let selected = [];
@@ -1291,6 +1342,7 @@ function makeAssistant(engine, services) {
         // a double click (or a double Enter) sends the same request once
         if (v === lastSent.text && Date.now() - lastSent.at < 1500) return;
         lastSent = { text: v, at: Date.now() };
+        voice.silence();
         if (busy) { queued.push(v); return; }
         busy = true;
         addUser(v);
@@ -1306,6 +1358,7 @@ function makeAssistant(engine, services) {
           reply = "Here's what I'd run. Check it, then choose Run.";
         }
         t.text.textContent = reply;
+        voice.speak(reply);
         if (meta && meta.content) t.cards.prepend(contentCard(meta.content));
         if (meta) t.meta.textContent = describeSource(meta);
         remember('user', v);

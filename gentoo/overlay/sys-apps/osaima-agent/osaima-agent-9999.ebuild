@@ -59,6 +59,17 @@ src_install() {
 	dobin "${T}/osaima-agent"
 
 	systemd_newuserunit "${FILESDIR}"/osaima-agent.service osaima-agent.service
+
+	if use voice; then
+		# The push-to-talk service the desktop shell's microphone button uses.
+		cat > "${T}/osaima-voice" <<-EOF || die
+		#!/bin/sh
+		export PYTHONPATH="${site}\${PYTHONPATH:+:\$PYTHONPATH}"
+		exec ${EPYTHON} -m osaima_agent.voice.server "\$@"
+		EOF
+		dobin "${T}/osaima-voice"
+		systemd_newuserunit "${FILESDIR}"/osaima-voice.service osaima-voice.service
+	fi
 	dodoc README.md
 }
 
