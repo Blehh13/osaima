@@ -37,7 +37,12 @@ fn comm_of(value: &Value) -> String {
     match value {
         Value::String(s) => s.clone(),
         Value::Array(bytes) => {
-            let raw: Vec<u8> = bytes.iter().filter_map(Value::as_u64).map(|b| b as u8).take_while(|b| *b != 0).collect();
+            let raw: Vec<u8> = bytes
+                .iter()
+                .filter_map(Value::as_u64)
+                .map(|b| b as u8)
+                .take_while(|b| *b != 0)
+                .collect();
             String::from_utf8_lossy(&raw).into_owned()
         }
         _ => String::new(),
@@ -48,12 +53,15 @@ fn comm_of(value: &Value) -> String {
 /// `{"key": 7, "value": {...}}` or wrapped in `{"formatted": {...}}`, depending on the
 /// bpftool version.
 pub fn parse_map_dump(json: &str) -> Result<Vec<ThreadStats>, String> {
-    let root: Value = serde_json::from_str(json).map_err(|e| format!("bpftool printed something unexpected: {e}"))?;
+    let root: Value = serde_json::from_str(json)
+        .map_err(|e| format!("bpftool printed something unexpected: {e}"))?;
     let entries = root.as_array().ok_or("bpftool did not print a list")?;
     let mut threads = Vec::new();
     for entry in entries {
         let entry = entry.get("formatted").unwrap_or(entry);
-        let (Some(tid), Some(value)) = (entry.get("key").and_then(Value::as_u64), entry.get("value")) else {
+        let (Some(tid), Some(value)) =
+            (entry.get("key").and_then(Value::as_u64), entry.get("value"))
+        else {
             continue;
         };
         threads.push(ThreadStats {
@@ -111,21 +119,38 @@ impl BpfCollector {
             Ok(o) => o,
             Err(e) => {
                 let _ = fs::remove_dir_all(pin_dir);
-                return Err(io::Error::new(e.kind(), format!("cannot run {bpftool}: {e}")));
+                return Err(io::Error::new(
+                    e.kind(),
+                    format!("cannot run {bpftool}: {e}"),
+                ));
             }
         };
         if !output.status.success() {
             let _ = fs::remove_dir_all(pin_dir);
             let message = String::from_utf8_lossy(&output.stderr);
-            return Err(io::Error::other(format!("{bpftool} could not load {}: {}", object.display(), message.trim())));
+            return Err(io::Error::other(format!(
+                "{bpftool} could not load {}: {}",
+                object.display(),
+                message.trim()
+            )));
         }
-        Ok(Self { bpftool: bpftool.to_string(), pin_dir: pin_dir.to_path_buf(), proc_root: PathBuf::from("/proc") })
+        Ok(Self {
+            bpftool: bpftool.to_string(),
+            pin_dir: pin_dir.to_path_buf(),
+            proc_root: PathBuf::from("/proc"),
+        })
     }
 
     fn dump(&self) -> io::Result<String> {
-        let output = Command::new(&self.bpftool).args(["-j", "map", "dump", "pinned"]).arg(self.pin_dir.join("maps/tasks")).output()?;
+        let output = Command::new(&self.bpftool)
+            .args(["-j", "map", "dump", "pinned"])
+            .arg(self.pin_dir.join("maps/tasks"))
+            .output()?;
         if !output.status.success() {
-            return Err(io::Error::other(format!("cannot read the telemetry map: {}", String::from_utf8_lossy(&output.stderr).trim())));
+            return Err(io::Error::other(format!(
+                "cannot read the telemetry map: {}",
+                String::from_utf8_lossy(&output.stderr).trim()
+            )));
         }
         Ok(String::from_utf8_lossy(&output.stdout).into_owned())
     }
@@ -145,10 +170,15 @@ impl Collector for BpfCollector {
         for (tgid, counters) in per_process(&threads) {
             let dir = self.proc_root.join(tgid.to_string());
             // the process may have exited since the map was written
-            let (Ok(stat), Ok(status)) = (fs::read_to_string(dir.join("stat")), fs::read_to_string(dir.join("status"))) else {
+            let (Ok(stat), Ok(status)) = (
+                fs::read_to_string(dir.join("stat")),
+                fs::read_to_string(dir.join("status")),
+            ) else {
                 continue;
             };
-            let (Some(stat), Some(uid)) = (parse_stat(&stat), parse_uid(&status)) else { continue };
+            let (Some(stat), Some(uid)) = (parse_stat(&stat), parse_uid(&status)) else {
+                continue;
+            };
             samples.push(Sample {
                 pid: tgid as i32,
                 start_time: stat.start_time,
@@ -181,7 +211,16 @@ mod tests {
         assert_eq!(threads.len(), 3);
         assert_eq!(threads[0].tid, 100);
         assert_eq!(threads[0].comm, "firefox");
-        assert_eq!(threads[0].counters, Counters { run_ns: 5000, wait_ns: 100, slices: 3, voluntary: 2, involuntary: 1 });
+        assert_eq!(
+            threads[0].counters,
+            Counters {
+                run_ns: 5000,
+                wait_ns: 100,
+                slices: 3,
+                voluntary: 2,
+                involuntary: 1
+            }
+        );
         assert_eq!(threads[0].wake_lat_max_ns, 70);
         assert_eq!(threads[1].comm, "Work", "a name printed as bytes");
     }
@@ -190,7 +229,10 @@ mod tests {
     fn the_wrapped_shape_is_parsed_too() {
         let wrapped = r#"[{"formatted": {"key": 5, "value": {"run_ns": 9, "wait_ns": 0, "slices": 1, "voluntary": 0, "involuntary": 0, "wake_lat_max_ns": 0, "tgid": 5, "comm": "x"}}}]"#;
         let threads = parse_map_dump(wrapped).unwrap();
-        assert_eq!((threads[0].tid, threads[0].tgid, threads[0].counters.run_ns), (5, 5, 9));
+        assert_eq!(
+            (threads[0].tid, threads[0].tgid, threads[0].counters.run_ns),
+            (5, 5, 9)
+        );
     }
 
     #[test]
@@ -198,7 +240,9 @@ mod tests {
         assert!(parse_map_dump("not json").is_err());
         assert!(parse_map_dump("{}").is_err());
         assert!(parse_map_dump("[]").unwrap().is_empty());
-        assert!(parse_map_dump(r#"[{"nothing": 1}, {"key": 1}]"#).unwrap().is_empty());
+        assert!(parse_map_dump(r#"[{"nothing": 1}, {"key": 1}]"#)
+            .unwrap()
+            .is_empty());
     }
 
     #[test]
@@ -206,13 +250,28 @@ mod tests {
         let totals = per_process(&parse_map_dump(PLAIN).unwrap());
         assert_eq!(totals.len(), 1, "the tgid 0 entry (idle) is dropped");
         let firefox = totals[&100];
-        assert_eq!(firefox, Counters { run_ns: 6000, wait_ns: 110, slices: 4, voluntary: 3, involuntary: 1 });
+        assert_eq!(
+            firefox,
+            Counters {
+                run_ns: 6000,
+                wait_ns: 110,
+                slices: 4,
+                voluntary: 3,
+                involuntary: 1
+            }
+        );
     }
 
     #[test]
     fn a_missing_bpftool_is_a_clear_error() {
         let dir = std::env::temp_dir().join(format!("osaima-schedd-pin-{}", std::process::id()));
-        let err = BpfCollector::attach("/nonexistent/bpftool", Path::new("/nonexistent/x.bpf.o"), &dir).err().expect("attaching should fail");
+        let err = BpfCollector::attach(
+            "/nonexistent/bpftool",
+            Path::new("/nonexistent/x.bpf.o"),
+            &dir,
+        )
+        .err()
+        .expect("attaching should fail");
         assert!(err.to_string().contains("cannot run"), "{err}");
         assert!(!dir.exists(), "nothing is left behind");
     }

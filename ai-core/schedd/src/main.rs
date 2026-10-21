@@ -201,11 +201,23 @@ fn run(o: &Opts) -> Result<(), String> {
             std::path::Path::new(&o.bpf_object),
             std::path::Path::new(PIN_DIR),
         )
-        .map_err(|e| format!("cannot start the eBPF telemetry: {e} (use --source proc to go without)"))?;
-        drive(Engine::new(collector, KernelActuator, classifier, policy, cfg), o, "eBPF")
+        .map_err(|e| {
+            format!("cannot start the eBPF telemetry: {e} (use --source proc to go without)")
+        })?;
+        drive(
+            Engine::new(collector, KernelActuator, classifier, policy, cfg),
+            o,
+            "eBPF",
+        )
     } else {
         drive(
-            Engine::new(ProcCollector::new(), KernelActuator, classifier, policy, cfg),
+            Engine::new(
+                ProcCollector::new(),
+                KernelActuator,
+                classifier,
+                policy,
+                cfg,
+            ),
             o,
             "/proc",
         )
@@ -213,7 +225,11 @@ fn run(o: &Opts) -> Result<(), String> {
 }
 
 /// Measure, judge and set priorities until told to stop, then put everything back.
-fn drive<C: Collector>(mut engine: Engine<C, KernelActuator>, o: &Opts, source: &str) -> Result<(), String> {
+fn drive<C: Collector>(
+    mut engine: Engine<C, KernelActuator>,
+    o: &Opts,
+    source: &str,
+) -> Result<(), String> {
     println!(
         "osaima-schedd: {} on {source} data every {} s, processes of users from {} up{}",
         engine.classifier_name(),
