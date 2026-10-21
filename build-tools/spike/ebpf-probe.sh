@@ -74,7 +74,7 @@ run_case() {
 			sh -c 'echo \$\$ > '\$cg'/low/cgroup.procs; exec python3 /tmp/hog.py 5' &
 		done
 		sleep 0.5
-		sh -c 'echo \$\$ > '\$cg'/high/cgroup.procs; exec python3 /tmp/latprobe.py 4' | sed "s|^|$label: |"
+		sh -c 'echo \$\$ > '\$cg'/high/cgroup.procs; exec python3 /tmp/latprobe.py 4' | sed 's|^|$label: |'
 		wait
 		rmdir \$cg/high \$cg/low \$cg 2>/dev/null || true
 	" 2>&1
