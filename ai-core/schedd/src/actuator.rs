@@ -130,7 +130,10 @@ impl Actuator for KernelActuator {
     fn restore(&mut self, originals: &[Original]) -> io::Result<()> {
         let tids: Vec<i32> = originals.iter().map(|o| o.tid).collect();
         for_each_thread(&tids, |tid| {
-            let original = originals.iter().find(|o| o.tid == tid).expect("tid came from the list");
+            let original = originals
+                .iter()
+                .find(|o| o.tid == tid)
+                .expect("tid came from the list");
             set_policy(tid, original.policy)?;
             set_nice(tid, original.nice)
         })
@@ -145,7 +148,12 @@ mod tests {
     struct Sleeper(Child);
     impl Sleeper {
         fn new() -> Self {
-            Sleeper(Command::new("sleep").arg("60").spawn().expect("the sleep command is needed for this test"))
+            Sleeper(
+                Command::new("sleep")
+                    .arg("60")
+                    .spawn()
+                    .expect("the sleep command is needed for this test"),
+            )
         }
         fn pid(&self) -> i32 {
             self.0.id() as i32
@@ -173,16 +181,40 @@ mod tests {
         let child = Sleeper::new();
         let before = get_nice(child.pid()).unwrap();
         let target = (before + 5).min(19);
-        KernelActuator.apply(child.pid(), Setting { nice: target, sched: Sched::Normal }).unwrap();
+        KernelActuator
+            .apply(
+                child.pid(),
+                Setting {
+                    nice: target,
+                    sched: Sched::Normal,
+                },
+            )
+            .unwrap();
         assert_eq!(get_nice(child.pid()).unwrap(), target);
     }
 
     #[test]
     fn batch_and_idle_policies_can_be_set_without_privilege() {
         let child = Sleeper::new();
-        KernelActuator.apply(child.pid(), Setting { nice: 10, sched: Sched::Batch }).unwrap();
+        KernelActuator
+            .apply(
+                child.pid(),
+                Setting {
+                    nice: 10,
+                    sched: Sched::Batch,
+                },
+            )
+            .unwrap();
         assert_eq!(get_policy(child.pid()).unwrap(), libc::SCHED_BATCH);
-        KernelActuator.apply(child.pid(), Setting { nice: 19, sched: Sched::Idle }).unwrap();
+        KernelActuator
+            .apply(
+                child.pid(),
+                Setting {
+                    nice: 19,
+                    sched: Sched::Idle,
+                },
+            )
+            .unwrap();
         assert_eq!(get_policy(child.pid()).unwrap(), libc::SCHED_IDLE);
     }
 
@@ -191,13 +223,25 @@ mod tests {
         let mut child = Command::new("true").spawn().unwrap();
         let pid = child.id() as i32;
         child.wait().unwrap();
-        assert!(KernelActuator.apply(pid, Setting { nice: 5, sched: Sched::Normal }).is_err());
+        assert!(KernelActuator
+            .apply(
+                pid,
+                Setting {
+                    nice: 5,
+                    sched: Sched::Normal
+                }
+            )
+            .is_err());
         assert!(KernelActuator.read(pid).is_err());
     }
 
     #[test]
     fn restoring_a_thread_that_exited_is_fine() {
-        let ghost = Original { tid: i32::MAX, nice: 0, policy: libc::SCHED_OTHER };
+        let ghost = Original {
+            tid: i32::MAX,
+            nice: 0,
+            policy: libc::SCHED_OTHER,
+        };
         assert!(KernelActuator.restore(&[ghost]).is_ok());
     }
 }

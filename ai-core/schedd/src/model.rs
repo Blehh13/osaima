@@ -26,7 +26,12 @@ pub enum Class {
 }
 
 impl Class {
-    pub const ALL: [Class; 4] = [Class::Interactive, Class::Media, Class::Batch, Class::Background];
+    pub const ALL: [Class; 4] = [
+        Class::Interactive,
+        Class::Media,
+        Class::Batch,
+        Class::Background,
+    ];
 
     pub fn name(self) -> &'static str {
         match self {
@@ -93,7 +98,8 @@ const INPUTS: usize = 5;
 
 impl Model {
     pub fn from_json(text: &str) -> Result<Model, ModelError> {
-        let model: Model = serde_json::from_str(text).map_err(|e| ModelError::Parse(e.to_string()))?;
+        let model: Model =
+            serde_json::from_str(text).map_err(|e| ModelError::Parse(e.to_string()))?;
         model.check()?;
         Ok(model)
     }
@@ -104,17 +110,34 @@ impl Model {
             return Err(ModelError::Shape("it needs at least two classes".into()));
         }
         if self.weights.len() != k || self.bias.len() != k {
-            return Err(ModelError::Shape(format!("{k} classes but {} weight rows and {} biases", self.weights.len(), self.bias.len())));
+            return Err(ModelError::Shape(format!(
+                "{k} classes but {} weight rows and {} biases",
+                self.weights.len(),
+                self.bias.len()
+            )));
         }
-        if self.mean.len() != INPUTS || self.scale.len() != INPUTS || self.weights.iter().any(|w| w.len() != INPUTS) {
-            return Err(ModelError::Shape(format!("every row must have {INPUTS} values")));
+        if self.mean.len() != INPUTS
+            || self.scale.len() != INPUTS
+            || self.weights.iter().any(|w| w.len() != INPUTS)
+        {
+            return Err(ModelError::Shape(format!(
+                "every row must have {INPUTS} values"
+            )));
         }
         if self.scale.iter().any(|s| !s.is_finite() || *s <= 0.0) {
-            return Err(ModelError::Shape("every scale must be a positive number".into()));
+            return Err(ModelError::Shape(
+                "every scale must be a positive number".into(),
+            ));
         }
-        let mut all = self.mean.iter().chain(self.bias.iter()).chain(self.weights.iter().flatten());
+        let mut all = self
+            .mean
+            .iter()
+            .chain(self.bias.iter())
+            .chain(self.weights.iter().flatten());
         if all.any(|v| !v.is_finite()) {
-            return Err(ModelError::Shape("a number in the model is not finite".into()));
+            return Err(ModelError::Shape(
+                "a number in the model is not finite".into(),
+            ));
         }
         Ok(())
     }
@@ -127,7 +150,13 @@ impl Model {
             .weights
             .iter()
             .zip(&self.bias)
-            .map(|(row, b)| b + row.iter().enumerate().map(|(j, w)| w * (x[j] - self.mean[j]) / self.scale[j]).sum::<f64>())
+            .map(|(row, b)| {
+                b + row
+                    .iter()
+                    .enumerate()
+                    .map(|(j, w)| w * (x[j] - self.mean[j]) / self.scale[j])
+                    .sum::<f64>()
+            })
             .collect();
         let top = scores.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
         let exps: Vec<f64> = scores.iter().map(|s| (s - top).exp()).collect();
@@ -169,7 +198,13 @@ mod tests {
     use super::*;
 
     fn f(cpu: f64, vol: f64, invol: f64, slice: f64) -> Features {
-        Features { cpu_util: cpu, vol_rate: vol, invol_rate: invol, slice_ms: slice, wait_ratio: 0.0 }
+        Features {
+            cpu_util: cpu,
+            vol_rate: vol,
+            invol_rate: invol,
+            slice_ms: slice,
+            wait_ratio: 0.0,
+        }
     }
 
     #[test]
@@ -232,12 +267,30 @@ mod tests {
             edit(&mut v);
             Model::from_json(&v.to_string())
         };
-        assert!(matches!(broken(&|v| v["mean"] = serde_json::json!([0.0])), Err(ModelError::Shape(_))));
-        assert!(matches!(broken(&|v| v["bias"] = serde_json::json!([0.0])), Err(ModelError::Shape(_))));
-        assert!(matches!(broken(&|v| v["scale"][2] = serde_json::json!(0.0)), Err(ModelError::Shape(_))));
-        assert!(matches!(broken(&|v| v["classes"] = serde_json::json!(["batch"])), Err(ModelError::Shape(_))));
-        assert!(matches!(Model::from_json("{not json"), Err(ModelError::Parse(_))));
-        assert!(matches!(Model::from_json(r#"{"version":1}"#), Err(ModelError::Parse(_))));
+        assert!(matches!(
+            broken(&|v| v["mean"] = serde_json::json!([0.0])),
+            Err(ModelError::Shape(_))
+        ));
+        assert!(matches!(
+            broken(&|v| v["bias"] = serde_json::json!([0.0])),
+            Err(ModelError::Shape(_))
+        ));
+        assert!(matches!(
+            broken(&|v| v["scale"][2] = serde_json::json!(0.0)),
+            Err(ModelError::Shape(_))
+        ));
+        assert!(matches!(
+            broken(&|v| v["classes"] = serde_json::json!(["batch"])),
+            Err(ModelError::Shape(_))
+        ));
+        assert!(matches!(
+            Model::from_json("{not json"),
+            Err(ModelError::Parse(_))
+        ));
+        assert!(matches!(
+            Model::from_json(r#"{"version":1}"#),
+            Err(ModelError::Parse(_))
+        ));
     }
 
     #[test]

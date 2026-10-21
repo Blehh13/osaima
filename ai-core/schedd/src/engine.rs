@@ -91,12 +91,30 @@ pub struct Engine<C, A> {
 }
 
 impl<C: Collector, A: Actuator> Engine<C, A> {
-    pub fn new(collector: C, actuator: A, classifier: Classifier, policy: Policy, cfg: Config) -> Self {
-        Engine { collector, actuator, classifier, policy, cfg, own_pid: std::process::id() as i32, tracked: HashMap::new() }
+    pub fn new(
+        collector: C,
+        actuator: A,
+        classifier: Classifier,
+        policy: Policy,
+        cfg: Config,
+    ) -> Self {
+        Engine {
+            collector,
+            actuator,
+            classifier,
+            policy,
+            cfg,
+            own_pid: std::process::id() as i32,
+            tracked: HashMap::new(),
+        }
     }
 
     fn skip(&self, s: &Sample) -> bool {
-        s.kernel_thread || s.pid <= 1 || s.pid == self.own_pid || s.uid < self.cfg.min_uid || self.cfg.ignore.contains(&s.comm)
+        s.kernel_thread
+            || s.pid <= 1
+            || s.pid == self.own_pid
+            || s.uid < self.cfg.min_uid
+            || self.cfg.ignore.contains(&s.comm)
     }
 
     /// Measure every process, judge those with a baseline, and change priorities that need it.
@@ -117,7 +135,14 @@ impl<C: Collector, A: Actuator> Engine<C, A> {
                     // new process, or the pid was reused: start from a baseline
                     self.tracked.insert(
                         s.pid,
-                        Tracked { start_time: s.start_time, prev: s.counters, applied: None, candidate: None, originals: Vec::new(), refused: false },
+                        Tracked {
+                            start_time: s.start_time,
+                            prev: s.counters,
+                            applied: None,
+                            candidate: None,
+                            originals: Vec::new(),
+                            refused: false,
+                        },
                     );
                     continue;
                 }
@@ -148,7 +173,15 @@ impl<C: Collector, A: Actuator> Engine<C, A> {
             // the verdict has held long enough: set the priority
             tracked.candidate = None;
             let setting = self.policy.setting(class);
-            let mut change = Change { pid: s.pid, comm: s.comm.clone(), class, confidence, setting, applied: false, error: None };
+            let mut change = Change {
+                pid: s.pid,
+                comm: s.comm.clone(),
+                class,
+                confidence,
+                setting,
+                applied: false,
+                error: None,
+            };
             if self.cfg.dry_run {
                 tracked.applied = Some(class);
             } else {
@@ -186,12 +219,23 @@ impl<C: Collector, A: Actuator> Engine<C, A> {
 
     /// How many processes are being tracked, and how many have been given a priority.
     pub fn counts(&self) -> (usize, usize) {
-        (self.tracked.len(), self.tracked.values().filter(|t| t.applied.is_some()).count())
+        (
+            self.tracked.len(),
+            self.tracked
+                .values()
+                .filter(|t| t.applied.is_some())
+                .count(),
+        )
     }
 }
 
 /// Remember the original settings the first time, then apply the new one.
-fn set_priority<A: Actuator>(actuator: &mut A, originals: &mut Vec<Original>, pid: i32, setting: Setting) -> io::Result<()> {
+fn set_priority<A: Actuator>(
+    actuator: &mut A,
+    originals: &mut Vec<Original>,
+    pid: i32,
+    setting: Setting,
+) -> io::Result<()> {
     if originals.is_empty() {
         *originals = actuator.read(pid)?;
     }
@@ -221,7 +265,11 @@ mod tests {
     }
     impl Actuator for &mut Recorder {
         fn read(&mut self, pid: i32) -> io::Result<Vec<Original>> {
-            Ok(vec![Original { tid: pid, nice: 0, policy: 0 }])
+            Ok(vec![Original {
+                tid: pid,
+                nice: 0,
+                policy: 0,
+            }])
         }
         fn apply(&mut self, pid: i32, setting: Setting) -> io::Result<()> {
             if self.refuse {
@@ -245,7 +293,13 @@ mod tests {
             comm: format!("proc{pid}"),
             uid: 1000,
             kernel_thread: false,
-            counters: Counters { run_ns: n * run_ms * 1_000_000, wait_ns: 0, slices: n * slices, voluntary: n * vol, involuntary: n * invol },
+            counters: Counters {
+                run_ns: n * run_ms * 1_000_000,
+                wait_ns: 0,
+                slices: n * slices,
+                voluntary: n * vol,
+                involuntary: n * invol,
+            },
         }
     }
     fn batch(pid: i32, n: u64) -> Sample {
@@ -255,8 +309,18 @@ mod tests {
         proc(pid, n, 40, 100, 100, 0)
     }
 
-    fn engine(rounds: Vec<Vec<Sample>>, rec: &mut Recorder, cfg: Config) -> Engine<Script, &mut Recorder> {
-        Engine::new(Script(rounds.into()), rec, Classifier::Rules, Policy::default(), cfg)
+    fn engine(
+        rounds: Vec<Vec<Sample>>,
+        rec: &mut Recorder,
+        cfg: Config,
+    ) -> Engine<Script, &mut Recorder> {
+        Engine::new(
+            Script(rounds.into()),
+            rec,
+            Classifier::Rules,
+            Policy::default(),
+            cfg,
+        )
     }
 
     #[test]
@@ -264,7 +328,11 @@ mod tests {
         let mut rec = Recorder::default();
         let rounds = (0..5).map(|n| vec![batch(10, n)]).collect();
         let mut e = engine(rounds, &mut rec, Config::default());
-        assert_eq!(e.tick(1.0).unwrap().judged, 0, "the first reading is only a baseline");
+        assert_eq!(
+            e.tick(1.0).unwrap().judged,
+            0,
+            "the first reading is only a baseline"
+        );
         for _ in 0..2 {
             let r = e.tick(1.0).unwrap();
             assert_eq!(r.judged, 1);
@@ -274,11 +342,29 @@ mod tests {
         assert_eq!(r.changes.len(), 1);
         let c = &r.changes[0];
         assert_eq!((c.pid, c.class, c.applied), (10, Class::Batch, true));
-        assert_eq!(c.setting, Setting { nice: 10, sched: Sched::Batch });
-        assert!(e.tick(1.0).unwrap().changes.is_empty(), "it is not changed again");
+        assert_eq!(
+            c.setting,
+            Setting {
+                nice: 10,
+                sched: Sched::Batch
+            }
+        );
+        assert!(
+            e.tick(1.0).unwrap().changes.is_empty(),
+            "it is not changed again"
+        );
         assert_eq!(e.counts(), (1, 1));
         drop(e);
-        assert_eq!(rec.applied, vec![(10, Setting { nice: 10, sched: Sched::Batch })]);
+        assert_eq!(
+            rec.applied,
+            vec![(
+                10,
+                Setting {
+                    nice: 10,
+                    sched: Sched::Batch
+                }
+            )]
+        );
     }
 
     #[test]
@@ -308,7 +394,13 @@ mod tests {
                 counters.1 += 1;
             }
             let mut s = proc(30, 0, 0, 0, 0, 0);
-            s.counters = Counters { run_ns: counters.0 * 1_000_000_000, slices: counters.0 * 10 + counters.1, voluntary: 1, involuntary: counters.0 * 50, wait_ns: 0 };
+            s.counters = Counters {
+                run_ns: counters.0 * 1_000_000_000,
+                slices: counters.0 * 10 + counters.1,
+                voluntary: 1,
+                involuntary: counters.0 * 50,
+                wait_ns: 0,
+            };
             readings.push(vec![s]);
         }
         let mut e = engine(readings, &mut rec, Config::default());
@@ -332,10 +424,21 @@ mod tests {
         system_user.uid = 999;
         let ordinary = batch(44, 0);
         let all = |n: u64| {
-            [&root, &kernel, &ignored, &init, &own, &system_user, &ordinary]
-                .into_iter()
-                .map(|s| Sample { counters: batch(s.pid, n).counters, ..s.clone() })
-                .collect::<Vec<_>>()
+            [
+                &root,
+                &kernel,
+                &ignored,
+                &init,
+                &own,
+                &system_user,
+                &ordinary,
+            ]
+            .into_iter()
+            .map(|s| Sample {
+                counters: batch(s.pid, n).counters,
+                ..s.clone()
+            })
+            .collect::<Vec<_>>()
         };
         let rounds = (0..5).map(all).collect();
         let mut e = engine(rounds, &mut rec, Config::default());
@@ -351,7 +454,12 @@ mod tests {
         let mut rec = Recorder::default();
         let mut reborn = batch(50, 4);
         reborn.start_time = 2000;
-        let rounds = vec![vec![batch(50, 0)], vec![batch(50, 1)], vec![batch(50, 2)], vec![reborn]];
+        let rounds = vec![
+            vec![batch(50, 0)],
+            vec![batch(50, 1)],
+            vec![batch(50, 2)],
+            vec![reborn],
+        ];
         let mut e = engine(rounds, &mut rec, Config::default());
         for _ in 0..3 {
             let _ = e.tick(1.0).unwrap();
@@ -364,7 +472,14 @@ mod tests {
     fn a_dry_run_decides_but_changes_nothing() {
         let mut rec = Recorder::default();
         let rounds = (0..5).map(|n| vec![batch(60, n)]).collect();
-        let mut e = engine(rounds, &mut rec, Config { dry_run: true, ..Config::default() });
+        let mut e = engine(
+            rounds,
+            &mut rec,
+            Config {
+                dry_run: true,
+                ..Config::default()
+            },
+        );
         let mut changes = Vec::new();
         for _ in 0..5 {
             changes.extend(e.tick(1.0).unwrap().changes);
@@ -377,7 +492,10 @@ mod tests {
 
     #[test]
     fn a_refusal_is_reported_once_and_not_retried() {
-        let mut rec = Recorder { refuse: true, ..Recorder::default() };
+        let mut rec = Recorder {
+            refuse: true,
+            ..Recorder::default()
+        };
         let rounds = (0..8).map(|n| vec![batch(70, n)]).collect();
         let mut e = engine(rounds, &mut rec, Config::default());
         let mut changes = Vec::new();
@@ -393,7 +511,9 @@ mod tests {
     #[test]
     fn shutdown_puts_back_what_was_changed() {
         let mut rec = Recorder::default();
-        let rounds = (0..5).map(|n| vec![batch(80, n), interactive(81, n)]).collect();
+        let rounds = (0..5)
+            .map(|n| vec![batch(80, n), interactive(81, n)])
+            .collect();
         let mut e = engine(rounds, &mut rec, Config::default());
         for _ in 0..5 {
             let _ = e.tick(1.0).unwrap();
@@ -408,9 +528,22 @@ mod tests {
     #[test]
     fn an_unsure_model_changes_nothing() {
         let mut rec = Recorder::default();
-        let unsure = Model { version: 1, classes: vec![Class::Batch, Class::Background], mean: vec![0.0; 5], scale: vec![1.0; 5], weights: vec![vec![0.0; 5]; 2], bias: vec![0.0, 0.0] };
+        let unsure = Model {
+            version: 1,
+            classes: vec![Class::Batch, Class::Background],
+            mean: vec![0.0; 5],
+            scale: vec![1.0; 5],
+            weights: vec![vec![0.0; 5]; 2],
+            bias: vec![0.0, 0.0],
+        };
         let rounds = (0..6).map(|n| vec![batch(90, n)]).collect();
-        let mut e = Engine::new(Script(rounds), &mut rec, Classifier::Trained(unsure), Policy::default(), Config::default());
+        let mut e = Engine::new(
+            Script(rounds),
+            &mut rec,
+            Classifier::Trained(unsure),
+            Policy::default(),
+            Config::default(),
+        );
         for _ in 0..6 {
             assert!(e.tick(1.0).unwrap().changes.is_empty());
         }

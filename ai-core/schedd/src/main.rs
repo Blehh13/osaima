@@ -81,11 +81,15 @@ fn parse(args: &[String]) -> Result<Opts, String> {
             o.command = it.next().expect("peeked").clone();
         }
     }
-    fn value<'a>(it: &mut impl Iterator<Item = &'a String>, flag: &str) -> Result<&'a String, String> {
+    fn value<'a>(
+        it: &mut impl Iterator<Item = &'a String>,
+        flag: &str,
+    ) -> Result<&'a String, String> {
         it.next().ok_or_else(|| format!("{flag} needs a value"))
     }
     fn number<T: std::str::FromStr>(text: &str, flag: &str) -> Result<T, String> {
-        text.parse().map_err(|_| format!("{flag}: '{text}' is not a valid number"))
+        text.parse()
+            .map_err(|_| format!("{flag}: '{text}' is not a valid number"))
     }
     while let Some(arg) = it.next() {
         match arg.as_str() {
@@ -141,8 +145,11 @@ fn load_classifier(path: &Option<String>) -> Result<Classifier, String> {
     match path {
         None => Ok(Classifier::Rules),
         Some(p) => {
-            let text = std::fs::read_to_string(p).map_err(|e| format!("cannot read the model {p}: {e}"))?;
-            Model::from_json(&text).map(Classifier::Trained).map_err(|e| format!("{p}: {e}"))
+            let text = std::fs::read_to_string(p)
+                .map_err(|e| format!("cannot read the model {p}: {e}"))?;
+            Model::from_json(&text)
+                .map(Classifier::Trained)
+                .map_err(|e| format!("{p}: {e}"))
         }
     }
 }
@@ -151,21 +158,41 @@ fn run(o: &Opts) -> Result<(), String> {
     let classifier = load_classifier(&o.model)?;
     let policy = match &o.policy {
         None => Policy::default(),
-        Some(p) => Policy::from_json(&std::fs::read_to_string(p).map_err(|e| format!("cannot read the policy {p}: {e}"))?)?,
+        Some(p) => Policy::from_json(
+            &std::fs::read_to_string(p).map_err(|e| format!("cannot read the policy {p}: {e}"))?,
+        )?,
     };
-    let mut cfg = Config { min_uid: o.min_uid, hysteresis: o.hysteresis, min_confidence: o.min_confidence, dry_run: o.dry_run, ..Config::default() };
+    let mut cfg = Config {
+        min_uid: o.min_uid,
+        hysteresis: o.hysteresis,
+        min_confidence: o.min_confidence,
+        dry_run: o.dry_run,
+        ..Config::default()
+    };
     cfg.ignore.extend(o.ignore.iter().cloned());
-    let mut engine = Engine::new(ProcCollector::new(), KernelActuator, classifier, policy, cfg);
+    let mut engine = Engine::new(
+        ProcCollector::new(),
+        KernelActuator,
+        classifier,
+        policy,
+        cfg,
+    );
     println!(
         "osaima-schedd: {} every {} s, processes of users from {} up{}",
         engine.classifier_name(),
         o.interval,
         o.min_uid,
-        if o.dry_run { " (dry run: nothing is changed)" } else { "" }
+        if o.dry_run {
+            " (dry run: nothing is changed)"
+        } else {
+            ""
+        }
     );
     install_signal_handlers();
 
-    engine.tick(o.interval).map_err(|e| format!("cannot read /proc: {e}"))?; // the baseline
+    engine
+        .tick(o.interval)
+        .map_err(|e| format!("cannot read /proc: {e}"))?; // the baseline
     let mut last = Instant::now();
     while !STOP.load(Ordering::SeqCst) {
         nap(o.interval);
@@ -175,19 +202,31 @@ fn run(o: &Opts) -> Result<(), String> {
         let now = Instant::now();
         let seconds = now.duration_since(last).as_secs_f64();
         last = now;
-        let report = engine.tick(seconds).map_err(|e| format!("cannot read /proc: {e}"))?;
+        let report = engine
+            .tick(seconds)
+            .map_err(|e| format!("cannot read /proc: {e}"))?;
         for c in &report.changes {
             let what = match (&c.error, c.applied) {
                 (Some(e), _) => format!("refused: {e}"),
                 (None, true) => "set".to_string(),
                 (None, false) => "would set".to_string(),
             };
-            println!("{} {} -> {} (p={:.2}): {what} nice {} {:?}", c.pid, c.comm, c.class, c.confidence, c.setting.nice, c.setting.sched);
+            println!(
+                "{} {} -> {} (p={:.2}): {what} nice {} {:?}",
+                c.pid, c.comm, c.class, c.confidence, c.setting.nice, c.setting.sched
+            );
         }
         if o.verbose || o.once {
-            let by_class: Vec<String> = Class::ALL.iter().map(|k| format!("{k} {}", report.counts.get(k).copied().unwrap_or(0))).collect();
+            let by_class: Vec<String> = Class::ALL
+                .iter()
+                .map(|k| format!("{k} {}", report.counts.get(k).copied().unwrap_or(0)))
+                .collect();
             let (tracked, adjusted) = engine.counts();
-            println!("judged {} ({}); {tracked} tracked, {adjusted} adjusted", report.judged, by_class.join(", "));
+            println!(
+                "judged {} ({}); {tracked} tracked, {adjusted} adjusted",
+                report.judged,
+                by_class.join(", ")
+            );
         }
         if o.once {
             break;
@@ -204,9 +243,15 @@ fn sample(o: &Opts) -> Result<(), String> {
         return Err("sample needs --pids".into());
     }
     let mut collector = ProcCollector::new();
-    let read = |c: &mut ProcCollector| -> Result<HashMap<i32, osaima_schedd::collector::Sample>, String> {
-        Ok(c.sample().map_err(|e| format!("cannot read /proc: {e}"))?.into_iter().filter(|s| o.pids.contains(&s.pid)).map(|s| (s.pid, s)).collect())
-    };
+    let read =
+        |c: &mut ProcCollector| -> Result<HashMap<i32, osaima_schedd::collector::Sample>, String> {
+            Ok(c.sample()
+                .map_err(|e| format!("cannot read /proc: {e}"))?
+                .into_iter()
+                .filter(|s| o.pids.contains(&s.pid))
+                .map(|s| (s.pid, s))
+                .collect())
+        };
     println!("pid,comm,cpu_util,vol_rate,invol_rate,slice_ms,wait_ratio");
     let mut prev = read(&mut collector)?;
     let mut last = Instant::now();
@@ -222,8 +267,19 @@ fn sample(o: &Opts) -> Result<(), String> {
         pids.sort();
         for pid in pids {
             let (s, before) = (&current[pid], prev.get(pid));
-            if let Some(f) = before.and_then(|b| Features::between(&b.counters, &s.counters, seconds)) {
-                println!("{},{},{:.6},{:.4},{:.4},{:.4},{:.4}", s.pid, s.comm.replace(',', ";"), f.cpu_util, f.vol_rate, f.invol_rate, f.slice_ms, f.wait_ratio);
+            if let Some(f) =
+                before.and_then(|b| Features::between(&b.counters, &s.counters, seconds))
+            {
+                println!(
+                    "{},{},{:.6},{:.4},{:.4},{:.4},{:.4}",
+                    s.pid,
+                    s.comm.replace(',', ";"),
+                    f.cpu_util,
+                    f.vol_rate,
+                    f.invol_rate,
+                    f.slice_ms,
+                    f.wait_ratio
+                );
             }
         }
         prev = current;
@@ -268,22 +324,40 @@ mod tests {
     #[test]
     fn options_are_parsed() {
         let o = parse(&args("run --interval 0.5 --min-uid 500 --hysteresis 2 --ignore firefox --ignore foot --dry-run -v")).unwrap();
-        assert_eq!((o.command.as_str(), o.interval, o.min_uid, o.hysteresis), ("run", 0.5, 500, 2));
+        assert_eq!(
+            (o.command.as_str(), o.interval, o.min_uid, o.hysteresis),
+            ("run", 0.5, 500, 2)
+        );
         assert_eq!(o.ignore, vec!["firefox", "foot"]);
         assert!(o.dry_run && o.verbose && !o.once);
         let s = parse(&args("sample --pids 10,20,30 --seconds 5")).unwrap();
-        assert_eq!((s.command.as_str(), s.pids.clone(), s.seconds), ("sample", vec![10, 20, 30], 5.0));
+        assert_eq!(
+            (s.command.as_str(), s.pids.clone(), s.seconds),
+            ("sample", vec![10, 20, 30], 5.0)
+        );
         assert_eq!(parse(&[]).unwrap().command, "run");
     }
 
     #[test]
     fn bad_options_are_explained() {
-        assert!(parse(&args("--interval fast")).unwrap_err().contains("not a valid number"));
-        assert!(parse(&args("--interval")).unwrap_err().contains("needs a value"));
-        assert!(parse(&args("--interval 0")).unwrap_err().contains("between"));
-        assert!(parse(&args("--hysteresis 0")).unwrap_err().contains("at least 1"));
-        assert!(parse(&args("--min-confidence 2")).unwrap_err().contains("between 0 and 1"));
-        assert!(parse(&args("--bogus")).unwrap_err().contains("unknown option"));
+        assert!(parse(&args("--interval fast"))
+            .unwrap_err()
+            .contains("not a valid number"));
+        assert!(parse(&args("--interval"))
+            .unwrap_err()
+            .contains("needs a value"));
+        assert!(parse(&args("--interval 0"))
+            .unwrap_err()
+            .contains("between"));
+        assert!(parse(&args("--hysteresis 0"))
+            .unwrap_err()
+            .contains("at least 1"));
+        assert!(parse(&args("--min-confidence 2"))
+            .unwrap_err()
+            .contains("between 0 and 1"));
+        assert!(parse(&args("--bogus"))
+            .unwrap_err()
+            .contains("unknown option"));
         assert_eq!(parse(&args("--help")).unwrap_err(), "");
     }
 

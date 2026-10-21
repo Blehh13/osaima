@@ -17,7 +17,13 @@ pub struct Counters {
     pub involuntary: u64,
 }
 
-pub const FEATURE_NAMES: [&str; 5] = ["cpu_util", "vol_rate", "invol_rate", "slice_ms", "wait_ratio"];
+pub const FEATURE_NAMES: [&str; 5] = [
+    "cpu_util",
+    "vol_rate",
+    "invol_rate",
+    "slice_ms",
+    "wait_ratio",
+];
 
 /// What one window looked like. Rates are per second.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Serialize, Deserialize)]
@@ -53,8 +59,16 @@ impl Features {
             cpu_util: run / 1e9 / seconds,
             vol_rate: vol / seconds,
             invol_rate: invol / seconds,
-            slice_ms: if slices > 0.0 { run / slices / 1e6 } else { 0.0 },
-            wait_ratio: if run > 0.0 { (wait / run).min(MAX_WAIT_RATIO) } else { 0.0 },
+            slice_ms: if slices > 0.0 {
+                run / slices / 1e6
+            } else {
+                0.0
+            },
+            wait_ratio: if run > 0.0 {
+                (wait / run).min(MAX_WAIT_RATIO)
+            } else {
+                0.0
+            },
         })
     }
 
@@ -71,7 +85,13 @@ impl Features {
     }
 
     pub fn as_array(&self) -> [f64; 5] {
-        [self.cpu_util, self.vol_rate, self.invol_rate, self.slice_ms, self.wait_ratio]
+        [
+            self.cpu_util,
+            self.vol_rate,
+            self.invol_rate,
+            self.slice_ms,
+            self.wait_ratio,
+        ]
     }
 }
 
@@ -134,9 +154,21 @@ mod tests {
 
     #[test]
     fn model_inputs_squeeze_the_wide_ranges() {
-        let f = Features { cpu_util: 0.5, vol_rate: 0.0, invol_rate: 0.0, slice_ms: 0.0, wait_ratio: 0.0 };
+        let f = Features {
+            cpu_util: 0.5,
+            vol_rate: 0.0,
+            invol_rate: 0.0,
+            slice_ms: 0.0,
+            wait_ratio: 0.0,
+        };
         assert_eq!(f.model_inputs(), [0.5, 0.0, 0.0, 0.0, 0.0]);
-        let busy = Features { cpu_util: 1.0, vol_rate: 99.0, invol_rate: 9.0, slice_ms: 3.0, wait_ratio: 1.0 };
+        let busy = Features {
+            cpu_util: 1.0,
+            vol_rate: 99.0,
+            invol_rate: 9.0,
+            slice_ms: 3.0,
+            wait_ratio: 1.0,
+        };
         let inputs = busy.model_inputs();
         assert!((inputs[1] - 100f64.ln()).abs() < 1e-9);
         assert!((inputs[2] - 10f64.ln()).abs() < 1e-9);

@@ -35,7 +35,9 @@ pub struct ProcCollector {
 
 impl ProcCollector {
     pub fn new() -> Self {
-        Self { root: PathBuf::from("/proc") }
+        Self {
+            root: PathBuf::from("/proc"),
+        }
     }
 
     pub fn at(root: impl Into<PathBuf>) -> Self {
@@ -54,7 +56,13 @@ impl Collector for ProcCollector {
         let mut samples = Vec::new();
         for entry in fs::read_dir(&self.root)? {
             let Ok(entry) = entry else { continue };
-            let Some(pid) = entry.file_name().to_str().and_then(|n| n.parse::<i32>().ok()) else { continue };
+            let Some(pid) = entry
+                .file_name()
+                .to_str()
+                .and_then(|n| n.parse::<i32>().ok())
+            else {
+                continue;
+            };
             // A process can exit between listing and reading; that is not an error.
             if let Some(sample) = read_process(&entry.path(), pid) {
                 samples.push(sample);
@@ -125,7 +133,11 @@ pub fn parse_stat(text: &str) -> Option<Stat> {
     let comm = text[open + 1..close].to_string();
     // After the name: state(field 3) ppid(4) ... flags(9) ... starttime(22)
     let rest: Vec<&str> = text[close + 1..].split_whitespace().collect();
-    Some(Stat { comm, flags: rest.get(6)?.parse().ok()?, start_time: rest.get(19)?.parse().ok()? })
+    Some(Stat {
+        comm,
+        flags: rest.get(6)?.parse().ok()?,
+        start_time: rest.get(19)?.parse().ok()?,
+    })
 }
 
 /// `/proc/PID/task/TID/schedstat` is `run_ns wait_ns timeslices`.
@@ -136,7 +148,13 @@ pub fn parse_schedstat(text: &str) -> Option<(u64, u64, u64)> {
 
 /// The real user id from the `Uid:` line of `/proc/PID/status`.
 pub fn parse_uid(status: &str) -> Option<u32> {
-    status.lines().find_map(|l| l.strip_prefix("Uid:"))?.split_whitespace().next()?.parse().ok()
+    status
+        .lines()
+        .find_map(|l| l.strip_prefix("Uid:"))?
+        .split_whitespace()
+        .next()?
+        .parse()
+        .ok()
 }
 
 /// Voluntary and involuntary context switches from `/proc/PID/status`.
@@ -148,7 +166,10 @@ pub fn parse_switches(status: &str) -> (u64, u64) {
             .and_then(|v| v.trim().parse::<u64>().ok())
             .unwrap_or(0)
     };
-    (get("voluntary_ctxt_switches:"), get("nonvoluntary_ctxt_switches:"))
+    (
+        get("voluntary_ctxt_switches:"),
+        get("nonvoluntary_ctxt_switches:"),
+    )
 }
 
 #[cfg(test)]
@@ -177,7 +198,10 @@ mod tests {
 
     #[test]
     fn schedstat_and_status_are_parsed() {
-        assert_eq!(parse_schedstat("123456789 987 42\n"), Some((123456789, 987, 42)));
+        assert_eq!(
+            parse_schedstat("123456789 987 42\n"),
+            Some((123456789, 987, 42))
+        );
         assert_eq!(parse_schedstat("1 2"), None);
         assert_eq!(parse_schedstat("a b c"), None);
         let status = "Name:\tbash\nUid:\t1000\t1000\t1000\t1000\nvoluntary_ctxt_switches:\t77\nnonvoluntary_ctxt_switches:\t5\n";
@@ -189,20 +213,37 @@ mod tests {
 
     /// A fake /proc with one process of two threads and one kernel thread.
     fn fake_proc() -> PathBuf {
-        let root = std::env::temp_dir().join(format!("osaima-schedd-proc-{}-{:?}", std::process::id(), std::thread::current().id()));
+        let root = std::env::temp_dir().join(format!(
+            "osaima-schedd-proc-{}-{:?}",
+            std::process::id(),
+            std::thread::current().id()
+        ));
         let _ = fs::remove_dir_all(&root);
         let write = |path: PathBuf, text: &str| {
             fs::create_dir_all(path.parent().unwrap()).unwrap();
             fs::write(path, text).unwrap();
         };
-        let status = |uid: u32, vol: u64, invol: u64| format!("Name:\tx\nUid:\t{uid}\t{uid}\t{uid}\t{uid}\nvoluntary_ctxt_switches:\t{vol}\nnonvoluntary_ctxt_switches:\t{invol}\n");
+        let status = |uid: u32, vol: u64, invol: u64| {
+            format!("Name:\tx\nUid:\t{uid}\t{uid}\t{uid}\t{uid}\nvoluntary_ctxt_switches:\t{vol}\nnonvoluntary_ctxt_switches:\t{invol}\n")
+        };
         write(root.join("100/stat"), STAT);
         write(root.join("100/status"), &status(1000, 10, 1));
         for (tid, run) in [(100, 1_000_000u64), (101, 2_000_000)] {
-            write(root.join(format!("100/task/{tid}/schedstat")), &format!("{run} 500 10\n"));
-            write(root.join(format!("100/task/{tid}/status")), &status(1000, 10, 1));
+            write(
+                root.join(format!("100/task/{tid}/schedstat")),
+                &format!("{run} 500 10\n"),
+            );
+            write(
+                root.join(format!("100/task/{tid}/status")),
+                &status(1000, 10, 1),
+            );
         }
-        write(root.join("2/stat"), &STAT.replace("4194560", &PF_KTHREAD.to_string()).replace("4242 (Web Content (2))", "2 (kthreadd)"));
+        write(
+            root.join("2/stat"),
+            &STAT
+                .replace("4194560", &PF_KTHREAD.to_string())
+                .replace("4242 (Web Content (2))", "2 (kthreadd)"),
+        );
         write(root.join("2/status"), &status(0, 0, 0));
         write(root.join("2/task/2/schedstat"), "5 5 1\n");
         write(root.join("2/task/2/status"), &status(0, 0, 0));
@@ -218,7 +259,10 @@ mod tests {
         samples.sort_by_key(|s| s.pid);
         assert_eq!(samples.len(), 2, "{samples:?}");
         let kthread = &samples[0];
-        assert_eq!((kthread.pid, kthread.uid, kthread.kernel_thread), (2, 0, true));
+        assert_eq!(
+            (kthread.pid, kthread.uid, kthread.kernel_thread),
+            (2, 0, true)
+        );
         let app = &samples[1];
         assert_eq!((app.pid, app.uid, app.kernel_thread), (100, 1000, false));
         assert_eq!(app.comm, "Web Content (2)");
