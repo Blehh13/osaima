@@ -3,6 +3,11 @@
 from __future__ import annotations
 
 import copy
+import sys
+import tempfile
+import textwrap
+from collections.abc import AsyncIterator
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -95,3 +100,35 @@ class FakeTools:
 @pytest.fixture
 def audit(tmp_path: Any) -> AuditLog:
     return AuditLog(tmp_path / "audit.jsonl")
+
+# ── shared by the voice tests ───────────────────────────────────────────────
+
+RECORDER = textwrap.dedent(
+    """
+    import signal, sys, time
+    stop = []
+    signal.signal(signal.SIGINT, lambda *_: stop.append(1))
+    seconds = float(sys.argv[2])
+    with open(sys.argv[1], "wb") as f:
+        f.write(b"RIFF" + bytes(40) + bytes(int(seconds * 32000)))
+    while not stop:
+        time.sleep(0.02)
+    """
+)
+
+
+@pytest.fixture
+def helpers(tmp_path: Path) -> dict[str, Any]:
+    script = tmp_path / "recorder.py"
+    script.write_text(RECORDER)
+    return {
+        "record": (sys.executable, str(script), "{output}", "1.0"),
+        "play": (sys.executable, "-c", "import time; time.sleep(0.05)", "{input}"),
+        "slow_play": (sys.executable, "-c", "import time; time.sleep(30)", "{input}"),
+    }
+
+
+@pytest.fixture
+async def socket_dir() -> AsyncIterator[Path]:
+    with tempfile.TemporaryDirectory(prefix="osa-") as d:
+        yield Path(d)
