@@ -1,0 +1,200 @@
+{"id": 0, "utterance": "connect me to the vpn", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false, "source": "llm"}
+{"id": 1, "utterance": "i need a brief rundown on this project", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false, "source": "llm"}
+{"id": 2, "utterance": "what's the file called that has the june sales data", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false, "source": "llm"}
+{"id": 3, "utterance": "what does it mean when this command fails", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false, "source": "llm"}
+{"id": 4, "utterance": "what's the status of my notifications now?", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false, "source": "llm"}
+{"id": 5, "utterance": "i want to set up a new software project now", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false, "source": "llm"}
+{"id": 6, "utterance": "take me to that other window", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false, "source": "llm"}
+{"id": 7, "utterance": "open a word processor", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false, "source": "llm"}
+{"id": 8, "utterance": "disabling bluetooth might save some battery life", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false, "source": "llm"}
+{"id": 9, "utterance": "how do i capture this browser tab", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false, "source": "llm"}
+{"id": 10, "utterance": "i need to get the dependencies for this project", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false, "source": "llm"}
+{"id": 11, "utterance": "write a function to convert Celsius to Fahrenheit", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false, "source": "llm"}
+{"id": 12, "utterance": "can you commit this file and push the changes to origin", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false, "source": "llm"}
+{"id": 13, "utterance": "what's currently running on this machine", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false, "source": "llm"}
+{"id": 14, "utterance": "watch for changes and recompile automatically", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false, "source": "llm"}
+{"id": 15, "utterance": "commit message for the new feature please", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false, "source": "llm"}
+{"id": 16, "utterance": "lock my screen", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false, "source": "llm"}
+{"id": 17, "utterance": "create a virtual environment for me", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false, "source": "llm"}
+{"id": 18, "utterance": "play the music that just started playing", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false, "source": "llm"}
+{"id": 19, "utterance": "i need to run an emulator", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false, "source": "llm"}
+{"id": 20, "utterance": "please rebuild the project in release mode", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false, "source": "llm"}
+{"id": 21, "utterance": "[", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false, "source": "llm"}
+{"id": 22, "utterance": "i need a picture of just the terminal", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false, "source": "llm"}
+{"id": 23, "utterance": "create a new branch for the new feature and switch to it", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false, "source": "llm"}
+{"id": 24, "utterance": "what's the main idea of this document", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false, "source": "llm"}
+{"id": 25, "utterance": "write a brief response to john's message", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false, "source": "llm"}
+{"id": 26, "utterance": "please save my work and lock up", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false, "source": "llm"}
+{"id": 27, "utterance": "turn off do not disturb mode please", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false, "source": "llm"}
+{"id": 28, "utterance": "[", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false, "source": "llm"}
+{"id": 29, "utterance": "what's the translation for this text in spanish", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false, "source": "llm"}
+{"id": 30, "utterance": "how do i change the brightness", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false, "source": "llm"}
+{"id": 31, "utterance": "can you scaffold a new project with me", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false, "source": "llm"}
+{"id": 32, "utterance": "can you switch windows for me", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false, "source": "llm"}
+{"id": 33, "utterance": "brighten up the screen for me", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false, "source": "llm"}
+{"id": 34, "utterance": "organize all mp3 files in music folder into subfolders", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false, "source": "llm"}
+{"id": 35, "utterance": "take me off the vpn", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false, "source": "llm"}
+{"id": 36, "utterance": "turn on bluetooth so i can pair my headphones", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false, "source": "llm"}
+{"id": 37, "utterance": "translate this for me in french please", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false, "source": "llm"}
+{"id": 38, "utterance": "skip to the next track, please", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false, "source": "llm"}
+{"id": 39, "utterance": "make a new python class called Person with these attributes", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false, "source": "llm"}
+{"id": 40, "utterance": "can you create a script to automate this task for me", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false, "source": "llm"}
+{"id": 41, "utterance": "make my phone connect to this computer via bluetooth", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false, "source": "llm"}
+{"id": 42, "utterance": "move focus to the other window", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false, "source": "llm"}
+{"id": 43, "utterance": "can you run my test suite with coverage enabled", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false, "source": "llm"}
+{"id": 44, "utterance": "start composing a new email to my manager", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false, "source": "llm"}
+{"id": 45, "utterance": "can you reboot for me", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false, "source": "llm"}
+{"id": 46, "utterance": "push changes to the upstream repository on github", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false, "source": "llm"}
+{"id": 47, "utterance": "can you show me the clipboard contents?", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false, "source": "llm"}
+{"id": 48, "utterance": "stop apache\",", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false, "source": "llm"}
+{"id": 49, "utterance": "disable notifications for the next hour", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false, "source": "llm"}
+{"id": 50, "utterance": "what's on my clipboard right now?", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false, "source": "llm"}
+{"id": 51, "utterance": "where is my pdf file from yesterday", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false, "source": "llm"}
+{"id": 52, "utterance": "open excel file called financial projections", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false, "source": "llm"}
+{"id": 53, "utterance": "start up the development server", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false, "source": "llm"}
+{"id": 54, "utterance": "screenshot the entire desktop for me", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false, "source": "llm"}
+{"id": 55, "utterance": "launch chrome browser", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false, "source": "llm"}
+{"id": 56, "utterance": "help me reply to this email quickly", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false, "source": "llm"}
+{"id": 57, "utterance": "i'm getting this error message what does it say", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false, "source": "llm"}
+{"id": 58, "utterance": "change layout to tile\",", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false, "source": "llm"}
+{"id": 59, "utterance": "stop this script", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false, "source": "llm"}
+{"id": 60, "utterance": "can you open the finance spreadsheet", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false, "source": "llm"}
+{"id": 61, "utterance": "make the display brighter", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false, "source": "llm"}
+{"id": 62, "utterance": "what's the status of my current build", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false, "source": "llm"}
+{"id": 63, "utterance": "how do i reorganize this mess without messing everything up", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false, "source": "llm"}
+{"id": 64, "utterance": "can you install all required packages now", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false, "source": "llm"}
+{"id": 65, "utterance": "tell me about the programs running right now", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false, "source": "llm"}
+{"id": 66, "utterance": "what's the command to unmount the usb drive?", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false, "source": "llm"}
+{"id": 67, "utterance": "move windows to the right edge please\",", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false, "source": "llm"}
+{"id": 68, "utterance": "go ahead and switch to the next tab", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false, "source": "llm"}
+{"id": 69, "utterance": "can you help me rework this poorly written code", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false, "source": "llm"}
+{"id": 70, "utterance": "launch development environment", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false, "source": "llm"}
+{"id": 71, "utterance": "can you refactor this spaghetti code into something readable", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false, "source": "llm"}
+{"id": 72, "utterance": "turn on the vpn", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false, "source": "llm"}
+{"id": 73, "utterance": "shut down the application", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false, "source": "llm"}
+{"id": 74, "utterance": "[\"can you write a commit message for me about this change", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false, "source": "llm"}
+{"id": 75, "utterance": "can you secure the computer now", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false, "source": "llm"}
+{"id": 76, "utterance": "show me the july budget breakdown", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false, "source": "llm"}
+{"id": 77, "utterance": "show me all the processes currently in memory", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false, "source": "llm"}
+{"id": 78, "utterance": "suspend and wake me up in an hour", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false, "source": "llm"}
+{"id": 79, "utterance": "can you explain what this error code means", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false, "source": "llm"}
+{"id": 80, "utterance": "what's the cpu load like right now", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false, "source": "llm"}
+{"id": 81, "utterance": "mount the external hard drive", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false, "source": "llm"}
+{"id": 82, "utterance": "what's in the clipboard?", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false, "source": "llm"}
+{"id": 83, "utterance": "what's the command to create a virtual env?", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false, "source": "llm"}
+{"id": 84, "utterance": "test suite coverage report", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false, "source": "llm"}
+{"id": 85, "utterance": "rewind 10 seconds, can you do that?", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false, "source": "llm"}
+{"id": 86, "utterance": "switch to fullscreen mode now\",", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false, "source": "llm"}
+{"id": 87, "utterance": "run the test suite with coverage please", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false, "source": "llm"}
+{"id": 88, "utterance": "setup a fresh new project for coding", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false, "source": "llm"}
+{"id": 89, "utterance": "can you tidy up the messy code for me", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false, "source": "llm"}
+{"id": 90, "utterance": "i need to pair a new speaker with this computer", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false, "source": "llm"}
+{"id": 91, "utterance": "can you kill this process", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false, "source": "llm"}
+{"id": 92, "utterance": "what's the command to start a dev server", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false, "source": "llm"}
+{"id": 93, "utterance": "open the file called accounting reports january 2022 excel", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false, "source": "llm"}
+{"id": 94, "utterance": "build my project with hot reload on", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false, "source": "llm"}
+{"id": 95, "utterance": "is the httpd service running\",", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false, "source": "llm"}
+{"id": 96, "utterance": "lower the volume", "track": "SYSTEM_COMMAND", "intent": "volume_control", "edge_case": false, "source": "llm"}
+{"id": 97, "utterance": "what are some possible docstring formats i could use here\",", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false, "source": "llm"}
+{"id": 98, "utterance": "clear all my notifications from last night", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false, "source": "llm"}
+{"id": 99, "utterance": "what do you call sleep mode", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false, "source": "llm"}
+{"id": 100, "utterance": "how do i create a function to sort a list of numbers in ascending order", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false, "source": "llm"}
+{"id": 101, "utterance": "start the terminal app", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false, "source": "llm"}
+{"id": 102, "utterance": "make the music quieter", "track": "SYSTEM_COMMAND", "intent": "volume_control", "edge_case": false, "source": "llm"}
+{"id": 103, "utterance": "add type hints to this method\",", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false, "source": "llm"}
+{"id": 104, "utterance": "display all files modified within the last week", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false, "source": "llm"}
+{"id": 105, "utterance": "what files do i have called report something", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false, "source": "llm"}
+{"id": 106, "utterance": "can you make a new conda environment?", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false, "source": "llm"}
+{"id": 107, "utterance": "let's create a new software project from scratch", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false, "source": "llm"}
+{"id": 108, "utterance": "switch to portuguese translation", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false, "source": "llm"}
+{"id": 109, "utterance": "make a clean environment with the latest python", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false, "source": "llm"}
+{"id": 110, "utterance": "i need to simplify this code, can you assist me", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false, "source": "llm"}
+{"id": 111, "utterance": "create a new project for me please", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false, "source": "llm"}
+{"id": 112, "utterance": "what's next on the playlist?", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false, "source": "llm"}
+{"id": 113, "utterance": "lock the machine", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false, "source": "llm"}
+{"id": 114, "utterance": "how do i write a good commit message for this update", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false, "source": "llm"}
+{"id": 115, "utterance": "help me set up the dev environment", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false, "source": "llm"}
+{"id": 116, "utterance": "make a development environment available", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false, "source": "llm"}
+{"id": 117, "utterance": "start a fresh environment with python 3.8 please", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false, "source": "llm"}
+{"id": 118, "utterance": "i want to commit all the new files and then push the changes", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false, "source": "llm"}
+{"id": 119, "utterance": "switch to workspace 2 and move this window", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false, "source": "llm"}
+{"id": 120, "utterance": "what's the command to end it", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false, "source": "llm"}
+{"id": 121, "utterance": "display the processes that are currently active", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false, "source": "llm"}
+{"id": 122, "utterance": "how do i quit this thing\",", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false, "source": "llm"}
+{"id": 123, "utterance": "force quit the program", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false, "source": "llm"}
+{"id": 124, "utterance": "compose an email to request a meeting", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false, "source": "llm"}
+{"id": 125, "utterance": "i need to unplug the memory stick, what do i do?", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false, "source": "llm"}
+{"id": 126, "utterance": "what's the temperature reading for the cpu", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false, "source": "llm"}
+{"id": 127, "utterance": "disable the vpn connection", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false, "source": "llm"}
+{"id": 128, "utterance": "put it to bed", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false, "source": "llm"}
+{"id": 129, "utterance": "how much battery life is left", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false, "source": "llm"}
+{"id": 130, "utterance": "how much juice is left in this thing", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false, "source": "llm"}
+{"id": 131, "utterance": "can you take a screenshot of the whole window", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false, "source": "llm"}
+{"id": 132, "utterance": "check the battery level please", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false, "source": "llm"}
+{"id": 133, "utterance": "remove the dvd from the computer", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false, "source": "llm"}
+{"id": 134, "utterance": "draft a response to the smiths' inquiry", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false, "source": "llm"}
+{"id": 135, "utterance": "compile it now with -O3 flag", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false, "source": "llm"}
+{"id": 136, "utterance": "turn the volume down a bit", "track": "SYSTEM_COMMAND", "intent": "volume_control", "edge_case": false, "source": "llm"}
+{"id": 137, "utterance": "[", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false, "source": "llm"}
+{"id": 138, "utterance": "i need a dev server up", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false, "source": "llm"}
+{"id": 139, "utterance": "restart the mysql service\",", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false, "source": "llm"}
+{"id": 140, "utterance": "wifi is off what do i do", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false, "source": "llm"}
+{"id": 141, "utterance": "how do i convert all mp3s to wav format", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false, "source": "llm"}
+{"id": 142, "utterance": "can you put all windows on top of each other\",", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false, "source": "llm"}
+{"id": 143, "utterance": "is it time to shut down and secure the system", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false, "source": "llm"}
+{"id": 144, "utterance": "is my laptop charged", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false, "source": "llm"}
+{"id": 145, "utterance": "show me the current running processes", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false, "source": "llm"}
+{"id": 146, "utterance": "what's the command for running tests with coverage statistics", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false, "source": "llm"}
+{"id": 147, "utterance": "move that window to the next workspace", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false, "source": "llm"}
+{"id": 148, "utterance": "can you show me all the word documents on my desktop", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false, "source": "llm"}
+{"id": 149, "utterance": "pause this song, i need to talk", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false, "source": "llm"}
+{"id": 150, "utterance": "what's the command to install everything", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false, "source": "llm"}
+{"id": 151, "utterance": "how do i eject this cd?", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false, "source": "llm"}
+{"id": 152, "utterance": "where's the other open app", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false, "source": "llm"}
+{"id": 153, "utterance": "i want to connect to the vpn please", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false, "source": "llm"}
+{"id": 154, "utterance": "how's my disk usage looking", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false, "source": "llm"}
+{"id": 155, "utterance": "what's the current charge status", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false, "source": "llm"}
+{"id": 156, "utterance": "what's the command to switch to workspace 2?", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false, "source": "llm"}
+{"id": 157, "utterance": "i need the spreadsheet from march 2022", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false, "source": "llm"}
+{"id": 158, "utterance": "can you generate some comments for me on this code\",", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false, "source": "llm"}
+{"id": 159, "utterance": "what does this error code indicate", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false, "source": "llm"}
+{"id": 160, "utterance": "cpu usage", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false, "source": "llm"}
+{"id": 161, "utterance": "write docstring for this function\",", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false, "source": "llm"}
+{"id": 162, "utterance": "can i turn up the screen's brightness", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false, "source": "llm"}
+{"id": 163, "utterance": "create a commit message that describes the fix", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false, "source": "llm"}
+{"id": 164, "utterance": "is the system running low on ram", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false, "source": "llm"}
+{"id": 165, "utterance": "can you summarize this file for me", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false, "source": "llm"}
+{"id": 166, "utterance": "what's the shortcut to capture this screen", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false, "source": "llm"}
+{"id": 167, "utterance": "start firefox please", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false, "source": "llm"}
+{"id": 168, "utterance": "start the ssh service please\",", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false, "source": "llm"}
+{"id": 169, "utterance": "can you rename all files in this folder to lowercase", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false, "source": "llm"}
+{"id": 170, "utterance": "can you silence notifications for a bit", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false, "source": "llm"}
+{"id": 171, "utterance": "turn on wifi", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false, "source": "llm"}
+{"id": 172, "utterance": "view my clipboard, please", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false, "source": "llm"}
+{"id": 173, "utterance": "this script isn't running what is the issue", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false, "source": "llm"}
+{"id": 174, "utterance": "what's a good commit message for these modifications", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false, "source": "llm"}
+{"id": 175, "utterance": "shutdown now please", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false, "source": "llm"}
+{"id": 176, "utterance": "please run my test suite so i can see what's failing", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false, "source": "llm"}
+{"id": 177, "utterance": "can you interpret this document into italian", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false, "source": "llm"}
+{"id": 178, "utterance": "can you mass rename these files to follow a specific naming scheme", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false, "source": "llm"}
+{"id": 179, "utterance": "how do i create a branch from the master branch and push it", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false, "source": "llm"}
+{"id": 180, "utterance": "turn on wireless connectivity", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false, "source": "llm"}
+{"id": 181, "utterance": "enable wifi please", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false, "source": "llm"}
+{"id": 182, "utterance": "move this window to a different workspace", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false, "source": "llm"}
+{"id": 183, "utterance": "what's the command to close what's open\",", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false, "source": "llm"}
+{"id": 184, "utterance": "i don't need this application anymore\",", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false, "source": "llm"}
+{"id": 185, "utterance": "what did i copy and paste last?", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false, "source": "llm"}
+{"id": 186, "utterance": "rename these files to match their corresponding pdfs please", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false, "source": "llm"}
+{"id": 187, "utterance": "can you move my current window to workspace 3?", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false, "source": "llm"}
+{"id": 188, "utterance": "install project dependencies and packages please", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false, "source": "llm"}
+{"id": 189, "utterance": "change the language to german", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false, "source": "llm"}
+{"id": 190, "utterance": "generate code to calculate the area of a triangle given three points", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false, "source": "llm"}
+{"id": 191, "utterance": "can you mute the sound", "track": "SYSTEM_COMMAND", "intent": "volume_control", "edge_case": false, "source": "llm"}
+{"id": 192, "utterance": "summarize the contents of this readme", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false, "source": "llm"}
+{"id": 193, "utterance": "can you make the screen brighter", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false, "source": "llm"}
+{"id": 194, "utterance": "connect me to wifi network", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false, "source": "llm"}
+{"id": 195, "utterance": "can you enable bluetooth on this machine please", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false, "source": "llm"}
+{"id": 196, "utterance": "[", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false, "source": "llm"}
+{"id": 197, "utterance": "what's in a nutshell, what's the document about", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false, "source": "llm"}
+{"id": 198, "utterance": "shut down this program\",", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false, "source": "llm"}
+{"id": 199, "utterance": "how do i turn off the audio", "track": "SYSTEM_COMMAND", "intent": "volume_control", "edge_case": false, "source": "llm"}

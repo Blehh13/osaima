@@ -1,0 +1,98 @@
+[
+ {
+  "utterance": "Can you remind me to review my notes from yesterday's meeting and update my calendar?",
+  "gold": "orchestrate"
+ },
+ {
+  "utterance": "I need Spotify open",
+  "gold": "open_app"
+ },
+ {
+  "utterance": "Show me how to update my Python packages.",
+  "gold": "execute_command"
+ },
+ {
+  "utterance": "Assist in getting rid of the redundant files.",
+  "gold": "clean_storage"
+ },
+ {
+  "utterance": "Create a code snippet for me called 'Find Prime Numbers' and have it print primes less than 100.",
+  "gold": "create_note"
+ },
+ {
+  "utterance": "I want to search for 'conference call' in my documents.",
+  "gold": "search_notes"
+ },
+ {
+  "utterance": "Clean up my desktop.",
+  "gold": "close_all_windows"
+ },
+ {
+  "utterance": "Hey, can you help me jot down some notes? Just a title and the body please.",
+  "gold": "create_note"
+ },
+ {
+  "utterance": "Bring up the 'Vacation Destinations' note on my screen.",
+  "gold": "view_note"
+ },
+ {
+  "utterance": "I want to see my system's running processes.",
+  "gold": "execute_command"
+ },
+ {
+  "utterance": "cycle to the window before this",
+  "gold": "focus_app"
+ },
+ {
+  "utterance": "Create an event 'Project Review' on March 10th at 4 PM in my calendar.",
+  "gold": "schedule_event"
+ },
+ {
+  "utterance": "Just shut everything down, I need space.",
+  "gold": "minimize_all"
+ },
+ {
+  "utterance": "I want to revise the 'Movie Recommendations' note and include my new favorite movie.",
+  "gold": "edit_note"
+ },
+ {
+  "utterance": "can you maximise this one",
+  "gold": "layout"
+ },
+ {
+  "utterance": "Search for the most popular video game this year.",
+  "gold": "search_web"
+ },
+ {
+  "utterance": "I'm looking for 'Workout Routine' note. Could you display it?",
+  "gold": "view_note"
+ },
+ {
+  "utterance": "Change the window spacing to default settings.",
+  "gold": "set_gaps"
+ },
+ {
+  "utterance": "Create a note for me with this title and content: 'Grocery List' and 'Eggs, Milk, Bread.'",
+  "gold": "create_note"
+ },
+ {
+  "utterance": "can you get GNOME Settings on screen",
+  "gold": "open_app"
+ },
+ {
+  "utterance": "Give me the result of 42 minus 19.",
+  "gold": "calculator"
+ },
+ {
+  "utterance": "I want to review the 'Household Expenses' note.",
+  "gold": "view_note"
+ },
+ {
+  "utterance": "I'm looking for notes labeled 'client onboarding'.",
+  "gold": "search_notes"
+ },
+ {
+  "utterance": "Hello, I'm feeling overwhelmed, can you help me organize my tasks?",
+  "gold": "greeting"
+ }
+]

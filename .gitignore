@@ -1,3 +1,41 @@
+# --- Secrets: never commit (rotate any key that was ever in these) ---
+secret.txt
+test_gemini.js
+list_models.js
+.merge-backup-*/
+.env
+*.key
+
+# --- Build outputs and environments ---
+**/target/
+**/venv/
+.venv/
+__pycache__/
+*.pyc
+out/
+
+# --- Large or regenerable artefacts ---
+*.zip
+*.gguf
+*.onnx
+*.qcow2
+ai-core/intent-router/intent_bert_tiny*/
+ai-core/intent-router/intent_minilm/
+ai-core/intent-router/intent_embed/
+ai-core/rag-engine/chroma_db/
+ai-core/get-pip.py
+graphify-out/
+
+# --- Copies and unrelated nested repos ---
+osaima-feature-lua-window-manager/
+AIOS/
+
+# --- Personal tool state (Claude Code, Serena, graphify hooks) ---
+.claude/
+CLAUDE.md
+.graphifyignore
+.serena/cache/
+.serena/project.local.yml
 # Rust
 target/
 
@@ -18,9 +56,7 @@ node_modules/
 Thumbs.db
 
 # Python
-__pycache__/
 *.py[cod]
-.venv/
 .mypy_cache/
 .ruff_cache/
 .pytest_cache/
@@ -28,3 +64,7 @@ __pycache__/
 
 # Evaluation run output (copy chosen results into docs/ to keep them)
 ai-core/agent/evals/results/
+
+# Not for the repo: committed by mistake upstream
+ui/osaima-shell/node_modules/
+ui/osaima-shell/src-tauri/build_error.txt

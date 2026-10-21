@@ -1,6 +1,6 @@
-# osaima-shell — Interstellar OS Agentic Shell
+# osaima-shell — OSAIMA Agentic Shell
 
-The desktop shell for Interstellar OS: an ambient, AI-first environment with a
+The desktop shell for OSAIMA: an ambient, AI-first environment with a
 **Lua-driven tiling window manager**, an AI command hub, and live system context
 from the MCP daemon.
 

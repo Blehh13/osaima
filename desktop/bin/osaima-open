@@ -1,0 +1,7 @@
+#!/bin/sh
+# osaima-open <app> — bring an OSAIMA app's window forward, or start it.
+case "$1" in
+	''|*[!a-z]*) echo "usage: osaima-open <app name, lowercase letters>" >&2; exit 2 ;;
+esac
+title="OSAIMA $(printf '%s' "$1" | cut -c1 | tr a-z A-Z)$(printf '%s' "$1" | cut -c2-)"
+swaymsg -q "[title=\"^$title\$\"] focus" 2>/dev/null || exec osaima-app "$1"

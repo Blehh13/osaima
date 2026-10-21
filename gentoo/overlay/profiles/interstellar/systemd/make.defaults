@@ -1,0 +1,4 @@
+
+# app-misc/interstellar-release replaces the distro identity that
+# sys-apps/baselayout installs; let it take over those files.
+COLLISION_IGNORE="${COLLISION_IGNORE} /etc/os-release /usr/lib/os-release"

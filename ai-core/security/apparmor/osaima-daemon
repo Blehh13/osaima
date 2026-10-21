@@ -1,0 +1,20 @@
+# AppArmor profile for the OSAIMA AI-core daemon (PDR §4.3).
+#
+# Stage 1: lets the daemon (and the bubblewrap sandbox it spawns for
+# AI-generated commands) create user namespaces, which Ubuntu 24.04+ denies to
+# unprivileged programs by default. Gentoo does not restrict this, but loading
+# the profile there is harmless.
+#
+# TODO(stage 2): drop flags=(unconfined) and enumerate the daemon's file,
+# network and socket access so a prompt injection cannot reach beyond it.
+#
+# Install:  sudo cp osaima-daemon /etc/apparmor.d/ && sudo apparmor_parser -r /etc/apparmor.d/osaima-daemon
+
+abi <abi/4.0>,
+include <tunables/global>
+
+profile osaima-daemon /{usr/bin/osaima-mcp-daemon,usr/lib/osaima/mcp-daemon,home/*/**/ai-core/mcp-daemon/target/*/mcp-daemon} flags=(unconfined) {
+  userns,
+
+  include if exists <local/osaima-daemon>
+}

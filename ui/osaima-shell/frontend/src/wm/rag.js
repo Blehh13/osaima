@@ -173,7 +173,7 @@ export const SEED_KNOWLEDGE = [
   {
     title: 'Window Manager — Lua config',
     source: 'readme',
-    text: `The Interstellar shell window manager is configured in a live Lua file called wm.lua.
+    text: `The OSAIMA shell window manager is configured in a live Lua file called wm.lua.
       You can set the layout with wm.layout, change gaps between windows with wm.gaps, set the master
       ratio with wm.master_ratio, define workspaces with wm.workspaces, and bind keys with wm.bind.
       Available layouts are tile, monocle, grid, spiral and float. Press Alt plus Tab to cycle layouts.

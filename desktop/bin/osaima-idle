@@ -1,0 +1,8 @@
+#!/bin/sh
+# Lock when asked (logind), before sleep, and after the idle time chosen in
+# Settings (~/.config/osaima/desktop.json "lock_minutes"; 0 = never; default 15).
+m=$(python3 -c 'import json,os;print(json.load(open(os.path.expanduser("~/.config/osaima/desktop.json"))).get("lock_minutes",15))' 2>/dev/null || echo 15)
+if [ "$m" -gt 0 ] 2>/dev/null; then
+	exec swayidle -w lock osaima-lock before-sleep osaima-lock timeout $((m * 60)) osaima-lock
+fi
+exec swayidle -w lock osaima-lock before-sleep osaima-lock

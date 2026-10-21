@@ -1,0 +1,484 @@
+{"utterance": "Close all my windows.", "track": "SYSTEM_COMMAND", "intent": "close_all_windows", "source": "llm"}
+{"utterance": "End every tab.", "track": "SYSTEM_COMMAND", "intent": "close_all_windows", "source": "llm"}
+{"utterance": "Clean up my desktop.", "track": "SYSTEM_COMMAND", "intent": "close_all_windows", "source": "llm"}
+{"utterance": "Shut down all active windows, please.", "track": "SYSTEM_COMMAND", "intent": "close_all_windows", "source": "llm"}
+{"utterance": "Is there any way to clear my screen?", "track": "SYSTEM_COMMAND", "intent": "close_all_windows", "source": "llm"}
+{"utterance": "Hey, shut everything down, will ya?", "track": "SYSTEM_COMMAND", "intent": "close_all_windows", "source": "llm"}
+{"utterance": "Can you help me tidy up my workspace?", "track": "SYSTEM_COMMAND", "intent": "close_all_windows", "source": "llm"}
+{"utterance": "Erasing all my open windows.", "track": "SYSTEM_COMMAND", "intent": "close_all_windows", "source": "llm"}
+{"utterance": "Please, get rid of everything on my desktop.", "track": "SYSTEM_COMMAND", "intent": "close_all_windows", "source": "llm"}
+{"utterance": "Would you mind closing everything?", "track": "SYSTEM_COMMAND", "intent": "close_all_windows", "source": "llm"}
+{"utterance": "Let's get rid of all this stuff on my desktop.", "track": "SYSTEM_COMMAND", "intent": "close_all_windows", "source": "llm"}
+{"utterance": "Clean my desktop, please.", "track": "SYSTEM_COMMAND", "intent": "close_all_windows", "source": "llm"}
+{"utterance": "End all activities, shut down everything.", "track": "SYSTEM_COMMAND", "intent": "close_all_windows", "source": "llm"}
+{"utterance": "Can you wipe my desktop clean?", "track": "SYSTEM_COMMAND", "intent": "close_all_windows", "source": "llm"}
+{"utterance": "I need to clear everything, can you assist?", "track": "SYSTEM_COMMAND", "intent": "close_all_windows", "source": "llm"}
+{"utterance": "Close down all apps.", "track": "SYSTEM_COMMAND", "intent": "close_all_windows", "source": "llm"}
+{"utterance": "Tidying up my computer.", "track": "SYSTEM_COMMAND", "intent": "close_all_windows", "source": "llm"}
+{"utterance": "Free up my screen and shut everything down.", "track": "SYSTEM_COMMAND", "intent": "close_all_windows", "source": "llm"}
+{"utterance": "Minimize all windows, please.", "track": "SYSTEM_COMMAND", "intent": "minimize_all", "source": "llm"}
+{"utterance": "Show me the desktop, thanks.", "track": "SYSTEM_COMMAND", "intent": "minimize_all", "source": "llm"}
+{"utterance": "Close everything, can you do that?", "track": "SYSTEM_COMMAND", "intent": "minimize_all", "source": "llm"}
+{"utterance": "I'd like to see my desktop, if that's possible.", "track": "SYSTEM_COMMAND", "intent": "minimize_all", "source": "llm"}
+{"utterance": "Tidy up the screen for me, will you?", "track": "SYSTEM_COMMAND", "intent": "minimize_all", "source": "llm"}
+{"utterance": "Is it possible to hide all open windows?", "track": "SYSTEM_COMMAND", "intent": "minimize_all", "source": "llm"}
+{"utterance": "Make sure no windows are visible.", "track": "SYSTEM_COMMAND", "intent": "minimize_all", "source": "llm"}
+{"utterance": "Hide the stuff on my screen, please.", "track": "SYSTEM_COMMAND", "intent": "minimize_all", "source": "llm"}
+{"utterance": "Can you minimize all the windows for me right now?", "track": "SYSTEM_COMMAND", "intent": "minimize_all", "source": "llm"}
+{"utterance": "I'd rather not see any windows at the moment.", "track": "SYSTEM_COMMAND", "intent": "minimize_all", "source": "llm"}
+{"utterance": "Hide the desktop, I'm busy.", "track": "SYSTEM_COMMAND", "intent": "minimize_all", "source": "llm"}
+{"utterance": "Let's go full screen on that game!", "track": "SYSTEM_COMMAND", "intent": "minimize_all", "source": "llm"}
+{"utterance": "I need a clean desktop, help me out.", "track": "SYSTEM_COMMAND", "intent": "minimize_all", "source": "llm"}
+{"utterance": "Just shut everything down, I need space.", "track": "SYSTEM_COMMAND", "intent": "minimize_all", "source": "llm"}
+{"utterance": "I'm ready for a new task, not this cluttered view.", "track": "SYSTEM_COMMAND", "intent": "minimize_all", "source": "llm"}
+{"utterance": "Clean up my screen, I'm starting a new task.", "track": "SYSTEM_COMMAND", "intent": "minimize_all", "source": "llm"}
+{"utterance": "Please adjust the window spacing.", "track": "SYSTEM_COMMAND", "intent": "set_gaps", "source": "llm"}
+{"utterance": "How do I change the space between windows?", "track": "SYSTEM_COMMAND", "intent": "set_gaps", "source": "llm"}
+{"utterance": "Could you help me tweak the window gap settings?", "track": "SYSTEM_COMMAND", "intent": "set_gaps", "source": "llm"}
+{"utterance": "I need to change the gap between my windows.", "track": "SYSTEM_COMMAND", "intent": "set_gaps", "source": "llm"}
+{"utterance": "Adjust the window gaps for me.", "track": "SYSTEM_COMMAND", "intent": "set_gaps", "source": "llm"}
+{"utterance": "Change the gap between the windows to my liking.", "track": "SYSTEM_COMMAND", "intent": "set_gaps", "source": "llm"}
+{"utterance": "I want to modify the window spacing.", "track": "SYSTEM_COMMAND", "intent": "set_gaps", "source": "llm"}
+{"utterance": "Make the space between my windows smaller.", "track": "SYSTEM_COMMAND", "intent": "set_gaps", "source": "llm"}
+{"utterance": "Set the gap between my windows to default.", "track": "SYSTEM_COMMAND", "intent": "set_gaps", "source": "llm"}
+{"utterance": "Change the window spacing to default settings.", "track": "SYSTEM_COMMAND", "intent": "set_gaps", "source": "llm"}
+{"utterance": "I want the gaps between my windows to change.", "track": "SYSTEM_COMMAND", "intent": "set_gaps", "source": "llm"}
+{"utterance": "How can I modify the space between my windows?", "track": "SYSTEM_COMMAND", "intent": "set_gaps", "source": "llm"}
+{"utterance": "Change my window gap to the standard setting.", "track": "SYSTEM_COMMAND", "intent": "set_gaps", "source": "llm"}
+{"utterance": "Change window spacing to default.", "track": "SYSTEM_COMMAND", "intent": "set_gaps", "source": "llm"}
+{"utterance": "I’d like to alter the window spacing.", "track": "SYSTEM_COMMAND", "intent": "set_gaps", "source": "llm"}
+{"utterance": "Set window gaps to default values.", "track": "SYSTEM_COMMAND", "intent": "set_gaps", "source": "llm"}
+{"utterance": "Can you clean up my CPU usage?", "track": "SYSTEM_COMMAND", "intent": "optimize_cpu", "source": "llm"}
+{"utterance": "Let's optimize my CPU right now!", "track": "SYSTEM_COMMAND", "intent": "optimize_cpu", "source": "llm"}
+{"utterance": "Hey, I want to stop the lag - clean memory for me.", "track": "SYSTEM_COMMAND", "intent": "optimize_cpu", "source": "llm"}
+{"utterance": "Clean up my CPU, please. Slowdowns are killing me.", "track": "SYSTEM_COMMAND", "intent": "optimize_cpu", "source": "llm"}
+{"utterance": "Could you optimize my CPU, please?", "track": "SYSTEM_COMMAND", "intent": "optimize_cpu", "source": "llm"}
+{"utterance": "Please optimize CPU usage and shut down unnecessary processes.", "track": "SYSTEM_COMMAND", "intent": "optimize_cpu", "source": "llm"}
+{"utterance": "I'm experiencing lag; can you optimize CPU?", "track": "SYSTEM_COMMAND", "intent": "optimize_cpu", "source": "llm"}
+{"utterance": "Freezing heavy processes, okay?", "track": "SYSTEM_COMMAND", "intent": "optimize_cpu", "source": "llm"}
+{"utterance": "Optimize my CPU, please, there's a lot of lagging.", "track": "SYSTEM_COMMAND", "intent": "optimize_cpu", "source": "llm"}
+{"utterance": "Hey, I need you to put all my apps to sleep.", "track": "SYSTEM_COMMAND", "intent": "optimize_cpu", "source": "llm"}
+{"utterance": "I want you to optimize CPU usage immediately.", "track": "SYSTEM_COMMAND", "intent": "optimize_cpu", "source": "llm"}
+{"utterance": "Help me clean up the memory, would you?", "track": "SYSTEM_COMMAND", "intent": "optimize_cpu", "source": "llm"}
+{"utterance": "Could you put my apps to sleep to optimize CPU?", "track": "SYSTEM_COMMAND", "intent": "optimize_cpu", "source": "llm"}
+{"utterance": "Hey, I'm feeling laggy, let's clean up my CPU!", "track": "SYSTEM_COMMAND", "intent": "optimize_cpu", "source": "llm"}
+{"utterance": "I need your help to freeze heavy processes for better performance.", "track": "SYSTEM_COMMAND", "intent": "optimize_cpu", "source": "llm"}
+{"utterance": "Hey, can you clean my CPU memory?", "track": "SYSTEM_COMMAND", "intent": "optimize_cpu", "source": "llm"}
+{"utterance": "Please optimize the CPU usage; I'm getting tired of the lag.", "track": "SYSTEM_COMMAND", "intent": "optimize_cpu", "source": "llm"}
+{"utterance": "Can you bring back the apps that were frozen?", "track": "SYSTEM_COMMAND", "intent": "wake_apps", "source": "llm"}
+{"utterance": "Please wake up the apps I left on standby.", "track": "SYSTEM_COMMAND", "intent": "wake_apps", "source": "llm"}
+{"utterance": "Resume the frozen apps, please.", "track": "SYSTEM_COMMAND", "intent": "wake_apps", "source": "llm"}
+{"utterance": "Hey computer, restart my paused apps, will you?", "track": "SYSTEM_COMMAND", "intent": "wake_apps", "source": "llm"}
+{"utterance": "I need my frozen apps to start working again.", "track": "SYSTEM_COMMAND", "intent": "wake_apps", "source": "llm"}
+{"utterance": "Could you unfreeze my apps for me?", "track": "SYSTEM_COMMAND", "intent": "wake_apps", "source": "llm"}
+{"utterance": "Wake up my apps that are stuck in a frozen state.", "track": "SYSTEM_COMMAND", "intent": "wake_apps", "source": "llm"}
+{"utterance": "Bring those frozen apps back to life, please.", "track": "SYSTEM_COMMAND", "intent": "wake_apps", "source": "llm"}
+{"utterance": "Resume those frozen apps, I really need them.", "track": "SYSTEM_COMMAND", "intent": "wake_apps", "source": "llm"}
+{"utterance": "I was using my apps and now they're frozen. Can you unfreeze them?", "track": "SYSTEM_COMMAND", "intent": "wake_apps", "source": "llm"}
+{"utterance": "Hey buddy, can you unfreeze my apps?", "track": "SYSTEM_COMMAND", "intent": "wake_apps", "source": "llm"}
+{"utterance": "Unfreeze the apps for me, please.", "track": "SYSTEM_COMMAND", "intent": "wake_apps", "source": "llm"}
+{"utterance": "Resume work for my frozen apps.", "track": "SYSTEM_COMMAND", "intent": "wake_apps", "source": "llm"}
+{"utterance": "I need help restarting my paused apps.", "track": "SYSTEM_COMMAND", "intent": "wake_apps", "source": "llm"}
+{"utterance": "Hey computer, please reactivate my frozen apps.", "track": "SYSTEM_COMMAND", "intent": "wake_apps", "source": "llm"}
+{"utterance": "Could you help me wake up these frozen apps?", "track": "SYSTEM_COMMAND", "intent": "wake_apps", "source": "llm"}
+{"utterance": "Resume frozen apps, I'm counting on you.", "track": "SYSTEM_COMMAND", "intent": "wake_apps", "source": "llm"}
+{"utterance": "I need my apps to wake up from the frozen state.", "track": "SYSTEM_COMMAND", "intent": "wake_apps", "source": "llm"}
+{"utterance": "Please reactivate my frozen apps.", "track": "SYSTEM_COMMAND", "intent": "wake_apps", "source": "llm"}
+{"utterance": "Clean up my computer files, please.", "track": "SYSTEM_COMMAND", "intent": "clean_storage", "source": "llm"}
+{"utterance": "Hey there, could you tidy up my storage?", "track": "SYSTEM_COMMAND", "intent": "clean_storage", "source": "llm"}
+{"utterance": "Could you help me empty the trash?", "track": "SYSTEM_COMMAND", "intent": "clean_storage", "source": "llm"}
+{"utterance": "Clear the caches on my device, if you don't mind.", "track": "SYSTEM_COMMAND", "intent": "clean_storage", "source": "llm"}
+{"utterance": "I need help with cleaning up some digital clutter.", "track": "SYSTEM_COMMAND", "intent": "clean_storage", "source": "llm"}
+{"utterance": "May I ask you to delete the temporary files?", "track": "SYSTEM_COMMAND", "intent": "clean_storage", "source": "llm"}
+{"utterance": "Purge my storage, would you?", "track": "SYSTEM_COMMAND", "intent": "clean_storage", "source": "llm"}
+{"utterance": "Help me sort through the junk files.", "track": "SYSTEM_COMMAND", "intent": "clean_storage", "source": "llm"}
+{"utterance": "Just nudge me to empty the recycle bin.", "track": "SYSTEM_COMMAND", "intent": "clean_storage", "source": "llm"}
+{"utterance": "Clean up the mess, I guess.", "track": "SYSTEM_COMMAND", "intent": "clean_storage", "source": "llm"}
+{"utterance": "Got any tricks to declutter my PC?", "track": "SYSTEM_COMMAND", "intent": "clean_storage", "source": "llm"}
+{"utterance": "Show me how to tidy up my computer.", "track": "SYSTEM_COMMAND", "intent": "clean_storage", "source": "llm"}
+{"utterance": "Time to clean out my digital space, yeah?", "track": "SYSTEM_COMMAND", "intent": "clean_storage", "source": "llm"}
+{"utterance": "Assist in getting rid of the redundant files.", "track": "SYSTEM_COMMAND", "intent": "clean_storage", "source": "llm"}
+{"utterance": "Please assist with my computer cleaning.", "track": "SYSTEM_COMMAND", "intent": "clean_storage", "source": "llm"}
+{"utterance": "Can you sweep through my hard drive?", "track": "SYSTEM_COMMAND", "intent": "clean_storage", "source": "llm"}
+{"utterance": "Help me empty my computer trash can.", "track": "SYSTEM_COMMAND", "intent": "clean_storage", "source": "llm"}
+{"utterance": "Tell me how to empty my computer's recycle bin.", "track": "SYSTEM_COMMAND", "intent": "clean_storage", "source": "llm"}
+{"utterance": "Let's get rid of those temporary files, shall we?", "track": "SYSTEM_COMMAND", "intent": "clean_storage", "source": "llm"}
+{"utterance": "Hey Siri, my internet is slow. Can you help me reset my network?", "track": "SYSTEM_COMMAND", "intent": "fix_network", "source": "llm"}
+{"utterance": "Alexa, why is my internet so sluggish? I need to restart my Wi-Fi router, please.", "track": "SYSTEM_COMMAND", "intent": "fix_network", "source": "llm"}
+{"utterance": "Okay Google, my connection is dragging. Reset the network settings for me.", "track": "SYSTEM_COMMAND", "intent": "fix_network", "source": "llm"}
+{"utterance": "Hey, I need some assistance with my laggy internet. Can you reset the network?", "track": "SYSTEM_COMMAND", "intent": "fix_network", "source": "llm"}
+{"utterance": "Can you reset my Wi-Fi settings? My internet feels extremely slow.", "track": "SYSTEM_COMMAND", "intent": "fix_network", "source": "llm"}
+{"utterance": "Hey Cortana, my internet isn't working right. A reset would be great.", "track": "SYSTEM_COMMAND", "intent": "fix_network", "source": "llm"}
+{"utterance": "AI buddy, my internet is crawling. Reset the network, will you?", "track": "SYSTEM_COMMAND", "intent": "fix_network", "source": "llm"}
+{"utterance": "Hello, I've got a slow internet connection. How do I reset the network?", "track": "SYSTEM_COMMAND", "intent": "fix_network", "source": "llm"}
+{"utterance": "Hey, the internet's sluggish. Could you reset my Wi-Fi settings, please?", "track": "SYSTEM_COMMAND", "intent": "fix_network", "source": "llm"}
+{"utterance": "Can you help me reset the network? My internet is painfully slow.", "track": "SYSTEM_COMMAND", "intent": "fix_network", "source": "llm"}
+{"utterance": "Hey there, my Wi-Fi is acting up. A reset sounds good.", "track": "SYSTEM_COMMAND", "intent": "fix_network", "source": "llm"}
+{"utterance": "My internet feels like molasses. Resetting the network should help, right?", "track": "SYSTEM_COMMAND", "intent": "fix_network", "source": "llm"}
+{"utterance": "Alexa, my internet is just slow. Resetting the network is what I want.", "track": "SYSTEM_COMMAND", "intent": "fix_network", "source": "llm"}
+{"utterance": "I need help fixing my sluggish internet. A reset of the network would do the trick.", "track": "SYSTEM_COMMAND", "intent": "fix_network", "source": "llm"}
+{"utterance": "Hey Siri, reset my internet settings? My connection is lagging.", "track": "SYSTEM_COMMAND", "intent": "fix_network", "source": "llm"}
+{"utterance": "Can you reset the Wi-Fi network? I'm dealing with slow internet speed.", "track": "SYSTEM_COMMAND", "intent": "fix_network", "source": "llm"}
+{"utterance": "Hey, I'm facing issues with my slow internet. Reset the network, please.", "track": "SYSTEM_COMMAND", "intent": "fix_network", "source": "llm"}
+{"utterance": "Set a 10-second timer for me, please.", "track": "SYSTEM_COMMAND", "intent": "timer", "source": "llm"}
+{"utterance": "How long should I wait before starting a task?", "track": "SYSTEM_COMMAND", "intent": "timer", "source": "llm"}
+{"utterance": "I need a timer for 20 seconds, can you set that up quickly?", "track": "SYSTEM_COMMAND", "intent": "timer", "source": "llm"}
+{"utterance": "Could you please count down from 15 seconds?", "track": "SYSTEM_COMMAND", "intent": "timer", "source": "llm"}
+{"utterance": "Initiate a countdown timer for 30 seconds, if you don't mind.", "track": "SYSTEM_COMMAND", "intent": "timer", "source": "llm"}
+{"utterance": "I want to set a 45-second countdown, how do I do that?", "track": "SYSTEM_COMMAND", "intent": "timer", "source": "llm"}
+{"utterance": "Set a brief timer of 5 seconds, thanks.", "track": "SYSTEM_COMMAND", "intent": "timer", "source": "llm"}
+{"utterance": "Can we start a 2-second timer together?", "track": "SYSTEM_COMMAND", "intent": "timer", "source": "llm"}
+{"utterance": "Time to start a quick timer; make it 12 seconds long.", "track": "SYSTEM_COMMAND", "intent": "timer", "source": "llm"}
+{"utterance": "I'd like to count down 20 seconds, could you help me with that?", "track": "SYSTEM_COMMAND", "intent": "timer", "source": "llm"}
+{"utterance": "Help me set a timer for 25 seconds, would you?", "track": "SYSTEM_COMMAND", "intent": "timer", "source": "llm"}
+{"utterance": "Give me 10 seconds to finish my work.", "track": "SYSTEM_COMMAND", "intent": "timer", "source": "llm"}
+{"utterance": "Start a countdown timer for a quick task, make it 8 seconds long.", "track": "SYSTEM_COMMAND", "intent": "timer", "source": "llm"}
+{"utterance": "Set a timer for 20 seconds, please.", "track": "SYSTEM_COMMAND", "intent": "timer", "source": "llm"}
+{"utterance": "Could we initiate a timer for 15 seconds?", "track": "SYSTEM_COMMAND", "intent": "timer", "source": "llm"}
+{"utterance": "Time to start a timer for a moment, let's make it 30 seconds long.", "track": "SYSTEM_COMMAND", "intent": "timer", "source": "llm"}
+{"utterance": "I want to time something for 12 seconds, can we set that up?", "track": "SYSTEM_COMMAND", "intent": "timer", "source": "llm"}
+{"utterance": "Please help me with setting a timer for 20 seconds, I'm ready to start.", "track": "SYSTEM_COMMAND", "intent": "timer", "source": "llm"}
+{"utterance": "I need a timer to track 15 seconds, can you set that for me?", "track": "SYSTEM_COMMAND", "intent": "timer", "source": "llm"}
+{"utterance": "Stop the timer please", "track": "SYSTEM_COMMAND", "intent": "stop_timer", "source": "llm"}
+{"utterance": "Cancel the timer, I've finished", "track": "SYSTEM_COMMAND", "intent": "stop_timer", "source": "llm"}
+{"utterance": "End timer now, I'm done with this", "track": "SYSTEM_COMMAND", "intent": "stop_timer", "source": "llm"}
+{"utterance": "Omit the timer, I'm finished", "track": "SYSTEM_COMMAND", "intent": "stop_timer", "source": "llm"}
+{"utterance": "Time's up, stop counting", "track": "SYSTEM_COMMAND", "intent": "stop_timer", "source": "llm"}
+{"utterance": "Shut off the timer, it's unnecessary", "track": "SYSTEM_COMMAND", "intent": "stop_timer", "source": "llm"}
+{"utterance": "Timer, please end", "track": "SYSTEM_COMMAND", "intent": "stop_timer", "source": "llm"}
+{"utterance": "Could we pause the timer, I've reached my goal", "track": "SYSTEM_COMMAND", "intent": "stop_timer", "source": "llm"}
+{"utterance": "Cancel this counting, I've completed the task", "track": "SYSTEM_COMMAND", "intent": "stop_timer", "source": "llm"}
+{"utterance": "Turn off the timer, I'm finished", "track": "SYSTEM_COMMAND", "intent": "stop_timer", "source": "llm"}
+{"utterance": "Stop the countdown, I've achieved my goal", "track": "SYSTEM_COMMAND", "intent": "stop_timer", "source": "llm"}
+{"utterance": "Cancel this ticking, I've got it done", "track": "SYSTEM_COMMAND", "intent": "stop_timer", "source": "llm"}
+{"utterance": "Discontinue timer, I'm done here", "track": "SYSTEM_COMMAND", "intent": "stop_timer", "source": "llm"}
+{"utterance": "Eliminate the timer, I'm finished", "track": "SYSTEM_COMMAND", "intent": "stop_timer", "source": "llm"}
+{"utterance": "Stop counting time, I've reached my target", "track": "SYSTEM_COMMAND", "intent": "stop_timer", "source": "llm"}
+{"utterance": "End the timer, it's not needed anymore", "track": "SYSTEM_COMMAND", "intent": "stop_timer", "source": "llm"}
+{"utterance": "Cancel the timer, I've finished with it", "track": "SYSTEM_COMMAND", "intent": "stop_timer", "source": "llm"}
+{"utterance": "Omit the timer, I've completed my task", "track": "SYSTEM_COMMAND", "intent": "stop_timer", "source": "llm"}
+{"utterance": "Disable the timer, I've reached my goal", "track": "SYSTEM_COMMAND", "intent": "stop_timer", "source": "llm"}
+{"utterance": "Hey, remind me to call my mom tomorrow at 4 PM.", "track": "SYSTEM_COMMAND", "intent": "reminder", "source": "llm"}
+{"utterance": "I want a reminder to water the plants on Tuesday.", "track": "SYSTEM_COMMAND", "intent": "reminder", "source": "llm"}
+{"utterance": "Don't forget to take my vitamins at 8 AM daily.", "track": "SYSTEM_COMMAND", "intent": "reminder", "source": "llm"}
+{"utterance": "Set a reminder to go grocery shopping.", "track": "SYSTEM_COMMAND", "intent": "reminder", "source": "llm"}
+{"utterance": "Could you remind me to submit my report by Friday?", "track": "SYSTEM_COMMAND", "intent": "reminder", "source": "llm"}
+{"utterance": "Please remind me to call John next week.", "track": "SYSTEM_COMMAND", "intent": "reminder", "source": "llm"}
+{"utterance": "Hey there, set a reminder for my dentist appointment this Thursday.", "track": "SYSTEM_COMMAND", "intent": "reminder", "source": "llm"}
+{"utterance": "I'd like a reminder to check my emails after lunch.", "track": "SYSTEM_COMMAND", "intent": "reminder", "source": "llm"}
+{"utterance": "Could you remind me to renew my passport in 6 months?", "track": "SYSTEM_COMMAND", "intent": "reminder", "source": "llm"}
+{"utterance": "Set a reminder to call my friend Sarah tonight.", "track": "SYSTEM_COMMAND", "intent": "reminder", "source": "llm"}
+{"utterance": "Hey, I need to be reminded to do yoga every morning.", "track": "SYSTEM_COMMAND", "intent": "reminder", "source": "llm"}
+{"utterance": "Could you remind me to pay the rent on the 1st of each month?", "track": "SYSTEM_COMMAND", "intent": "reminder", "source": "llm"}
+{"utterance": "Set a reminder to get a haircut next weekend.", "track": "SYSTEM_COMMAND", "intent": "reminder", "source": "llm"}
+{"utterance": "Hey, remind me to stop by the pharmacy tomorrow.", "track": "SYSTEM_COMMAND", "intent": "reminder", "source": "llm"}
+{"utterance": "I need a reminder to watch my favorite TV show tonight.", "track": "SYSTEM_COMMAND", "intent": "reminder", "source": "llm"}
+{"utterance": "Could you remind me to drop off my car at the mechanic's shop this Friday?", "track": "SYSTEM_COMMAND", "intent": "reminder", "source": "llm"}
+{"utterance": "Show me my calendar.", "track": "SYSTEM_COMMAND", "intent": "calendar", "source": "llm"}
+{"utterance": "Can you display my schedule for today?", "track": "SYSTEM_COMMAND", "intent": "calendar", "source": "llm"}
+{"utterance": "What's the date for next Friday?", "track": "SYSTEM_COMMAND", "intent": "calendar", "source": "llm"}
+{"utterance": "Hey, could you pull up my upcoming events?", "track": "SYSTEM_COMMAND", "intent": "calendar", "source": "llm"}
+{"utterance": "I need to see my calendar, please.", "track": "SYSTEM_COMMAND", "intent": "calendar", "source": "llm"}
+{"utterance": "Could you check my appointments for this week?", "track": "SYSTEM_COMMAND", "intent": "calendar", "source": "llm"}
+{"utterance": "Calendar, open.", "track": "SYSTEM_COMMAND", "intent": "calendar", "source": "llm"}
+{"utterance": "Hey AI, show me today's date.", "track": "SYSTEM_COMMAND", "intent": "calendar", "source": "llm"}
+{"utterance": "Is my calendar showing up?", "track": "SYSTEM_COMMAND", "intent": "calendar", "source": "llm"}
+{"utterance": "What are my bookings for tomorrow?", "track": "SYSTEM_COMMAND", "intent": "calendar", "source": "llm"}
+{"utterance": "Hey, can you open up my calendar?", "track": "SYSTEM_COMMAND", "intent": "calendar", "source": "llm"}
+{"utterance": "I want to see my calendar for next month.", "track": "SYSTEM_COMMAND", "intent": "calendar", "source": "llm"}
+{"utterance": "Hey there, what's my schedule looking like?", "track": "SYSTEM_COMMAND", "intent": "calendar", "source": "llm"}
+{"utterance": "Could you let me see my calendar?", "track": "SYSTEM_COMMAND", "intent": "calendar", "source": "llm"}
+{"utterance": "Open my calendar, would you?", "track": "SYSTEM_COMMAND", "intent": "calendar", "source": "llm"}
+{"utterance": "Hey AI, could you show me today's date?", "track": "SYSTEM_COMMAND", "intent": "calendar", "source": "llm"}
+{"utterance": "I just need to see when I've got stuff planned.", "track": "SYSTEM_COMMAND", "intent": "calendar", "source": "llm"}
+{"utterance": "Hey, can I look at my calendar?", "track": "SYSTEM_COMMAND", "intent": "calendar", "source": "llm"}
+{"utterance": "Schedule a meeting called 'Project Kickoff' on March 15th at 10 AM.", "track": "SYSTEM_COMMAND", "intent": "schedule_event", "source": "llm"}
+{"utterance": "Add an event for 'Doctor's Appointment' on Thursday next week at 3 PM.", "track": "SYSTEM_COMMAND", "intent": "schedule_event", "source": "llm"}
+{"utterance": "Can we book 'Team Sync-up' in my calendar for April 5th at 2 PM?", "track": "SYSTEM_COMMAND", "intent": "schedule_event", "source": "llm"}
+{"utterance": "I want to set a 'Yoga Class' reminder for tomorrow morning.", "track": "SYSTEM_COMMAND", "intent": "schedule_event", "source": "llm"}
+{"utterance": "Help me arrange 'Interview with Jane Doe' for next Monday at 9 AM.", "track": "SYSTEM_COMMAND", "intent": "schedule_event", "source": "llm"}
+{"utterance": "Set a reminder for 'Dentist Appointment' on February 20th at 11 AM.", "track": "SYSTEM_COMMAND", "intent": "schedule_event", "source": "llm"}
+{"utterance": "Create an event 'Project Review' on March 10th at 4 PM in my calendar.", "track": "SYSTEM_COMMAND", "intent": "schedule_event", "source": "llm"}
+{"utterance": "Could you help me book 'Lunch with Tom' for this Friday at 12 PM?", "track": "SYSTEM_COMMAND", "intent": "schedule_event", "source": "llm"}
+{"utterance": "Put 'Conference Call' on my calendar for April 18th at 1 PM.", "track": "SYSTEM_COMMAND", "intent": "schedule_event", "source": "llm"}
+{"utterance": "Add 'Dinner Reservation' for April 25th at 7 PM to my calendar.", "track": "SYSTEM_COMMAND", "intent": "schedule_event", "source": "llm"}
+{"utterance": "Schedule 'Client Meeting' for May 1st at 9 AM in my calendar.", "track": "SYSTEM_COMMAND", "intent": "schedule_event", "source": "llm"}
+{"utterance": "I need to add 'Gym Session' to my calendar for Tuesday, March 29th at 7 AM.", "track": "SYSTEM_COMMAND", "intent": "schedule_event", "source": "llm"}
+{"utterance": "Let's get 'Webinar Registration' done for April 3rd at 6 PM.", "track": "SYSTEM_COMMAND", "intent": "schedule_event", "source": "llm"}
+{"utterance": "Remind me to 'Doctor Appointment' tomorrow at 10 AM.", "track": "SYSTEM_COMMAND", "intent": "schedule_event", "source": "llm"}
+{"utterance": "Book 'Conference' in my calendar for June 12th at 9 AM, please.", "track": "SYSTEM_COMMAND", "intent": "schedule_event", "source": "llm"}
+{"utterance": "Help me pencil in 'Coffee with Sarah' for next Wednesday at 10 AM.", "track": "SYSTEM_COMMAND", "intent": "schedule_event", "source": "llm"}
+{"utterance": "Set 'Lunch with Mike' on my calendar for March 22nd at 1 PM.", "track": "SYSTEM_COMMAND", "intent": "schedule_event", "source": "llm"}
+{"utterance": "Add an appointment called 'Dental Checkup' for April 5th at 3 PM.", "track": "SYSTEM_COMMAND", "intent": "schedule_event", "source": "llm"}
+{"utterance": "Let's set 'Team-building Activity' for April 20th at 5 PM in my calendar.", "track": "SYSTEM_COMMAND", "intent": "schedule_event", "source": "llm"}
+{"utterance": "What is 12 divided by 4?", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "Can you calculate 7 multiplied by 6 for me?", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "How much is 15 plus 29?", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "Give me the result of 42 minus 19.", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "Tell me the sum of 100 and 200.", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "I need the answer to 34 multiplied by 5.", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "Could you compute the total of 50, 75, and 125?", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "What's 123 divided by 3?", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "Show me the result when you multiply 8 by 9.", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "Find out what 21 plus 37 equals.", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "I'm looking for 56 minus 13.", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "Help me figure out the sum of 47 and 68.", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "Please calculate the product of 23 and 4.", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "I want to know the result of adding 99 and 101.", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "Work out 85 minus 32 for me.", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "Can you tell me what 14 plus 89 equals?", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "I need the result of dividing 144 by 12.", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "Could you help me add up 34, 67, and 89?", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "What's 56 divided by 8?", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "Tell me the sum of 23, 19, and 31.", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "I need the product of 9 times 12.", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "Calculate 50 plus 150.", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "Show me the result of dividing 123 by 5.", "track": "SYSTEM_COMMAND", "intent": "calculator", "source": "llm"}
+{"utterance": "What's the weather like today?", "track": "SYSTEM_COMMAND", "intent": "weather", "source": "llm"}
+{"utterance": "Can you tell me the forecast for now?", "track": "SYSTEM_COMMAND", "intent": "weather", "source": "llm"}
+{"utterance": "Give me the weather update, please.", "track": "SYSTEM_COMMAND", "intent": "weather", "source": "llm"}
+{"utterance": "Hey, what's the current weather?", "track": "SYSTEM_COMMAND", "intent": "weather", "source": "llm"}
+{"utterance": "Is it raining outside right now?", "track": "SYSTEM_COMMAND", "intent": "weather", "source": "llm"}
+{"utterance": "Show me the weather on my phone, will you?", "track": "SYSTEM_COMMAND", "intent": "weather", "source": "llm"}
+{"utterance": "Tell me if it's sunny or rainy.", "track": "SYSTEM_COMMAND", "intent": "weather", "source": "llm"}
+{"utterance": "Hey Siri, what's the weather looking like?", "track": "SYSTEM_COMMAND", "intent": "weather", "source": "llm"}
+{"utterance": "Do you know if it's going to be sunny today?", "track": "SYSTEM_COMMAND", "intent": "weather", "source": "llm"}
+{"utterance": "Hey Google, can you check the weather for me?", "track": "SYSTEM_COMMAND", "intent": "weather", "source": "llm"}
+{"utterance": "Is it hot or cold outside?", "track": "SYSTEM_COMMAND", "intent": "weather", "source": "llm"}
+{"utterance": "Show me the weather app, please.", "track": "SYSTEM_COMMAND", "intent": "weather", "source": "llm"}
+{"utterance": "Hey, tell me if it's snowing or just drizzling outside.", "track": "SYSTEM_COMMAND", "intent": "weather", "source": "llm"}
+{"utterance": "Could you give me a weather update for tomorrow?", "track": "SYSTEM_COMMAND", "intent": "weather", "source": "llm"}
+{"utterance": "Hey, what's the forecast for the weekend?", "track": "SYSTEM_COMMAND", "intent": "weather", "source": "llm"}
+{"utterance": "Is it windy outside right now?", "track": "SYSTEM_COMMAND", "intent": "weather", "source": "llm"}
+{"utterance": "Show me the weather forecast for the next 7 days.", "track": "SYSTEM_COMMAND", "intent": "weather", "source": "llm"}
+{"utterance": "Find information on renewable energy sources.", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "Google the latest Mars rover images.", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "Search for recipes with avocado and eggs.", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "Check the weather forecast for Tokyo tomorrow.", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "Look up the best running shoes for trail running.", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "What's the capital of Norway?", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "Find me articles about the benefits of meditation.", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "Can you search for vegan chocolate cake recipes?", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "Tell me more about the Eiffel Tower.", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "Search for the most popular video game this year.", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "Find out the current exchange rate between USD and EUR.", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "Search for the top-rated sushi restaurants in Los Angeles.", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "Show me YouTube videos about underwater photography.", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "Search for the tallest building in the world.", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "Find the lyrics for 'Bohemian Rhapsody' by Queen.", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "Search for the most famous landmarks in Paris.", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "Look up information on the history of the Roman Empire.", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "Search for the best coffee shops near me.", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "Tell me the current top news stories.", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "Search for how to start a vegetable garden at home.", "track": "SYSTEM_COMMAND", "intent": "search_web", "source": "llm"}
+{"utterance": "Open a note-taking app, please.", "track": "SYSTEM_COMMAND", "intent": "scratchpad", "source": "llm"}
+{"utterance": "Can you open a blank document for me?", "track": "SYSTEM_COMMAND", "intent": "scratchpad", "source": "llm"}
+{"utterance": "I need a place to jot down notes.", "track": "SYSTEM_COMMAND", "intent": "scratchpad", "source": "llm"}
+{"utterance": "Hey, give me a notepad window.", "track": "SYSTEM_COMMAND", "intent": "scratchpad", "source": "llm"}
+{"utterance": "Show me a writing pad.", "track": "SYSTEM_COMMAND", "intent": "scratchpad", "source": "llm"}
+{"utterance": "Let's start a new note-taking session.", "track": "SYSTEM_COMMAND", "intent": "scratchpad", "source": "llm"}
+{"utterance": "I'd like to create a note-taking page.", "track": "SYSTEM_COMMAND", "intent": "scratchpad", "source": "llm"}
+{"utterance": "Open up a note-taking app, thanks.", "track": "SYSTEM_COMMAND", "intent": "scratchpad", "source": "llm"}
+{"utterance": "Is there a way to jot down something quick?", "track": "SYSTEM_COMMAND", "intent": "scratchpad", "source": "llm"}
+{"utterance": "Could you bring up a notepad for me?", "track": "SYSTEM_COMMAND", "intent": "scratchpad", "source": "llm"}
+{"utterance": "Grab a blank page for me to write on.", "track": "SYSTEM_COMMAND", "intent": "scratchpad", "source": "llm"}
+{"utterance": "I want to write some quick notes.", "track": "SYSTEM_COMMAND", "intent": "scratchpad", "source": "llm"}
+{"utterance": "Can you open a note-taking app for me?", "track": "SYSTEM_COMMAND", "intent": "scratchpad", "source": "llm"}
+{"utterance": "I need to take a few notes right now.", "track": "SYSTEM_COMMAND", "intent": "scratchpad", "source": "llm"}
+{"utterance": "Open up a writing space, please.", "track": "SYSTEM_COMMAND", "intent": "scratchpad", "source": "llm"}
+{"utterance": "Can you help me with a notepad?", "track": "SYSTEM_COMMAND", "intent": "scratchpad", "source": "llm"}
+{"utterance": "I want to open a note-taking app to jot down ideas.", "track": "SYSTEM_COMMAND", "intent": "scratchpad", "source": "llm"}
+{"utterance": "Display my notes", "track": "SYSTEM_COMMAND", "intent": "list_notes", "source": "llm"}
+{"utterance": "Can you show me all my notes?", "track": "SYSTEM_COMMAND", "intent": "list_notes", "source": "llm"}
+{"utterance": "I want to see my notes!", "track": "SYSTEM_COMMAND", "intent": "list_notes", "source": "llm"}
+{"utterance": "Please open up my notes.", "track": "SYSTEM_COMMAND", "intent": "list_notes", "source": "llm"}
+{"utterance": "Fetch my notes for me.", "track": "SYSTEM_COMMAND", "intent": "list_notes", "source": "llm"}
+{"utterance": "What do I have in my notes?", "track": "SYSTEM_COMMAND", "intent": "list_notes", "source": "llm"}
+{"utterance": "Hey, show me what I've jotted down.", "track": "SYSTEM_COMMAND", "intent": "list_notes", "source": "llm"}
+{"utterance": "Open my collection of notes.", "track": "SYSTEM_COMMAND", "intent": "list_notes", "source": "llm"}
+{"utterance": "I need to see what I wrote in my notes.", "track": "SYSTEM_COMMAND", "intent": "list_notes", "source": "llm"}
+{"utterance": "Show me my digital notes, please.", "track": "SYSTEM_COMMAND", "intent": "list_notes", "source": "llm"}
+{"utterance": "I want to revisit all my written notes.", "track": "SYSTEM_COMMAND", "intent": "list_notes", "source": "llm"}
+{"utterance": "Display my notes collection.", "track": "SYSTEM_COMMAND", "intent": "list_notes", "source": "llm"}
+{"utterance": "Could you pull up my notes?", "track": "SYSTEM_COMMAND", "intent": "list_notes", "source": "llm"}
+{"utterance": "Let's see what I've scribbled down.", "track": "SYSTEM_COMMAND", "intent": "list_notes", "source": "llm"}
+{"utterance": "I’d like to look through my notes.", "track": "SYSTEM_COMMAND", "intent": "list_notes", "source": "llm"}
+{"utterance": "I want to see my notes folder.", "track": "SYSTEM_COMMAND", "intent": "list_notes", "source": "llm"}
+{"utterance": "Retrieve my notes, please.", "track": "SYSTEM_COMMAND", "intent": "list_notes", "source": "llm"}
+{"utterance": "Can you pull up the note titled 'Summer Vacation Plans'?", "track": "SYSTEM_COMMAND", "intent": "view_note", "source": "llm"}
+{"utterance": "Show me the document named 'Budget Report'.", "track": "SYSTEM_COMMAND", "intent": "view_note", "source": "llm"}
+{"utterance": "Hey, I need to see the note with 'Project Ideas' in the title.", "track": "SYSTEM_COMMAND", "intent": "view_note", "source": "llm"}
+{"utterance": "I'm looking for 'Workout Routine' note. Could you display it?", "track": "SYSTEM_COMMAND", "intent": "view_note", "source": "llm"}
+{"utterance": "Find me the 'Grocery List' note, please.", "track": "SYSTEM_COMMAND", "intent": "view_note", "source": "llm"}
+{"utterance": "Bring up the 'Vacation Destinations' note on my screen.", "track": "SYSTEM_COMMAND", "intent": "view_note", "source": "llm"}
+{"utterance": "I want to read the note called 'Family Photos'.", "track": "SYSTEM_COMMAND", "intent": "view_note", "source": "llm"}
+{"utterance": "Could you show me the 'Meeting Notes' document?", "track": "SYSTEM_COMMAND", "intent": "view_note", "source": "llm"}
+{"utterance": "Play the 'Meditation Session' video for me.", "track": "SYSTEM_COMMAND", "intent": "view_note", "source": "llm"}
+{"utterance": "Bring up the 'Travel Itinerary' note.", "track": "SYSTEM_COMMAND", "intent": "view_note", "source": "llm"}
+{"utterance": "Can we see the 'Recipe Collection' note?", "track": "SYSTEM_COMMAND", "intent": "view_note", "source": "llm"}
+{"utterance": "I need to view the 'Daily Goals' note.", "track": "SYSTEM_COMMAND", "intent": "view_note", "source": "llm"}
+{"utterance": "Can you pull up the note 'Workout Tips'? Thanks!", "track": "SYSTEM_COMMAND", "intent": "view_note", "source": "llm"}
+{"utterance": "I forgot where I saved 'Budget Plan 2023'.", "track": "SYSTEM_COMMAND", "intent": "view_note", "source": "llm"}
+{"utterance": "Show me the 'Weekly Schedule'.", "track": "SYSTEM_COMMAND", "intent": "view_note", "source": "llm"}
+{"utterance": "I want to review the 'Household Expenses' note.", "track": "SYSTEM_COMMAND", "intent": "view_note", "source": "llm"}
+{"utterance": "Hey computer, display the 'Fitness Tracker' note, will you?", "track": "SYSTEM_COMMAND", "intent": "view_note", "source": "llm"}
+{"utterance": "Find and open the note 'Gardening Ideas'.", "track": "SYSTEM_COMMAND", "intent": "view_note", "source": "llm"}
+{"utterance": "I'm curious to see the 'Vacation Packing List'.", "track": "SYSTEM_COMMAND", "intent": "view_note", "source": "llm"}
+{"utterance": "Can you help me delete the note titled 'Grocery List', please?", "track": "SYSTEM_COMMAND", "intent": "delete_note", "source": "llm"}
+{"utterance": "I need to remove 'Vacation Plans' from my notes.", "track": "SYSTEM_COMMAND", "intent": "delete_note", "source": "llm"}
+{"utterance": "Delete the note with the title 'Workout Routine'.", "track": "SYSTEM_COMMAND", "intent": "delete_note", "source": "llm"}
+{"utterance": "Could you get rid of the 'Project Ideas' note for me?", "track": "SYSTEM_COMMAND", "intent": "delete_note", "source": "llm"}
+{"utterance": "Hey, I've got this note 'Meditation Practices' that I want gone.", "track": "SYSTEM_COMMAND", "intent": "delete_note", "source": "llm"}
+{"utterance": "Please remove the note titled 'Birthday Reminders'.", "track": "SYSTEM_COMMAND", "intent": "delete_note", "source": "llm"}
+{"utterance": "I'm looking to delete the note 'Book Review'.", "track": "SYSTEM_COMMAND", "intent": "delete_note", "source": "llm"}
+{"utterance": "Remove the note called 'Budget Plan' from my files, yeah?", "track": "SYSTEM_COMMAND", "intent": "delete_note", "source": "llm"}
+{"utterance": "I want to delete the note named 'Daily Tasks'.", "track": "SYSTEM_COMMAND", "intent": "delete_note", "source": "llm"}
+{"utterance": "Help me erase the note 'Healthy Recipes' from my collection.", "track": "SYSTEM_COMMAND", "intent": "delete_note", "source": "llm"}
+{"utterance": "Excuse me, could you delete 'Travel Itinerary'?", "track": "SYSTEM_COMMAND", "intent": "delete_note", "source": "llm"}
+{"utterance": "I need to get rid of this note 'Family Photos'.", "track": "SYSTEM_COMMAND", "intent": "delete_note", "source": "llm"}
+{"utterance": "Hey bot, let's remove the note 'Cooking Tips'.", "track": "SYSTEM_COMMAND", "intent": "delete_note", "source": "llm"}
+{"utterance": "Please help me delete the 'New Year's Resolutions' note.", "track": "SYSTEM_COMMAND", "intent": "delete_note", "source": "llm"}
+{"utterance": "I'm thinking of removing the note 'Fitness Tracker' - you can do this, right?", "track": "SYSTEM_COMMAND", "intent": "delete_note", "source": "llm"}
+{"utterance": "Could you delete the note 'Meeting Agenda' for me?", "track": "SYSTEM_COMMAND", "intent": "delete_note", "source": "llm"}
+{"utterance": "Find anything with 'important meeting' in my notes.", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "Show me my notes mentioning 'birthday gift'!", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "I want to search for 'conference call' in my documents.", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "Can you dig up any records of 'vacation plans'?", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "Search my files for the term 'project deadline'.", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "Hey there, I'm looking for 'team lunch' notes.", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "Locate all my notes that say 'urgent' or 'priority'.", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "I'm trying to recall any mentions of 'budget report'.", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "Help me find 'client feedback' from my notes.", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "Could you look for 'tax deadline' in my notes?", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "I need to find anything related to 'software update'.", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "Search for 'client meeting' in my notes.", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "I forgot to save this, search for 'client briefing'.", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "I want to find all the 'expense receipts' I have saved.", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "Show me notes with 'project name'.", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "Hey, can you search through my notes for 'client emails'?", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "I'm looking for notes labeled 'client onboarding'.", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "Help me retrieve notes with 'client contract'.", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "I can't remember if I wrote this down; search for 'client meeting notes'.", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "Find me anything with 'client feedback' in my notes.", "track": "SYSTEM_COMMAND", "intent": "search_notes", "source": "llm"}
+{"utterance": "Hey there, what's up?", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Can you help me out?", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Good morning, I'd like some coffee.", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Hello, can you turn on the lights?", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Hi, play some music, please.", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Greetings, I need to search for a recipe.", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Hello, can you remind me to call John?", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Hey, I need to book a flight.", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Hi there, I'm feeling bored, any suggestions?", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Hello, how's the weather today?", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Hi, I'm feeling down, can we chat for a bit?", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Hey, can I get a quick workout video?", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Hello, I'm feeling lonely, what's happening around here?", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Hey, can you set a timer for 10 minutes?", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Hello, I'm trying to learn Spanish, can you help?", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Hi, could you send me the latest news update?", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Hello, can you update my calendar?", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Hey, I need to change my Wi-Fi password.", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Hi, I need help with my homework.", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Hello, can you tell me a joke?", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Hey, I'm feeling adventurous, what are you doing?", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Hello, I'm feeling overwhelmed, can you help me organize my tasks?", "track": "SYSTEM_COMMAND", "intent": "greeting", "source": "llm"}
+{"utterance": "Can you tell me what you can do?", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "How can I make use of this assistant?", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "What features does this AI have?", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "Show me the ways to interact with you.", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "Explain how to communicate with you.", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "Give me the rundown on how to get things done with you.", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "What's the protocol for engaging with this AI?", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "Tell me the instructions for using you.", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "What's the procedure for asking questions to you?", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "Hey, can you give me the rundown on how to use your stuff?", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "I wanna know how to talk to this machine.", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "Could you enlighten me on how to utilize this AI?", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "Teach me how to work with this assistant, please.", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "Hey, I'm new to this. How do I use you?", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "Give me the lowdown on how to tap into your powers.", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "I'm lost in tech terms. Help me out with using you correctly.", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "Just guide me through the basic steps of using you.", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "Explain like I'm five how I can get things done with this AI.", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "Lay out the steps for me to start communicating with you.", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "I need the cheat sheet on how to chat with this AI.", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "Unpack the user guide for me, will you?", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "I'm a novice at this. What's the simplest way to start using you?", "track": "SYSTEM_COMMAND", "intent": "help", "source": "llm"}
+{"utterance": "I need to download this file right now.", "track": "WORKFLOW_GENERATION", "intent": "execute_command", "source": "llm"}
+{"utterance": "Can you install the latest version of Git?", "track": "WORKFLOW_GENERATION", "intent": "execute_command", "source": "llm"}
+{"utterance": "Show me how to update my Python packages.", "track": "WORKFLOW_GENERATION", "intent": "execute_command", "source": "llm"}
+{"utterance": "What's the command to list all files in my home directory?", "track": "WORKFLOW_GENERATION", "intent": "execute_command", "source": "llm"}
+{"utterance": "Fetch the source code for the new library I just heard about.", "track": "WORKFLOW_GENERATION", "intent": "execute_command", "source": "llm"}
+{"utterance": "I want to run a disk cleanup with advanced options.", "track": "WORKFLOW_GENERATION", "intent": "execute_command", "source": "llm"}
+{"utterance": "Teach me to uninstall a stubborn software.", "track": "WORKFLOW_GENERATION", "intent": "execute_command", "source": "llm"}
+{"utterance": "How do I set up a cron job for nightly backups?", "track": "WORKFLOW_GENERATION", "intent": "execute_command", "source": "llm"}
+{"utterance": "Give me the bash command to change my system time.", "track": "WORKFLOW_GENERATION", "intent": "execute_command", "source": "llm"}
+{"utterance": "I want to compile my C code from this new project.", "track": "WORKFLOW_GENERATION", "intent": "execute_command", "source": "llm"}
+{"utterance": "Can you walk me through setting up SSH keys?", "track": "WORKFLOW_GENERATION", "intent": "execute_command", "source": "llm"}
+{"utterance": "Teach me to update my Mac's system software.", "track": "WORKFLOW_GENERATION", "intent": "execute_command", "source": "llm"}
+{"utterance": "I need to create a new virtual environment for my Python project.", "track": "WORKFLOW_GENERATION", "intent": "execute_command", "source": "llm"}
+{"utterance": "What's the bash command to check disk space?", "track": "WORKFLOW_GENERATION", "intent": "execute_command", "source": "llm"}
+{"utterance": "How do I run a JavaScript script in a terminal?", "track": "WORKFLOW_GENERATION", "intent": "execute_command", "source": "llm"}
+{"utterance": "I want to see my system's running processes.", "track": "WORKFLOW_GENERATION", "intent": "execute_command", "source": "llm"}
+{"utterance": "Teach me the command to search for a file by name.", "track": "WORKFLOW_GENERATION", "intent": "execute_command", "source": "llm"}
+{"utterance": "How to install a package using npm?", "track": "WORKFLOW_GENERATION", "intent": "execute_command", "source": "llm"}
+{"utterance": "Set up a morning routine that includes exercise, shower, breakfast, and a quick read.", "track": "WORKFLOW_GENERATION", "intent": "orchestrate", "source": "llm"}
+{"utterance": "Turn off all lights, lock my house, and send goodnight messages to my contacts.", "track": "WORKFLOW_GENERATION", "intent": "orchestrate", "source": "llm"}
+{"utterance": "Can you remind me to review my notes from yesterday's meeting and update my calendar?", "track": "WORKFLOW_GENERATION", "intent": "orchestrate", "source": "llm"}
+{"utterance": "Hey, can you plan my day? Start with a jog, then lunch, work on my project, and relax with some Netflix after 6 PM.", "track": "WORKFLOW_GENERATION", "intent": "orchestrate", "source": "llm"}
+{"utterance": "Help me organize my workspace: clean up my desk, sort papers, and download my latest project files.", "track": "WORKFLOW_GENERATION", "intent": "orchestrate", "source": "llm"}
+{"utterance": "I need to prep for a surprise party. Organize a shopping list, order decorations, and remind me to call the caterer.", "track": "WORKFLOW_GENERATION", "intent": "orchestrate", "source": "llm"}
+{"utterance": "Okay computer, I'm out for the night. Close everything and lock up.", "track": "WORKFLOW_GENERATION", "intent": "orchestrate", "source": "llm"}
+{"utterance": "Give me a rundown on how to bake a chocolate cake with a step-by-step recipe.", "track": "WORKFLOW_GENERATION", "intent": "orchestrate", "source": "llm"}
+{"utterance": "I want to cook dinner tonight. What’s a simple vegetarian recipe?", "track": "WORKFLOW_GENERATION", "intent": "orchestrate", "source": "llm"}
+{"utterance": "Can you lay out the steps for me to get ready for a business trip tomorrow morning?", "track": "WORKFLOW_GENERATION", "intent": "orchestrate", "source": "llm"}
+{"utterance": "Set a reminder for tomorrow to double-check my online banking.", "track": "WORKFLOW_GENERATION", "intent": "orchestrate", "source": "llm"}
+{"utterance": "Help me pack my gym bag for a weekend workout.", "track": "WORKFLOW_GENERATION", "intent": "orchestrate", "source": "llm"}
+{"utterance": "I’m bored. Set up a playlist of calming music and dim the lights.", "track": "WORKFLOW_GENERATION", "intent": "orchestrate", "source": "llm"}
+{"utterance": "Could you remind me to water the plants and order groceries for next week?", "track": "WORKFLOW_GENERATION", "intent": "orchestrate", "source": "llm"}
+{"utterance": "Create a workout plan for me: 30-minute cardio, 15-minute strength training, and 15-minute stretching.", "track": "WORKFLOW_GENERATION", "intent": "orchestrate", "source": "llm"}
+{"utterance": "I need to organize my closet. Can you list the steps to sort clothes by season and color?", "track": "WORKFLOW_GENERATION", "intent": "orchestrate", "source": "llm"}
+{"utterance": "What's the best way to declutter my workspace and get my home office ready for a new project?", "track": "WORKFLOW_GENERATION", "intent": "orchestrate", "source": "llm"}
+{"utterance": "Hey, can you help me jot down some notes? Just a title and the body please.", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "I need to start writing something new. Can you set up a note with a title and content?", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "Create a note for me with this title and content: 'Grocery List' and 'Eggs, Milk, Bread.'", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "Please draft a note titled 'Workout Plan' with this content: 'Monday: Running, Tuesday: Yoga, ...'", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "I want to write a recipe for my mom. Title it 'Mom's Famous Cookies' and give me the steps.", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "Create an email draft with the title 'Meeting Reminder' and content saying 'Don't forget our meeting at 3 PM tomorrow.'", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "Can you put together an essay draft called 'The Impact of Technology on Society' for me?", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "Draft a code snippet for me called 'Sort List' and have it sort numbers in ascending order.", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "I want to write a note titled 'Daily Goals' with this content: 'Finish project, call John, read a book.'", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "Help me write an email draft with the title 'Update on Project' and content 'The project is progressing well, expect completion by Friday.'", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "Can you help me jot down notes for my vacation with this title 'Travel Diary' and content 'Day 1: Beach, Day 2: Museum, ...'", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "I need a draft called 'Business Proposal' with this content 'Outline of our new marketing strategy for Q2.'", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "Make a note titled 'Shopping List' with content 'Milk, Eggs, Bread, Cheese, Apples.'", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "Create a code snippet for me called 'Find Prime Numbers' and have it print primes less than 100.", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "I want to write a note called 'Daily Routine' with this content 'Wake up at 6 AM, breakfast at 7 AM, ..., bed at 10 PM.'", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "Draft an email titled 'Conference Invitation' with content 'I would love to attend the upcoming tech conference in San Francisco.'", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "Can you create a note for me with the title 'Meal Plan' and content 'Breakfast: Oatmeal, Lunch: Salad, Dinner: Grilled Chicken.'", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "I need a code draft called 'Reverse String' that reverses a given string input.", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "Write me an essay titled 'The Benefits of Meditation' with content explaining its mental and physical health benefits.", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "Draft an email with the title 'Team Update' and content 'The project is now 70% complete, next steps outlined in the attached document.'", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "Can you help me jot down notes for my book with the title 'Writing Tips' and content 'Tip 1: Outline your story first, Tip 2: Revise multiple times, ...'", "track": "CONTENT_GENERATION", "intent": "create_note", "source": "llm"}
+{"utterance": "Edit my note titled 'Grocery List' to add 'Apples' at the top.", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "Please help me update the note 'Workout Plan' with new exercises.", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "Can you modify the 'Travel Diary' note? I want to insert 'Visited Tokyo' at the beginning.", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "I need to change the content of 'Birthday Ideas' to include a suggestion for a surprise party.", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "Update the 'Daily Tasks' note, adding 'Finish report' as the first task.", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "Modify my 'Fitness Goals' note by adding my new weight loss target.", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "Could you help me expand the 'Book Club' note by adding 'Read 'The Great Gatsby' by March 1st'?", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "Change 'Meditation Techniques' note to start with 'Mindfulness exercise'.", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "I want to revise the 'Movie Recommendations' note and include my new favorite movie.", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "Can we edit the 'Vacation Photos' note to add a caption under the photo of the Eiffel Tower?", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "Update the 'Kitchen Recipes' note by adding a new section for vegan options.", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "Modify the 'Weekly Budget' note to include a breakdown of expenses.", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "Please add to the 'Study Timetable' note: 'Review chapter 3 on Tuesday'.", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "Help me draft a new paragraph for my 'Dreams Journal' note about my dream holiday in Hawaii.", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "I want to update the 'Tech Gadgets' note to remove 'Smartwatch' and add 'Virtual Reality Headset'.", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "Could we edit the 'Favorite Quotes' note by replacing 'Hope' with 'Dreams'?", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "Modify the 'Shopping List' note by adding '4 bananas'.", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "I need to update my 'Project Plan' note with the new deadline, 'June 30th'.", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "Edit the 'Memory Lane' note to include my favorite memory from college.", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "Please add a new entry to my 'Fitness Diary' note about today's workout.", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "Can we expand the 'Travel Itinerary' note to add 'Accommodation booked' section?", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}
+{"utterance": "I want to update my 'Shopping Wishlist' note with the latest fashion trends.", "track": "CONTENT_GENERATION", "intent": "edit_note", "source": "llm"}

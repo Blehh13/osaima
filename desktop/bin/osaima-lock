@@ -1,0 +1,10 @@
+#!/bin/sh
+# Lock screen in the OSAIMA style (the wallpaper, palette and type).
+# Idle timeout and a lock request can arrive together: lock only once.
+pgrep -x -u "$(id -u)" swaylock >/dev/null && exit 0
+exec swaylock -f -i "${OSAIMA_DESKTOP:-/usr/share/osaima/desktop}/wallpaper/osaima-contours.png" -s fill \
+	--font "Atkinson Hyperlegible Next" --indicator-radius 90 --indicator-thickness 8 \
+	--inside-color 16243ae6 --inside-clear-color 16243ae6 --inside-ver-color 16243ae6 --inside-wrong-color 16243ae6 \
+	--ring-color 3bb0a0 --ring-clear-color 93a5ba --ring-ver-color 3bb0a0 --ring-wrong-color e5675f \
+	--key-hl-color f2b630 --bs-hl-color e5675f --line-color 00000000 --separator-color 00000000 \
+	--text-color e6edf3 --text-clear-color e6edf3 --text-ver-color e6edf3 --text-wrong-color f3a39c

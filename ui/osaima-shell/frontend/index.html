@@ -3,8 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Interstellar OS</title>
+  <title>OSAIMA</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='1.5' y='1.5' width='21' height='21' rx='6' fill='%233bb0a0'/%3E%3Cpath d='M7 8.5l3.5 3.5L7 15.5M12.5 16h4.5' stroke='%230f1b2d' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="vendor/xterm.css" />
   <link rel="stylesheet" href="src/style.css" />
+  <link rel="stylesheet" href="src/theme.css" />
+  <script src="vendor/xterm.min.js"></script>
+  <script src="vendor/xterm-addon-fit.min.js"></script>
 </head>
 <body>
 
@@ -14,24 +19,16 @@
     <!-- Starfield canvas background -->
     <canvas id="starfield"></canvas>
 
-    <!-- Floating nebula orbs -->
-    <div class="nebula nebula-1"></div>
-    <div class="nebula nebula-2"></div>
-    <div class="nebula nebula-3"></div>
-
     <!-- Top status bar -->
     <header id="status-bar">
       <div class="status-left">
         <div id="os-logo">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="rgba(120,180,255,0.8)" stroke-width="1.5"/>
-            <circle cx="12" cy="12" r="4" fill="rgba(120,180,255,0.6)"/>
-            <line x1="12" y1="2" x2="12" y2="6" stroke="rgba(120,180,255,0.6)" stroke-width="1.5"/>
-            <line x1="12" y1="18" x2="12" y2="22" stroke="rgba(120,180,255,0.6)" stroke-width="1.5"/>
-            <line x1="2" y1="12" x2="6" y2="12" stroke="rgba(120,180,255,0.6)" stroke-width="1.5"/>
-            <line x1="18" y1="12" x2="22" y2="12" stroke="rgba(120,180,255,0.6)" stroke-width="1.5"/>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="1.5" y="1.5" width="21" height="21" rx="6" fill="#3bb0a0"/>
+            <path d="M7 8.5l3.5 3.5L7 15.5" stroke="#0f1b2d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12.5 16h4.5" stroke="#0f1b2d" stroke-width="2.2" stroke-linecap="round"/>
           </svg>
-          <span>Interstellar OS</span>
+          <span>OSAIMA</span>
         </div>
       </div>
       <div class="status-center">
@@ -41,12 +38,15 @@
         </div>
       </div>
       <div class="status-right">
-        <div id="daemon-indicator" class="indicator offline" title="MCP Daemon Status">
-          <span class="dot"></span>
-          <span class="label">AI Core</span>
-        </div>
-        <div class="status-pill" id="cpu-pill">CPU <span id="cpu-val">—</span></div>
-        <div class="status-pill" id="mem-pill">MEM <span id="mem-val">—</span></div>
+        <button id="ai-pill" class="ai-pill" data-state="wait" title="AI settings">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="ai-pill-text">Starting AI…</span>
+        </button>
+        <button id="fullscreen-toggle" title="Toggle Fullscreen" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 0 8px; color: rgba(255,255,255,0.8); cursor: pointer; display: flex; align-items: center; justify-content: center; height: 100%;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+          </svg>
+        </button>
         <button id="control-toggle" title="Control Center">
           <span class="ctl-ico" id="ctl-net">🌐</span>
           <span class="ctl-ico" id="ctl-vol">🔊</span>
@@ -87,9 +87,10 @@
         <span class="cc-slider-ico">🔊</span>
         <input type="range" id="cc-volume" min="0" max="100" value="65" />
       </div>
-      <div class="cc-footer">
+      <div class="cc-footer" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
         <span id="cc-battery">🔋 AC Power</span>
         <span id="cc-clock2">—</span>
+        <button id="cc-shutdown" style="background: transparent; border: none; color: #ef4444; font-size: 16px; cursor: pointer; padding: 4px; border-radius: 4px;" title="Shutdown OS">⏻</button>
       </div>
     </div>
     <!-- Screen dimming / night-light overlays (real, controlled by the sliders) -->
@@ -99,13 +100,79 @@
     <!-- Window manager surface — windows are tiled/floated here -->
     <div id="wm-surface"></div>
 
+    <!-- System Test Hub (Draggable tool window) -->
+    <div id="test-hub" class="test-hub">
+      <div class="test-hub-header" id="test-hub-header">
+        <span class="test-hub-title">🧪 System Test Hub</span>
+        <button class="test-hub-close" onclick="document.getElementById('test-hub').style.display='none'">✕</button>
+      </div>
+      <div class="test-hub-content">
+        <p class="test-hub-desc">Click these buttons to verify IPC and Daemon functionality.</p>
+        <button class="test-btn" id="test-btn-daemon">1. Ping AI Daemon</button>
+        <button class="test-btn" id="test-btn-list-dir">2. Read Directory (Tauri)</button>
+        <button class="test-btn" id="test-btn-sys-stats">3. Fetch System Stats</button>
+        <button class="test-btn" id="test-btn-spawn-term">4. Spawn Terminal UI</button>
+        <button class="test-btn" id="test-btn-notification">5. Trigger Notification</button>
+        <button class="test-btn" id="test-btn-rag">6. Test RAG Search</button>
+      </div>
+    </div>
+
+    <!-- Welcome (first start) and AI settings -->
+    <div id="api-key-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+      <div class="modal-window welcome">
+        <h2 id="welcome-title">Welcome to OSAIMA</h2>
+        <p class="welcome-lede">Tell your computer what you need in plain words. It shows you what it will do, and how risky that is, before anything changes.</p>
+
+        <fieldset class="mode-pick">
+          <legend>How should OSAIMA think?</legend>
+          <label class="mode-option">
+            <input type="radio" name="ai-mode" value="cloud" />
+            <span class="mode-name">Fast</span>
+            <span class="mode-desc">Uses Google Gemini. Answers in a second or two. What you type is sent to Google; commands still run only on this computer, after you approve them.</span>
+          </label>
+          <label class="mode-option">
+            <input type="radio" name="ai-mode" value="local" />
+            <span class="mode-name">Private</span>
+            <span class="mode-desc">Uses a model on this computer. Nothing you type leaves the machine, but answers take longer.</span>
+          </label>
+        </fieldset>
+
+        <div id="cloud-key" class="cloud-key" hidden>
+          <label for="api-key-input">Gemini API key</label>
+          <input type="password" id="api-key-input" placeholder="Paste your key" autocomplete="off" spellcheck="false" />
+          <p class="modal-hint">Saved privately on this computer. Get a free key at aistudio.google.com.</p>
+        </div>
+
+        <ul id="ai-status-list" class="ai-status-list"><li>Checking the AI core…</li></ul>
+
+        <div class="modal-footer">
+          <button id="api-key-close" class="modal-btn primary">Start</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Windows Mock Mode Modal -->
+    <div id="windows-mock-modal" class="modal-overlay hidden">
+      <div class="modal-window">
+        <div class="modal-header">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffaa00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <h2 style="color: #ffaa00;">Windows OS Detected</h2>
+        </div>
+        <div class="modal-body">
+          <p>OSAIMA is a Linux distribution. Since you are running it on Windows, the OS has fallen back to <strong>Mock Mode</strong>.</p>
+          <p>You can still interact with the UI, Window Manager, and Agentic features, but system-level hooks (like process freezing and D-Bus) are simulated.</p>
+        </div>
+        <div class="modal-footer" style="display: flex; gap: 12px; justify-content: flex-end;">
+          <button id="windows-mock-close" class="modal-btn primary">I Understand</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Desktop Widgets Layer -->
+    <div id="widgets-layer"></div>
+
     <!-- Notification stack (top-right) -->
     <div id="notifications"></div>
-
-    <!-- Center ambient message (hidden once windows are open) -->
-    <div id="ambient-center">
-      <p id="ambient-hint">Press <kbd>Space</kbd> to talk to your OS &nbsp;·&nbsp; <kbd>Alt</kbd>+<kbd>↵</kbd> for a terminal</p>
-    </div>
 
     <!-- Bottom dock: app launchers · open windows · workspaces · layout -->
     <footer id="dock">
@@ -118,33 +185,12 @@
       <div class="dock-section dock-layout" id="dock-layout" title="Current layout (Alt+Tab to cycle)">tile</div>
     </footer>
 
-    <!-- Context panel (bottom-right) -->
-    <aside id="context-panel">
-      <div class="context-label">SYSTEM CONTEXT</div>
-      <div class="context-row">
-        <span class="ctx-key">HOST</span>
-        <span class="ctx-val" id="ctx-host">—</span>
-      </div>
-      <div class="context-row">
-        <span class="ctx-key">KERNEL</span>
-        <span class="ctx-val" id="ctx-kernel">—</span>
-      </div>
-      <div class="context-row">
-        <span class="ctx-key">CPU CORES</span>
-        <span class="ctx-val" id="ctx-cores">—</span>
-      </div>
-      <div class="context-row">
-        <span class="ctx-key">MEMORY</span>
-        <span class="ctx-val" id="ctx-mem-bar">—</span>
-      </div>
-      <div class="mem-bar-track"><div class="mem-bar-fill" id="mem-bar-fill"></div></div>
-    </aside>
 
   </div>
 
   <!-- AI COMMAND HUB (activated by Space) -->
   <div id="launcher" class="hidden">
-    <div id="launcher-backdrop"></div>
+    <div id="launcher-backdrop" onclick="closeLauncher()"></div>
     <div id="launcher-panel">
       <div id="launcher-header">
         <div id="launcher-icon">
@@ -160,12 +206,19 @@
           autocomplete="off"
           spellcheck="false"
         />
-        <div id="launcher-close">ESC</div>
+        <div id="launcher-close" onclick="closeLauncher()">ESC</div>
       </div>
 
       <div id="launcher-suggestions">
         <div class="suggestion-group-label">QUICK ACTIONS</div>
         <div class="suggestions-grid">
+          <button class="suggestion-chip" onclick="runSuggestion(this)">Start VoxType voice typing [F9]</button>
+          <button class="suggestion-chip" onclick="runSuggestion(this)">Show system stats</button>
+          <button class="suggestion-chip" onclick="runSuggestion(this)">Open terminal</button>
+          <button class="suggestion-chip" onclick="runSuggestion(this)">Check AI core status</button>
+          <button class="suggestion-chip" onclick="runSuggestion(this)">List running processes</button>
+          <button class="suggestion-chip" onclick="runSuggestion(this)">Adjust display brightness</button>
+          <button class="suggestion-chip" onclick="runSuggestion(this)">Network diagnostics</button>
         </div>
       </div>
 

@@ -4,25 +4,21 @@
 EAPI=8
 
 DESCRIPTION="Interstellar OS meta package — pulls the full agentic desktop"
-HOMEPAGE="https://github.com/Blehh13/osaima"
+HOMEPAGE="https://github.com/akashmanjunath2505/osaima"
 
 LICENSE="metapackage"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE="+shell +ai +ollama desktop devtools"
+IUSE="+shell +ai desktop devtools"
 
 # A meta package has no source — it only expresses dependencies.
 RDEPEND="
 	app-misc/interstellar-release
 	shell? ( gui-apps/osaima-shell )
-	ai? (
-		sys-apps/osaima-ai-core
-		sys-apps/osaima-agent
-		ollama? ( sci-ml/ollama )
-	)
+	ai? ( sys-apps/osaima-ai-core )
 	desktop? (
 		gui-wm/sway
-		x11-terms/foot
+		gui-apps/foot
 		gui-libs/xdg-desktop-portal-wlr
 	)
 	devtools? (

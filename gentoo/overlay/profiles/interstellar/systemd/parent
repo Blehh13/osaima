@@ -1,0 +1,5 @@
+# Binary-package-friendly flavor: upstream Gentoo desktop/systemd USE flags,
+# so emerge can use the official binhost instead of compiling (used for the
+# QEMU test image, build-tools/scripts/build_vm_image.sh). The daemon relies
+# on systemd user services, so this is also the reference runtime.
+gentoo:default/linux/amd64/23.0/desktop/systemd

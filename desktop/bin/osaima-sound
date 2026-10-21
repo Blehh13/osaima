@@ -1,0 +1,5 @@
+#!/bin/sh
+# Waybar module: volume from PipeWire; prints nothing (no error) without audio.
+v=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null) || { echo '{"text":""}'; exit 0; }
+pct=$(echo "$v" | awk '{printf "%d", $2*100}')
+case "$v" in *MUTED*) echo '{"text":"Sound off","class":"muted"}' ;; *) echo "{\"text\":\"Sound $pct%\"}" ;; esac

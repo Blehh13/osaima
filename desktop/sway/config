@@ -1,0 +1,101 @@
+# OSAIMA desktop session (sway).
+# The assistant is the home window; real apps (Thunar, foot, Firefox) tile
+# beside it. The AI moves, focuses and closes windows through sway's IPC.
+
+set $mod Mod4
+
+# ── Look (palette from the OSAIMA logo) ────────────────────────────────────
+set $ink     #0f1b2d
+set $surface #16243a
+set $line    #2a3d5a
+set $frost   #e6edf3
+set $mist    #93a5ba
+set $accent  #3bb0a0
+set $amber   #f2b630
+
+output * bg $ink solid_color
+# wallpaper and the rest of the saved settings (Settings app / the assistant)
+exec osaima-apply-prefs
+font pango:Atkinson Hyperlegible Next 10
+default_border pixel 2
+default_floating_border pixel 2
+titlebar_padding 10 6
+gaps inner 8
+gaps outer 2
+#                       border   background text    indicator child_border
+client.focused          $accent  $surface   $frost  $accent   $accent
+client.focused_inactive $line    $surface   $mist   $line     $line
+client.unfocused        $line    $ink       $mist   $line     $line
+client.urgent           $amber   $ink       $frost  $amber    $amber
+
+# Tabbed and stacked containers show titles; keep them readable.
+title_align left
+
+# ── Input ──────────────────────────────────────────────────────────────────
+input type:keyboard xkb_layout us
+input type:touchpad {
+    tap enabled
+    natural_scroll enabled
+}
+
+# ── Window rules ───────────────────────────────────────────────────────────
+# OSAIMA's own apps set their title to "OSAIMA <App>".
+for_window [title="^OSAIMA Settings$"] floating enable, resize set 760 860, move position center
+# the Ask bar floats over whatever is open, on every workspace
+for_window [title="^OSAIMA Launcher$"] floating enable, sticky enable, resize set 760 420, move position center
+for_window [title="^OSAIMA About$"] floating enable, move position center
+for_window [app_id="thunar" title="^(File Operation Progress|Confirm to replace files)"] floating enable
+for_window [window_role="pop-up"] floating enable
+for_window [window_type="dialog"] floating enable
+
+# ── Keys ───────────────────────────────────────────────────────────────────
+# Ask from anywhere (the Ask bar), or bring up the assistant
+bindsym $mod+space exec osaima-open launcher
+bindsym $mod+a exec osaima-open assistant
+# Lock
+bindsym $mod+l exec osaima-lock
+# Apps
+bindsym $mod+Return exec foot
+bindsym $mod+e exec thunar
+bindsym $mod+b exec firefox
+bindsym $mod+comma exec osaima-open settings
+# Windows
+bindsym $mod+q kill
+bindsym $mod+f fullscreen toggle
+bindsym $mod+shift+space floating toggle
+bindsym $mod+t layout toggle split
+bindsym $mod+w layout tabbed
+bindsym $mod+Left focus left
+bindsym $mod+Right focus right
+bindsym $mod+Up focus up
+bindsym $mod+Down focus down
+bindsym $mod+shift+Left move left
+bindsym $mod+shift+Right move right
+bindsym $mod+shift+Up move up
+bindsym $mod+shift+Down move down
+floating_modifier $mod normal
+# Workspaces
+bindsym $mod+1 workspace number 1
+bindsym $mod+2 workspace number 2
+bindsym $mod+3 workspace number 3
+bindsym $mod+4 workspace number 4
+bindsym $mod+5 workspace number 5
+bindsym $mod+shift+1 move container to workspace number 1
+bindsym $mod+shift+2 move container to workspace number 2
+bindsym $mod+shift+3 move container to workspace number 3
+bindsym $mod+shift+4 move container to workspace number 4
+bindsym $mod+shift+5 move container to workspace number 5
+# Screenshot to ~/Pictures
+bindsym Print exec sh -c 'mkdir -p ~/Pictures && grim ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png'
+# Session
+bindsym $mod+shift+r reload
+bindsym $mod+shift+e exec swaynag -t warning -m 'Log out of OSAIMA?' -B 'Log out' 'swaymsg exit'
+
+# ── Session programs ───────────────────────────────────────────────────────
+exec waybar -c $OSAIMA_DESKTOP/waybar/config.jsonc -s $OSAIMA_DESKTOP/waybar/style.css
+exec mako -c $OSAIMA_DESKTOP/mako/config
+# lock when asked (e.g. "lock the screen" goes through logind), before sleep, and after 15 idle minutes
+exec osaima-idle
+exec osaima-open assistant
+
+include /etc/sway/config.d/*

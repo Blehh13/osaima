@@ -1,0 +1,500 @@
+{"id": 0, "category": "shell_commands", "reference": "export the PATH variable then source the bashrc", "n_words": 8}
+{"id": 1, "category": "dev_tools", "reference": "fine tune the bert tiny model and export it to onnx", "n_words": 11}
+{"id": 2, "category": "linux_internals", "reference": "pipewire replaces pulseaudio for lower latency capture", "n_words": 7}
+{"id": 3, "category": "workflow_phrases", "reference": "set up a django project with my usual virtual environment", "n_words": 10}
+{"id": 4, "category": "acronyms_numbers", "reference": "quantize the model to q four k m for six gigabytes of ram", "n_words": 13}
+{"id": 5, "category": "shell_commands", "reference": "git rebase dash i onto the main branch", "n_words": 8}
+{"id": 6, "category": "dev_tools", "reference": "the language server protocol handles autocomplete and refactoring", "n_words": 8}
+{"id": 7, "category": "linux_internals", "reference": "at spi provides the accessibility tree for gtk four apps", "n_words": 10}
+{"id": 8, "category": "workflow_phrases", "reference": "summarize the readme and draft a release note", "n_words": 8}
+{"id": 9, "category": "acronyms_numbers", "reference": "the a s r daemon emits j s o n over a unix socket", "n_words": 14}
+{"id": 10, "category": "shell_commands", "reference": "git rebase dash i onto the main branch", "n_words": 8}
+{"id": 11, "category": "dev_tools", "reference": "the ollama runtime serves llama three point one on localhost", "n_words": 10}
+{"id": 12, "category": "linux_internals", "reference": "read proc meminfo to check the available memory", "n_words": 8}
+{"id": 13, "category": "workflow_phrases", "reference": "commit everything with my conventional commit format and push", "n_words": 9}
+{"id": 14, "category": "acronyms_numbers", "reference": "the g p u is an r t x three zero six zero with twelve gigabytes", "n_words": 16}
+{"id": 15, "category": "shell_commands", "reference": "use ripgrep to search the entire codebase for the function", "n_words": 10}
+{"id": 16, "category": "dev_tools", "reference": "the language server protocol handles autocomplete and refactoring", "n_words": 8}
+{"id": 17, "category": "linux_internals", "reference": "the systemd unit runs as a user scope with private tmp", "n_words": 11}
+{"id": 18, "category": "workflow_phrases", "reference": "commit everything with my conventional commit format and push", "n_words": 9}
+{"id": 19, "category": "acronyms_numbers", "reference": "http localhost one one four three four serves the ollama a p i", "n_words": 13}
+{"id": 20, "category": "shell_commands", "reference": "use ripgrep to search the entire codebase for the function", "n_words": 10}
+{"id": 21, "category": "dev_tools", "reference": "open the integrated terminal in visual studio code", "n_words": 8}
+{"id": 22, "category": "linux_internals", "reference": "wayland compositors handle window management differently from x eleven", "n_words": 9}
+{"id": 23, "category": "workflow_phrases", "reference": "commit everything with my conventional commit format and push", "n_words": 9}
+{"id": 24, "category": "acronyms_numbers", "reference": "the r a g engine retrieves the top five chunks by cosine similarity", "n_words": 13}
+{"id": 25, "category": "shell_commands", "reference": "curl dash f s s L the install script and pipe it to bash", "n_words": 14}
+{"id": 26, "category": "dev_tools", "reference": "open the integrated terminal in visual studio code", "n_words": 8}
+{"id": 27, "category": "linux_internals", "reference": "wayland compositors handle window management differently from x eleven", "n_words": 9}
+{"id": 28, "category": "workflow_phrases", "reference": "summarize the readme and draft a release note", "n_words": 8}
+{"id": 29, "category": "acronyms_numbers", "reference": "the g p u is an r t x three zero six zero with twelve gigabytes", "n_words": 16}
+{"id": 30, "category": "shell_commands", "reference": "run sudo apt install pipewire and wireplumber", "n_words": 7}
+{"id": 31, "category": "dev_tools", "reference": "the ollama runtime serves llama three point one on localhost", "n_words": 10}
+{"id": 32, "category": "linux_internals", "reference": "read proc meminfo to check the available memory", "n_words": 8}
+{"id": 33, "category": "workflow_phrases", "reference": "add type hints to the parameters and return value", "n_words": 9}
+{"id": 34, "category": "acronyms_numbers", "reference": "the c p u load is at ninety five percent on eight cores", "n_words": 13}
+{"id": 35, "category": "shell_commands", "reference": "systemctl restart the nginx service and check its status", "n_words": 9}
+{"id": 36, "category": "dev_tools", "reference": "webpack bundles the typescript into a single artifact", "n_words": 8}
+{"id": 37, "category": "linux_internals", "reference": "apparmor confines the daemon to a read only home directory", "n_words": 10}
+{"id": 38, "category": "workflow_phrases", "reference": "add type hints to the parameters and return value", "n_words": 9}
+{"id": 39, "category": "acronyms_numbers", "reference": "quantize the model to q four k m for six gigabytes of ram", "n_words": 13}
+{"id": 40, "category": "shell_commands", "reference": "curl dash f s s L the install script and pipe it to bash", "n_words": 14}
+{"id": 41, "category": "dev_tools", "reference": "chromadb stores the embeddings from the mini l m model", "n_words": 10}
+{"id": 42, "category": "linux_internals", "reference": "inotify watches the documents directory for new files", "n_words": 8}
+{"id": 43, "category": "workflow_phrases", "reference": "scaffold a fast api service with async endpoints", "n_words": 8}
+{"id": 44, "category": "acronyms_numbers", "reference": "quantize the model to q four k m for six gigabytes of ram", "n_words": 13}
+{"id": 45, "category": "shell_commands", "reference": "curl dash f s s L the install script and pipe it to bash", "n_words": 14}
+{"id": 46, "category": "dev_tools", "reference": "the cuda toolkit accelerates whisper large v three inference", "n_words": 9}
+{"id": 47, "category": "linux_internals", "reference": "the systemd unit runs as a user scope with private tmp", "n_words": 11}
+{"id": 48, "category": "workflow_phrases", "reference": "create a new git branch called feature slash auth", "n_words": 9}
+{"id": 49, "category": "acronyms_numbers", "reference": "quantize the model to q four k m for six gigabytes of ram", "n_words": 13}
+{"id": 50, "category": "shell_commands", "reference": "git rebase dash i onto the main branch", "n_words": 8}
+{"id": 51, "category": "dev_tools", "reference": "the language server protocol handles autocomplete and refactoring", "n_words": 8}
+{"id": 52, "category": "linux_internals", "reference": "wayland compositors handle window management differently from x eleven", "n_words": 9}
+{"id": 53, "category": "workflow_phrases", "reference": "set up a django project with my usual virtual environment", "n_words": 10}
+{"id": 54, "category": "acronyms_numbers", "reference": "the l s p client talks j s o n r p c over a web socket", "n_words": 17}
+{"id": 55, "category": "shell_commands", "reference": "kill dash nine the process id four two seven one", "n_words": 10}
+{"id": 56, "category": "dev_tools", "reference": "the kubernetes pod is stuck in crash loop back off", "n_words": 10}
+{"id": 57, "category": "linux_internals", "reference": "inotify watches the documents directory for new files", "n_words": 8}
+{"id": 58, "category": "workflow_phrases", "reference": "generate a docstring for every public method in this class", "n_words": 10}
+{"id": 59, "category": "acronyms_numbers", "reference": "the s h a two fifty six audit log is append only", "n_words": 12}
+{"id": 60, "category": "shell_commands", "reference": "docker compose up dash d and tail the logs", "n_words": 9}
+{"id": 61, "category": "dev_tools", "reference": "the cuda toolkit accelerates whisper large v three inference", "n_words": 9}
+{"id": 62, "category": "linux_internals", "reference": "the cgroups v two hierarchy accounts per process resource usage", "n_words": 10}
+{"id": 63, "category": "workflow_phrases", "reference": "create a new git branch called feature slash auth", "n_words": 9}
+{"id": 64, "category": "acronyms_numbers", "reference": "l l m latency should stay under eight seconds on c p u", "n_words": 13}
+{"id": 65, "category": "shell_commands", "reference": "kill dash nine the process id four two seven one", "n_words": 10}
+{"id": 66, "category": "dev_tools", "reference": "fine tune the bert tiny model and export it to onnx", "n_words": 11}
+{"id": 67, "category": "linux_internals", "reference": "the systemd unit runs as a user scope with private tmp", "n_words": 11}
+{"id": 68, "category": "workflow_phrases", "reference": "commit everything with my conventional commit format and push", "n_words": 9}
+{"id": 69, "category": "acronyms_numbers", "reference": "the l s p client talks j s o n r p c over a web socket", "n_words": 17}
+{"id": 70, "category": "shell_commands", "reference": "systemctl restart the nginx service and check its status", "n_words": 9}
+{"id": 71, "category": "dev_tools", "reference": "npm install the model context protocol server package", "n_words": 8}
+{"id": 72, "category": "linux_internals", "reference": "the cgroups v two hierarchy accounts per process resource usage", "n_words": 10}
+{"id": 73, "category": "workflow_phrases", "reference": "create a new git branch called feature slash auth", "n_words": 9}
+{"id": 74, "category": "acronyms_numbers", "reference": "the w e r target is under eight percent for whisper", "n_words": 11}
+{"id": 75, "category": "shell_commands", "reference": "systemctl restart the nginx service and check its status", "n_words": 9}
+{"id": 76, "category": "dev_tools", "reference": "the cuda toolkit accelerates whisper large v three inference", "n_words": 9}
+{"id": 77, "category": "linux_internals", "reference": "the ebpf program attaches to the perf event source", "n_words": 9}
+{"id": 78, "category": "workflow_phrases", "reference": "commit everything with my conventional commit format and push", "n_words": 9}
+{"id": 79, "category": "acronyms_numbers", "reference": "http localhost one one four three four serves the ollama a p i", "n_words": 13}
+{"id": 80, "category": "shell_commands", "reference": "use ripgrep to search the entire codebase for the function", "n_words": 10}
+{"id": 81, "category": "dev_tools", "reference": "fine tune the bert tiny model and export it to onnx", "n_words": 11}
+{"id": 82, "category": "linux_internals", "reference": "at spi provides the accessibility tree for gtk four apps", "n_words": 10}
+{"id": 83, "category": "workflow_phrases", "reference": "scaffold a fast api service with async endpoints", "n_words": 8}
+{"id": 84, "category": "acronyms_numbers", "reference": "the w e r target is under eight percent for whisper", "n_words": 11}
+{"id": 85, "category": "shell_commands", "reference": "use ripgrep to search the entire codebase for the function", "n_words": 10}
+{"id": 86, "category": "dev_tools", "reference": "open the integrated terminal in visual studio code", "n_words": 8}
+{"id": 87, "category": "linux_internals", "reference": "the ebpf program attaches to the perf event source", "n_words": 9}
+{"id": 88, "category": "workflow_phrases", "reference": "add type hints to the parameters and return value", "n_words": 9}
+{"id": 89, "category": "acronyms_numbers", "reference": "the l s p client talks j s o n r p c over a web socket", "n_words": 17}
+{"id": 90, "category": "shell_commands", "reference": "export the PATH variable then source the bashrc", "n_words": 8}
+{"id": 91, "category": "dev_tools", "reference": "the pytest suite reports coverage for every module", "n_words": 8}
+{"id": 92, "category": "linux_internals", "reference": "at spi provides the accessibility tree for gtk four apps", "n_words": 10}
+{"id": 93, "category": "workflow_phrases", "reference": "summarize the readme and draft a release note", "n_words": 8}
+{"id": 94, "category": "acronyms_numbers", "reference": "the w e r target is under eight percent for whisper", "n_words": 11}
+{"id": 95, "category": "shell_commands", "reference": "curl dash f s s L the install script and pipe it to bash", "n_words": 14}
+{"id": 96, "category": "dev_tools", "reference": "the kubernetes pod is stuck in crash loop back off", "n_words": 10}
+{"id": 97, "category": "linux_internals", "reference": "the ebpf program attaches to the perf event source", "n_words": 9}
+{"id": 98, "category": "workflow_phrases", "reference": "commit everything with my conventional commit format and push", "n_words": 9}
+{"id": 99, "category": "acronyms_numbers", "reference": "l l m latency should stay under eight seconds on c p u", "n_words": 13}
+{"id": 100, "category": "shell_commands", "reference": "docker compose up dash d and tail the logs", "n_words": 9}
+{"id": 101, "category": "dev_tools", "reference": "the language server protocol handles autocomplete and refactoring", "n_words": 8}
+{"id": 102, "category": "linux_internals", "reference": "read proc meminfo to check the available memory", "n_words": 8}
+{"id": 103, "category": "workflow_phrases", "reference": "build the release binary and strip the debug symbols", "n_words": 9}
+{"id": 104, "category": "acronyms_numbers", "reference": "the l s p client talks j s o n r p c over a web socket", "n_words": 17}
+{"id": 105, "category": "shell_commands", "reference": "docker compose up dash d and tail the logs", "n_words": 9}
+{"id": 106, "category": "dev_tools", "reference": "chromadb stores the embeddings from the mini l m model", "n_words": 10}
+{"id": 107, "category": "linux_internals", "reference": "pipewire replaces pulseaudio for lower latency capture", "n_words": 7}
+{"id": 108, "category": "workflow_phrases", "reference": "create a new git branch called feature slash auth", "n_words": 9}
+{"id": 109, "category": "acronyms_numbers", "reference": "the a s r daemon emits j s o n over a unix socket", "n_words": 14}
+{"id": 110, "category": "shell_commands", "reference": "docker compose up dash d and tail the logs", "n_words": 9}
+{"id": 111, "category": "dev_tools", "reference": "the pytest suite reports coverage for every module", "n_words": 8}
+{"id": 112, "category": "linux_internals", "reference": "apparmor confines the daemon to a read only home directory", "n_words": 10}
+{"id": 113, "category": "workflow_phrases", "reference": "summarize the readme and draft a release note", "n_words": 8}
+{"id": 114, "category": "acronyms_numbers", "reference": "quantize the model to q four k m for six gigabytes of ram", "n_words": 13}
+{"id": 115, "category": "shell_commands", "reference": "docker compose up dash d and tail the logs", "n_words": 9}
+{"id": 116, "category": "dev_tools", "reference": "open the integrated terminal in visual studio code", "n_words": 8}
+{"id": 117, "category": "linux_internals", "reference": "the systemd unit runs as a user scope with private tmp", "n_words": 11}
+{"id": 118, "category": "workflow_phrases", "reference": "build the release binary and strip the debug symbols", "n_words": 9}
+{"id": 119, "category": "acronyms_numbers", "reference": "the c p u load is at ninety five percent on eight cores", "n_words": 13}
+{"id": 120, "category": "shell_commands", "reference": "kill dash nine the process id four two seven one", "n_words": 10}
+{"id": 121, "category": "dev_tools", "reference": "webpack bundles the typescript into a single artifact", "n_words": 8}
+{"id": 122, "category": "linux_internals", "reference": "pipewire replaces pulseaudio for lower latency capture", "n_words": 7}
+{"id": 123, "category": "workflow_phrases", "reference": "refactor the handler into smaller pure functions", "n_words": 7}
+{"id": 124, "category": "acronyms_numbers", "reference": "quantize the model to q four k m for six gigabytes of ram", "n_words": 13}
+{"id": 125, "category": "shell_commands", "reference": "grep dash r for the string TODO across the source tree", "n_words": 11}
+{"id": 126, "category": "dev_tools", "reference": "the kubernetes pod is stuck in crash loop back off", "n_words": 10}
+{"id": 127, "category": "linux_internals", "reference": "pipewire replaces pulseaudio for lower latency capture", "n_words": 7}
+{"id": 128, "category": "workflow_phrases", "reference": "add type hints to the parameters and return value", "n_words": 9}
+{"id": 129, "category": "acronyms_numbers", "reference": "l l m latency should stay under eight seconds on c p u", "n_words": 13}
+{"id": 130, "category": "shell_commands", "reference": "grep dash r for the string TODO across the source tree", "n_words": 11}
+{"id": 131, "category": "dev_tools", "reference": "webpack bundles the typescript into a single artifact", "n_words": 8}
+{"id": 132, "category": "linux_internals", "reference": "inotify watches the documents directory for new files", "n_words": 8}
+{"id": 133, "category": "workflow_phrases", "reference": "build the release binary and strip the debug symbols", "n_words": 9}
+{"id": 134, "category": "acronyms_numbers", "reference": "the g p u is an r t x three zero six zero with twelve gigabytes", "n_words": 16}
+{"id": 135, "category": "shell_commands", "reference": "export the PATH variable then source the bashrc", "n_words": 8}
+{"id": 136, "category": "dev_tools", "reference": "webpack bundles the typescript into a single artifact", "n_words": 8}
+{"id": 137, "category": "linux_internals", "reference": "the systemd unit runs as a user scope with private tmp", "n_words": 11}
+{"id": 138, "category": "workflow_phrases", "reference": "scaffold a fast api service with async endpoints", "n_words": 8}
+{"id": 139, "category": "acronyms_numbers", "reference": "quantize the model to q four k m for six gigabytes of ram", "n_words": 13}
+{"id": 140, "category": "shell_commands", "reference": "grep dash r for the string TODO across the source tree", "n_words": 11}
+{"id": 141, "category": "dev_tools", "reference": "fine tune the bert tiny model and export it to onnx", "n_words": 11}
+{"id": 142, "category": "linux_internals", "reference": "the systemd unit runs as a user scope with private tmp", "n_words": 11}
+{"id": 143, "category": "workflow_phrases", "reference": "install the requirements then run the migrations", "n_words": 7}
+{"id": 144, "category": "acronyms_numbers", "reference": "the a s r daemon emits j s o n over a unix socket", "n_words": 14}
+{"id": 145, "category": "shell_commands", "reference": "docker compose up dash d and tail the logs", "n_words": 9}
+{"id": 146, "category": "dev_tools", "reference": "the cuda toolkit accelerates whisper large v three inference", "n_words": 9}
+{"id": 147, "category": "linux_internals", "reference": "apparmor confines the daemon to a read only home directory", "n_words": 10}
+{"id": 148, "category": "workflow_phrases", "reference": "build the release binary and strip the debug symbols", "n_words": 9}
+{"id": 149, "category": "acronyms_numbers", "reference": "l l m latency should stay under eight seconds on c p u", "n_words": 13}
+{"id": 150, "category": "shell_commands", "reference": "run sudo apt install pipewire and wireplumber", "n_words": 7}
+{"id": 151, "category": "dev_tools", "reference": "fine tune the bert tiny model and export it to onnx", "n_words": 11}
+{"id": 152, "category": "linux_internals", "reference": "pipewire replaces pulseaudio for lower latency capture", "n_words": 7}
+{"id": 153, "category": "workflow_phrases", "reference": "add type hints to the parameters and return value", "n_words": 9}
+{"id": 154, "category": "acronyms_numbers", "reference": "the s h a two fifty six audit log is append only", "n_words": 12}
+{"id": 155, "category": "shell_commands", "reference": "curl dash f s s L the install script and pipe it to bash", "n_words": 14}
+{"id": 156, "category": "dev_tools", "reference": "the cuda toolkit accelerates whisper large v three inference", "n_words": 9}
+{"id": 157, "category": "linux_internals", "reference": "at spi provides the accessibility tree for gtk four apps", "n_words": 10}
+{"id": 158, "category": "workflow_phrases", "reference": "scaffold a fast api service with async endpoints", "n_words": 8}
+{"id": 159, "category": "acronyms_numbers", "reference": "http localhost one one four three four serves the ollama a p i", "n_words": 13}
+{"id": 160, "category": "shell_commands", "reference": "curl dash f s s L the install script and pipe it to bash", "n_words": 14}
+{"id": 161, "category": "dev_tools", "reference": "open the integrated terminal in visual studio code", "n_words": 8}
+{"id": 162, "category": "linux_internals", "reference": "the cgroups v two hierarchy accounts per process resource usage", "n_words": 10}
+{"id": 163, "category": "workflow_phrases", "reference": "add type hints to the parameters and return value", "n_words": 9}
+{"id": 164, "category": "acronyms_numbers", "reference": "the g p u is an r t x three zero six zero with twelve gigabytes", "n_words": 16}
+{"id": 165, "category": "shell_commands", "reference": "use ripgrep to search the entire codebase for the function", "n_words": 10}
+{"id": 166, "category": "dev_tools", "reference": "webpack bundles the typescript into a single artifact", "n_words": 8}
+{"id": 167, "category": "linux_internals", "reference": "pipewire replaces pulseaudio for lower latency capture", "n_words": 7}
+{"id": 168, "category": "workflow_phrases", "reference": "commit everything with my conventional commit format and push", "n_words": 9}
+{"id": 169, "category": "acronyms_numbers", "reference": "the w e r target is under eight percent for whisper", "n_words": 11}
+{"id": 170, "category": "shell_commands", "reference": "use ripgrep to search the entire codebase for the function", "n_words": 10}
+{"id": 171, "category": "dev_tools", "reference": "open the integrated terminal in visual studio code", "n_words": 8}
+{"id": 172, "category": "linux_internals", "reference": "the systemd unit runs as a user scope with private tmp", "n_words": 11}
+{"id": 173, "category": "workflow_phrases", "reference": "commit everything with my conventional commit format and push", "n_words": 9}
+{"id": 174, "category": "acronyms_numbers", "reference": "the r a g engine retrieves the top five chunks by cosine similarity", "n_words": 13}
+{"id": 175, "category": "shell_commands", "reference": "docker compose up dash d and tail the logs", "n_words": 9}
+{"id": 176, "category": "dev_tools", "reference": "fine tune the bert tiny model and export it to onnx", "n_words": 11}
+{"id": 177, "category": "linux_internals", "reference": "the ebpf program attaches to the perf event source", "n_words": 9}
+{"id": 178, "category": "workflow_phrases", "reference": "create a new git branch called feature slash auth", "n_words": 9}
+{"id": 179, "category": "acronyms_numbers", "reference": "the l s p client talks j s o n r p c over a web socket", "n_words": 17}
+{"id": 180, "category": "shell_commands", "reference": "run sudo apt install pipewire and wireplumber", "n_words": 7}
+{"id": 181, "category": "dev_tools", "reference": "the language server protocol handles autocomplete and refactoring", "n_words": 8}
+{"id": 182, "category": "linux_internals", "reference": "read proc meminfo to check the available memory", "n_words": 8}
+{"id": 183, "category": "workflow_phrases", "reference": "summarize the readme and draft a release note", "n_words": 8}
+{"id": 184, "category": "acronyms_numbers", "reference": "the c p u load is at ninety five percent on eight cores", "n_words": 13}
+{"id": 185, "category": "shell_commands", "reference": "git rebase dash i onto the main branch", "n_words": 8}
+{"id": 186, "category": "dev_tools", "reference": "the language server protocol handles autocomplete and refactoring", "n_words": 8}
+{"id": 187, "category": "linux_internals", "reference": "at spi provides the accessibility tree for gtk four apps", "n_words": 10}
+{"id": 188, "category": "workflow_phrases", "reference": "summarize the readme and draft a release note", "n_words": 8}
+{"id": 189, "category": "acronyms_numbers", "reference": "the a s r daemon emits j s o n over a unix socket", "n_words": 14}
+{"id": 190, "category": "shell_commands", "reference": "chmod plus x the deploy script then execute it", "n_words": 9}
+{"id": 191, "category": "dev_tools", "reference": "the ollama runtime serves llama three point one on localhost", "n_words": 10}
+{"id": 192, "category": "linux_internals", "reference": "wayland compositors handle window management differently from x eleven", "n_words": 9}
+{"id": 193, "category": "workflow_phrases", "reference": "generate a docstring for every public method in this class", "n_words": 10}
+{"id": 194, "category": "acronyms_numbers", "reference": "the c p u load is at ninety five percent on eight cores", "n_words": 13}
+{"id": 195, "category": "shell_commands", "reference": "systemctl restart the nginx service and check its status", "n_words": 9}
+{"id": 196, "category": "dev_tools", "reference": "the pytest suite reports coverage for every module", "n_words": 8}
+{"id": 197, "category": "linux_internals", "reference": "wayland compositors handle window management differently from x eleven", "n_words": 9}
+{"id": 198, "category": "workflow_phrases", "reference": "create a new git branch called feature slash auth", "n_words": 9}
+{"id": 199, "category": "acronyms_numbers", "reference": "the w e r target is under eight percent for whisper", "n_words": 11}
+{"id": 200, "category": "shell_commands", "reference": "chmod plus x the deploy script then execute it", "n_words": 9}
+{"id": 201, "category": "dev_tools", "reference": "the language server protocol handles autocomplete and refactoring", "n_words": 8}
+{"id": 202, "category": "linux_internals", "reference": "the cgroups v two hierarchy accounts per process resource usage", "n_words": 10}
+{"id": 203, "category": "workflow_phrases", "reference": "refactor the handler into smaller pure functions", "n_words": 7}
+{"id": 204, "category": "acronyms_numbers", "reference": "the w e r target is under eight percent for whisper", "n_words": 11}
+{"id": 205, "category": "shell_commands", "reference": "docker compose up dash d and tail the logs", "n_words": 9}
+{"id": 206, "category": "dev_tools", "reference": "chromadb stores the embeddings from the mini l m model", "n_words": 10}
+{"id": 207, "category": "linux_internals", "reference": "the ebpf program attaches to the perf event source", "n_words": 9}
+{"id": 208, "category": "workflow_phrases", "reference": "scaffold a fast api service with async endpoints", "n_words": 8}
+{"id": 209, "category": "acronyms_numbers", "reference": "quantize the model to q four k m for six gigabytes of ram", "n_words": 13}
+{"id": 210, "category": "shell_commands", "reference": "export the PATH variable then source the bashrc", "n_words": 8}
+{"id": 211, "category": "dev_tools", "reference": "chromadb stores the embeddings from the mini l m model", "n_words": 10}
+{"id": 212, "category": "linux_internals", "reference": "the cgroups v two hierarchy accounts per process resource usage", "n_words": 10}
+{"id": 213, "category": "workflow_phrases", "reference": "scaffold a fast api service with async endpoints", "n_words": 8}
+{"id": 214, "category": "acronyms_numbers", "reference": "http localhost one one four three four serves the ollama a p i", "n_words": 13}
+{"id": 215, "category": "shell_commands", "reference": "run sudo apt install pipewire and wireplumber", "n_words": 7}
+{"id": 216, "category": "dev_tools", "reference": "the ollama runtime serves llama three point one on localhost", "n_words": 10}
+{"id": 217, "category": "linux_internals", "reference": "inotify watches the documents directory for new files", "n_words": 8}
+{"id": 218, "category": "workflow_phrases", "reference": "create a new git branch called feature slash auth", "n_words": 9}
+{"id": 219, "category": "acronyms_numbers", "reference": "the c p u load is at ninety five percent on eight cores", "n_words": 13}
+{"id": 220, "category": "shell_commands", "reference": "git rebase dash i onto the main branch", "n_words": 8}
+{"id": 221, "category": "dev_tools", "reference": "open the integrated terminal in visual studio code", "n_words": 8}
+{"id": 222, "category": "linux_internals", "reference": "inotify watches the documents directory for new files", "n_words": 8}
+{"id": 223, "category": "workflow_phrases", "reference": "build the release binary and strip the debug symbols", "n_words": 9}
+{"id": 224, "category": "acronyms_numbers", "reference": "quantize the model to q four k m for six gigabytes of ram", "n_words": 13}
+{"id": 225, "category": "shell_commands", "reference": "systemctl restart the nginx service and check its status", "n_words": 9}
+{"id": 226, "category": "dev_tools", "reference": "npm install the model context protocol server package", "n_words": 8}
+{"id": 227, "category": "linux_internals", "reference": "at spi provides the accessibility tree for gtk four apps", "n_words": 10}
+{"id": 228, "category": "workflow_phrases", "reference": "scaffold a fast api service with async endpoints", "n_words": 8}
+{"id": 229, "category": "acronyms_numbers", "reference": "the s h a two fifty six audit log is append only", "n_words": 12}
+{"id": 230, "category": "shell_commands", "reference": "kill dash nine the process id four two seven one", "n_words": 10}
+{"id": 231, "category": "dev_tools", "reference": "npm install the model context protocol server package", "n_words": 8}
+{"id": 232, "category": "linux_internals", "reference": "inotify watches the documents directory for new files", "n_words": 8}
+{"id": 233, "category": "workflow_phrases", "reference": "add type hints to the parameters and return value", "n_words": 9}
+{"id": 234, "category": "acronyms_numbers", "reference": "the s h a two fifty six audit log is append only", "n_words": 12}
+{"id": 235, "category": "shell_commands", "reference": "kill dash nine the process id four two seven one", "n_words": 10}
+{"id": 236, "category": "dev_tools", "reference": "the cuda toolkit accelerates whisper large v three inference", "n_words": 9}
+{"id": 237, "category": "linux_internals", "reference": "the systemd unit runs as a user scope with private tmp", "n_words": 11}
+{"id": 238, "category": "workflow_phrases", "reference": "install the requirements then run the migrations", "n_words": 7}
+{"id": 239, "category": "acronyms_numbers", "reference": "the g p u is an r t x three zero six zero with twelve gigabytes", "n_words": 16}
+{"id": 240, "category": "shell_commands", "reference": "kill dash nine the process id four two seven one", "n_words": 10}
+{"id": 241, "category": "dev_tools", "reference": "the ollama runtime serves llama three point one on localhost", "n_words": 10}
+{"id": 242, "category": "linux_internals", "reference": "inotify watches the documents directory for new files", "n_words": 8}
+{"id": 243, "category": "workflow_phrases", "reference": "refactor the handler into smaller pure functions", "n_words": 7}
+{"id": 244, "category": "acronyms_numbers", "reference": "the s h a two fifty six audit log is append only", "n_words": 12}
+{"id": 245, "category": "shell_commands", "reference": "run sudo apt install pipewire and wireplumber", "n_words": 7}
+{"id": 246, "category": "dev_tools", "reference": "open the integrated terminal in visual studio code", "n_words": 8}
+{"id": 247, "category": "linux_internals", "reference": "d bus exposes the network manager interface over the session bus", "n_words": 11}
+{"id": 248, "category": "workflow_phrases", "reference": "refactor the handler into smaller pure functions", "n_words": 7}
+{"id": 249, "category": "acronyms_numbers", "reference": "l l m latency should stay under eight seconds on c p u", "n_words": 13}
+{"id": 250, "category": "shell_commands", "reference": "kill dash nine the process id four two seven one", "n_words": 10}
+{"id": 251, "category": "dev_tools", "reference": "the cuda toolkit accelerates whisper large v three inference", "n_words": 9}
+{"id": 252, "category": "linux_internals", "reference": "at spi provides the accessibility tree for gtk four apps", "n_words": 10}
+{"id": 253, "category": "workflow_phrases", "reference": "refactor the handler into smaller pure functions", "n_words": 7}
+{"id": 254, "category": "acronyms_numbers", "reference": "the s h a two fifty six audit log is append only", "n_words": 12}
+{"id": 255, "category": "shell_commands", "reference": "export the PATH variable then source the bashrc", "n_words": 8}
+{"id": 256, "category": "dev_tools", "reference": "the language server protocol handles autocomplete and refactoring", "n_words": 8}
+{"id": 257, "category": "linux_internals", "reference": "the systemd unit runs as a user scope with private tmp", "n_words": 11}
+{"id": 258, "category": "workflow_phrases", "reference": "commit everything with my conventional commit format and push", "n_words": 9}
+{"id": 259, "category": "acronyms_numbers", "reference": "the r a g engine retrieves the top five chunks by cosine similarity", "n_words": 13}
+{"id": 260, "category": "shell_commands", "reference": "docker compose up dash d and tail the logs", "n_words": 9}
+{"id": 261, "category": "dev_tools", "reference": "the ollama runtime serves llama three point one on localhost", "n_words": 10}
+{"id": 262, "category": "linux_internals", "reference": "at spi provides the accessibility tree for gtk four apps", "n_words": 10}
+{"id": 263, "category": "workflow_phrases", "reference": "install the requirements then run the migrations", "n_words": 7}
+{"id": 264, "category": "acronyms_numbers", "reference": "the w e r target is under eight percent for whisper", "n_words": 11}
+{"id": 265, "category": "shell_commands", "reference": "curl dash f s s L the install script and pipe it to bash", "n_words": 14}
+{"id": 266, "category": "dev_tools", "reference": "the cuda toolkit accelerates whisper large v three inference", "n_words": 9}
+{"id": 267, "category": "linux_internals", "reference": "read proc meminfo to check the available memory", "n_words": 8}
+{"id": 268, "category": "workflow_phrases", "reference": "refactor the handler into smaller pure functions", "n_words": 7}
+{"id": 269, "category": "acronyms_numbers", "reference": "the s h a two fifty six audit log is append only", "n_words": 12}
+{"id": 270, "category": "shell_commands", "reference": "chmod plus x the deploy script then execute it", "n_words": 9}
+{"id": 271, "category": "dev_tools", "reference": "the language server protocol handles autocomplete and refactoring", "n_words": 8}
+{"id": 272, "category": "linux_internals", "reference": "pipewire replaces pulseaudio for lower latency capture", "n_words": 7}
+{"id": 273, "category": "workflow_phrases", "reference": "install the requirements then run the migrations", "n_words": 7}
+{"id": 274, "category": "acronyms_numbers", "reference": "the w e r target is under eight percent for whisper", "n_words": 11}
+{"id": 275, "category": "shell_commands", "reference": "grep dash r for the string TODO across the source tree", "n_words": 11}
+{"id": 276, "category": "dev_tools", "reference": "webpack bundles the typescript into a single artifact", "n_words": 8}
+{"id": 277, "category": "linux_internals", "reference": "at spi provides the accessibility tree for gtk four apps", "n_words": 10}
+{"id": 278, "category": "workflow_phrases", "reference": "commit everything with my conventional commit format and push", "n_words": 9}
+{"id": 279, "category": "acronyms_numbers", "reference": "the g p u is an r t x three zero six zero with twelve gigabytes", "n_words": 16}
+{"id": 280, "category": "shell_commands", "reference": "docker compose up dash d and tail the logs", "n_words": 9}
+{"id": 281, "category": "dev_tools", "reference": "webpack bundles the typescript into a single artifact", "n_words": 8}
+{"id": 282, "category": "linux_internals", "reference": "the ebpf program attaches to the perf event source", "n_words": 9}
+{"id": 283, "category": "workflow_phrases", "reference": "scaffold a fast api service with async endpoints", "n_words": 8}
+{"id": 284, "category": "acronyms_numbers", "reference": "the c p u load is at ninety five percent on eight cores", "n_words": 13}
+{"id": 285, "category": "shell_commands", "reference": "grep dash r for the string TODO across the source tree", "n_words": 11}
+{"id": 286, "category": "dev_tools", "reference": "open the integrated terminal in visual studio code", "n_words": 8}
+{"id": 287, "category": "linux_internals", "reference": "apparmor confines the daemon to a read only home directory", "n_words": 10}
+{"id": 288, "category": "workflow_phrases", "reference": "summarize the readme and draft a release note", "n_words": 8}
+{"id": 289, "category": "acronyms_numbers", "reference": "the w e r target is under eight percent for whisper", "n_words": 11}
+{"id": 290, "category": "shell_commands", "reference": "grep dash r for the string TODO across the source tree", "n_words": 11}
+{"id": 291, "category": "dev_tools", "reference": "the cuda toolkit accelerates whisper large v three inference", "n_words": 9}
+{"id": 292, "category": "linux_internals", "reference": "wayland compositors handle window management differently from x eleven", "n_words": 9}
+{"id": 293, "category": "workflow_phrases", "reference": "refactor the handler into smaller pure functions", "n_words": 7}
+{"id": 294, "category": "acronyms_numbers", "reference": "the s h a two fifty six audit log is append only", "n_words": 12}
+{"id": 295, "category": "shell_commands", "reference": "grep dash r for the string TODO across the source tree", "n_words": 11}
+{"id": 296, "category": "dev_tools", "reference": "npm install the model context protocol server package", "n_words": 8}
+{"id": 297, "category": "linux_internals", "reference": "inotify watches the documents directory for new files", "n_words": 8}
+{"id": 298, "category": "workflow_phrases", "reference": "scaffold a fast api service with async endpoints", "n_words": 8}
+{"id": 299, "category": "acronyms_numbers", "reference": "the a s r daemon emits j s o n over a unix socket", "n_words": 14}
+{"id": 300, "category": "shell_commands", "reference": "run sudo apt install pipewire and wireplumber", "n_words": 7}
+{"id": 301, "category": "dev_tools", "reference": "the language server protocol handles autocomplete and refactoring", "n_words": 8}
+{"id": 302, "category": "linux_internals", "reference": "inotify watches the documents directory for new files", "n_words": 8}
+{"id": 303, "category": "workflow_phrases", "reference": "scaffold a fast api service with async endpoints", "n_words": 8}
+{"id": 304, "category": "acronyms_numbers", "reference": "the g p u is an r t x three zero six zero with twelve gigabytes", "n_words": 16}
+{"id": 305, "category": "shell_commands", "reference": "kill dash nine the process id four two seven one", "n_words": 10}
+{"id": 306, "category": "dev_tools", "reference": "the ollama runtime serves llama three point one on localhost", "n_words": 10}
+{"id": 307, "category": "linux_internals", "reference": "read proc meminfo to check the available memory", "n_words": 8}
+{"id": 308, "category": "workflow_phrases", "reference": "build the release binary and strip the debug symbols", "n_words": 9}
+{"id": 309, "category": "acronyms_numbers", "reference": "the r a g engine retrieves the top five chunks by cosine similarity", "n_words": 13}
+{"id": 310, "category": "shell_commands", "reference": "systemctl restart the nginx service and check its status", "n_words": 9}
+{"id": 311, "category": "dev_tools", "reference": "npm install the model context protocol server package", "n_words": 8}
+{"id": 312, "category": "linux_internals", "reference": "the systemd unit runs as a user scope with private tmp", "n_words": 11}
+{"id": 313, "category": "workflow_phrases", "reference": "summarize the readme and draft a release note", "n_words": 8}
+{"id": 314, "category": "acronyms_numbers", "reference": "the s h a two fifty six audit log is append only", "n_words": 12}
+{"id": 315, "category": "shell_commands", "reference": "systemctl restart the nginx service and check its status", "n_words": 9}
+{"id": 316, "category": "dev_tools", "reference": "npm install the model context protocol server package", "n_words": 8}
+{"id": 317, "category": "linux_internals", "reference": "pipewire replaces pulseaudio for lower latency capture", "n_words": 7}
+{"id": 318, "category": "workflow_phrases", "reference": "scaffold a fast api service with async endpoints", "n_words": 8}
+{"id": 319, "category": "acronyms_numbers", "reference": "the a s r daemon emits j s o n over a unix socket", "n_words": 14}
+{"id": 320, "category": "shell_commands", "reference": "export the PATH variable then source the bashrc", "n_words": 8}
+{"id": 321, "category": "dev_tools", "reference": "the kubernetes pod is stuck in crash loop back off", "n_words": 10}
+{"id": 322, "category": "linux_internals", "reference": "wayland compositors handle window management differently from x eleven", "n_words": 9}
+{"id": 323, "category": "workflow_phrases", "reference": "add type hints to the parameters and return value", "n_words": 9}
+{"id": 324, "category": "acronyms_numbers", "reference": "the g p u is an r t x three zero six zero with twelve gigabytes", "n_words": 16}
+{"id": 325, "category": "shell_commands", "reference": "git rebase dash i onto the main branch", "n_words": 8}
+{"id": 326, "category": "dev_tools", "reference": "fine tune the bert tiny model and export it to onnx", "n_words": 11}
+{"id": 327, "category": "linux_internals", "reference": "inotify watches the documents directory for new files", "n_words": 8}
+{"id": 328, "category": "workflow_phrases", "reference": "scaffold a fast api service with async endpoints", "n_words": 8}
+{"id": 329, "category": "acronyms_numbers", "reference": "http localhost one one four three four serves the ollama a p i", "n_words": 13}
+{"id": 330, "category": "shell_commands", "reference": "git rebase dash i onto the main branch", "n_words": 8}
+{"id": 331, "category": "dev_tools", "reference": "open the integrated terminal in visual studio code", "n_words": 8}
+{"id": 332, "category": "linux_internals", "reference": "the cgroups v two hierarchy accounts per process resource usage", "n_words": 10}
+{"id": 333, "category": "workflow_phrases", "reference": "scaffold a fast api service with async endpoints", "n_words": 8}
+{"id": 334, "category": "acronyms_numbers", "reference": "the l s p client talks j s o n r p c over a web socket", "n_words": 17}
+{"id": 335, "category": "shell_commands", "reference": "run sudo apt install pipewire and wireplumber", "n_words": 7}
+{"id": 336, "category": "dev_tools", "reference": "fine tune the bert tiny model and export it to onnx", "n_words": 11}
+{"id": 337, "category": "linux_internals", "reference": "apparmor confines the daemon to a read only home directory", "n_words": 10}
+{"id": 338, "category": "workflow_phrases", "reference": "scaffold a fast api service with async endpoints", "n_words": 8}
+{"id": 339, "category": "acronyms_numbers", "reference": "the w e r target is under eight percent for whisper", "n_words": 11}
+{"id": 340, "category": "shell_commands", "reference": "curl dash f s s L the install script and pipe it to bash", "n_words": 14}
+{"id": 341, "category": "dev_tools", "reference": "the language server protocol handles autocomplete and refactoring", "n_words": 8}
+{"id": 342, "category": "linux_internals", "reference": "inotify watches the documents directory for new files", "n_words": 8}
+{"id": 343, "category": "workflow_phrases", "reference": "set up a django project with my usual virtual environment", "n_words": 10}
+{"id": 344, "category": "acronyms_numbers", "reference": "the s h a two fifty six audit log is append only", "n_words": 12}
+{"id": 345, "category": "shell_commands", "reference": "git rebase dash i onto the main branch", "n_words": 8}
+{"id": 346, "category": "dev_tools", "reference": "npm install the model context protocol server package", "n_words": 8}
+{"id": 347, "category": "linux_internals", "reference": "inotify watches the documents directory for new files", "n_words": 8}
+{"id": 348, "category": "workflow_phrases", "reference": "refactor the handler into smaller pure functions", "n_words": 7}
+{"id": 349, "category": "acronyms_numbers", "reference": "quantize the model to q four k m for six gigabytes of ram", "n_words": 13}
+{"id": 350, "category": "shell_commands", "reference": "git rebase dash i onto the main branch", "n_words": 8}
+{"id": 351, "category": "dev_tools", "reference": "open the integrated terminal in visual studio code", "n_words": 8}
+{"id": 352, "category": "linux_internals", "reference": "the systemd unit runs as a user scope with private tmp", "n_words": 11}
+{"id": 353, "category": "workflow_phrases", "reference": "install the requirements then run the migrations", "n_words": 7}
+{"id": 354, "category": "acronyms_numbers", "reference": "l l m latency should stay under eight seconds on c p u", "n_words": 13}
+{"id": 355, "category": "shell_commands", "reference": "run sudo apt install pipewire and wireplumber", "n_words": 7}
+{"id": 356, "category": "dev_tools", "reference": "the language server protocol handles autocomplete and refactoring", "n_words": 8}
+{"id": 357, "category": "linux_internals", "reference": "inotify watches the documents directory for new files", "n_words": 8}
+{"id": 358, "category": "workflow_phrases", "reference": "refactor the handler into smaller pure functions", "n_words": 7}
+{"id": 359, "category": "acronyms_numbers", "reference": "http localhost one one four three four serves the ollama a p i", "n_words": 13}
+{"id": 360, "category": "shell_commands", "reference": "run sudo apt install pipewire and wireplumber", "n_words": 7}
+{"id": 361, "category": "dev_tools", "reference": "the language server protocol handles autocomplete and refactoring", "n_words": 8}
+{"id": 362, "category": "linux_internals", "reference": "the cgroups v two hierarchy accounts per process resource usage", "n_words": 10}
+{"id": 363, "category": "workflow_phrases", "reference": "create a new git branch called feature slash auth", "n_words": 9}
+{"id": 364, "category": "acronyms_numbers", "reference": "the l s p client talks j s o n r p c over a web socket", "n_words": 17}
+{"id": 365, "category": "shell_commands", "reference": "git rebase dash i onto the main branch", "n_words": 8}
+{"id": 366, "category": "dev_tools", "reference": "the cuda toolkit accelerates whisper large v three inference", "n_words": 9}
+{"id": 367, "category": "linux_internals", "reference": "inotify watches the documents directory for new files", "n_words": 8}
+{"id": 368, "category": "workflow_phrases", "reference": "install the requirements then run the migrations", "n_words": 7}
+{"id": 369, "category": "acronyms_numbers", "reference": "l l m latency should stay under eight seconds on c p u", "n_words": 13}
+{"id": 370, "category": "shell_commands", "reference": "docker compose up dash d and tail the logs", "n_words": 9}
+{"id": 371, "category": "dev_tools", "reference": "npm install the model context protocol server package", "n_words": 8}
+{"id": 372, "category": "linux_internals", "reference": "inotify watches the documents directory for new files", "n_words": 8}
+{"id": 373, "category": "workflow_phrases", "reference": "refactor the handler into smaller pure functions", "n_words": 7}
+{"id": 374, "category": "acronyms_numbers", "reference": "http localhost one one four three four serves the ollama a p i", "n_words": 13}
+{"id": 375, "category": "shell_commands", "reference": "kill dash nine the process id four two seven one", "n_words": 10}
+{"id": 376, "category": "dev_tools", "reference": "npm install the model context protocol server package", "n_words": 8}
+{"id": 377, "category": "linux_internals", "reference": "d bus exposes the network manager interface over the session bus", "n_words": 11}
+{"id": 378, "category": "workflow_phrases", "reference": "add type hints to the parameters and return value", "n_words": 9}
+{"id": 379, "category": "acronyms_numbers", "reference": "the r a g engine retrieves the top five chunks by cosine similarity", "n_words": 13}
+{"id": 380, "category": "shell_commands", "reference": "docker compose up dash d and tail the logs", "n_words": 9}
+{"id": 381, "category": "dev_tools", "reference": "fine tune the bert tiny model and export it to onnx", "n_words": 11}
+{"id": 382, "category": "linux_internals", "reference": "pipewire replaces pulseaudio for lower latency capture", "n_words": 7}
+{"id": 383, "category": "workflow_phrases", "reference": "commit everything with my conventional commit format and push", "n_words": 9}
+{"id": 384, "category": "acronyms_numbers", "reference": "the g p u is an r t x three zero six zero with twelve gigabytes", "n_words": 16}
+{"id": 385, "category": "shell_commands", "reference": "docker compose up dash d and tail the logs", "n_words": 9}
+{"id": 386, "category": "dev_tools", "reference": "the pytest suite reports coverage for every module", "n_words": 8}
+{"id": 387, "category": "linux_internals", "reference": "the ebpf program attaches to the perf event source", "n_words": 9}
+{"id": 388, "category": "workflow_phrases", "reference": "install the requirements then run the migrations", "n_words": 7}
+{"id": 389, "category": "acronyms_numbers", "reference": "the g p u is an r t x three zero six zero with twelve gigabytes", "n_words": 16}
+{"id": 390, "category": "shell_commands", "reference": "chmod plus x the deploy script then execute it", "n_words": 9}
+{"id": 391, "category": "dev_tools", "reference": "the ollama runtime serves llama three point one on localhost", "n_words": 10}
+{"id": 392, "category": "linux_internals", "reference": "d bus exposes the network manager interface over the session bus", "n_words": 11}
+{"id": 393, "category": "workflow_phrases", "reference": "commit everything with my conventional commit format and push", "n_words": 9}
+{"id": 394, "category": "acronyms_numbers", "reference": "the c p u load is at ninety five percent on eight cores", "n_words": 13}
+{"id": 395, "category": "shell_commands", "reference": "export the PATH variable then source the bashrc", "n_words": 8}
+{"id": 396, "category": "dev_tools", "reference": "fine tune the bert tiny model and export it to onnx", "n_words": 11}
+{"id": 397, "category": "linux_internals", "reference": "d bus exposes the network manager interface over the session bus", "n_words": 11}
+{"id": 398, "category": "workflow_phrases", "reference": "scaffold a fast api service with async endpoints", "n_words": 8}
+{"id": 399, "category": "acronyms_numbers", "reference": "the w e r target is under eight percent for whisper", "n_words": 11}
+{"id": 400, "category": "shell_commands", "reference": "kill dash nine the process id four two seven one", "n_words": 10}
+{"id": 401, "category": "dev_tools", "reference": "the language server protocol handles autocomplete and refactoring", "n_words": 8}
+{"id": 402, "category": "linux_internals", "reference": "pipewire replaces pulseaudio for lower latency capture", "n_words": 7}
+{"id": 403, "category": "workflow_phrases", "reference": "refactor the handler into smaller pure functions", "n_words": 7}
+{"id": 404, "category": "acronyms_numbers", "reference": "the c p u load is at ninety five percent on eight cores", "n_words": 13}
+{"id": 405, "category": "shell_commands", "reference": "kill dash nine the process id four two seven one", "n_words": 10}
+{"id": 406, "category": "dev_tools", "reference": "fine tune the bert tiny model and export it to onnx", "n_words": 11}
+{"id": 407, "category": "linux_internals", "reference": "pipewire replaces pulseaudio for lower latency capture", "n_words": 7}
+{"id": 408, "category": "workflow_phrases", "reference": "add type hints to the parameters and return value", "n_words": 9}
+{"id": 409, "category": "acronyms_numbers", "reference": "the g p u is an r t x three zero six zero with twelve gigabytes", "n_words": 16}
+{"id": 410, "category": "shell_commands", "reference": "export the PATH variable then source the bashrc", "n_words": 8}
+{"id": 411, "category": "dev_tools", "reference": "webpack bundles the typescript into a single artifact", "n_words": 8}
+{"id": 412, "category": "linux_internals", "reference": "the systemd unit runs as a user scope with private tmp", "n_words": 11}
+{"id": 413, "category": "workflow_phrases", "reference": "create a new git branch called feature slash auth", "n_words": 9}
+{"id": 414, "category": "acronyms_numbers", "reference": "the s h a two fifty six audit log is append only", "n_words": 12}
+{"id": 415, "category": "shell_commands", "reference": "chmod plus x the deploy script then execute it", "n_words": 9}
+{"id": 416, "category": "dev_tools", "reference": "the pytest suite reports coverage for every module", "n_words": 8}
+{"id": 417, "category": "linux_internals", "reference": "read proc meminfo to check the available memory", "n_words": 8}
+{"id": 418, "category": "workflow_phrases", "reference": "create a new git branch called feature slash auth", "n_words": 9}
+{"id": 419, "category": "acronyms_numbers", "reference": "http localhost one one four three four serves the ollama a p i", "n_words": 13}
+{"id": 420, "category": "shell_commands", "reference": "docker compose up dash d and tail the logs", "n_words": 9}
+{"id": 421, "category": "dev_tools", "reference": "the kubernetes pod is stuck in crash loop back off", "n_words": 10}
+{"id": 422, "category": "linux_internals", "reference": "read proc meminfo to check the available memory", "n_words": 8}
+{"id": 423, "category": "workflow_phrases", "reference": "generate a docstring for every public method in this class", "n_words": 10}
+{"id": 424, "category": "acronyms_numbers", "reference": "the s h a two fifty six audit log is append only", "n_words": 12}
+{"id": 425, "category": "shell_commands", "reference": "git rebase dash i onto the main branch", "n_words": 8}
+{"id": 426, "category": "dev_tools", "reference": "the cuda toolkit accelerates whisper large v three inference", "n_words": 9}
+{"id": 427, "category": "linux_internals", "reference": "d bus exposes the network manager interface over the session bus", "n_words": 11}
+{"id": 428, "category": "workflow_phrases", "reference": "add type hints to the parameters and return value", "n_words": 9}
+{"id": 429, "category": "acronyms_numbers", "reference": "quantize the model to q four k m for six gigabytes of ram", "n_words": 13}
+{"id": 430, "category": "shell_commands", "reference": "chmod plus x the deploy script then execute it", "n_words": 9}
+{"id": 431, "category": "dev_tools", "reference": "the ollama runtime serves llama three point one on localhost", "n_words": 10}
+{"id": 432, "category": "linux_internals", "reference": "the ebpf program attaches to the perf event source", "n_words": 9}
+{"id": 433, "category": "workflow_phrases", "reference": "commit everything with my conventional commit format and push", "n_words": 9}
+{"id": 434, "category": "acronyms_numbers", "reference": "l l m latency should stay under eight seconds on c p u", "n_words": 13}
+{"id": 435, "category": "shell_commands", "reference": "systemctl restart the nginx service and check its status", "n_words": 9}
+{"id": 436, "category": "dev_tools", "reference": "open the integrated terminal in visual studio code", "n_words": 8}
+{"id": 437, "category": "linux_internals", "reference": "apparmor confines the daemon to a read only home directory", "n_words": 10}
+{"id": 438, "category": "workflow_phrases", "reference": "build the release binary and strip the debug symbols", "n_words": 9}
+{"id": 439, "category": "acronyms_numbers", "reference": "the c p u load is at ninety five percent on eight cores", "n_words": 13}
+{"id": 440, "category": "shell_commands", "reference": "use ripgrep to search the entire codebase for the function", "n_words": 10}
+{"id": 441, "category": "dev_tools", "reference": "chromadb stores the embeddings from the mini l m model", "n_words": 10}
+{"id": 442, "category": "linux_internals", "reference": "pipewire replaces pulseaudio for lower latency capture", "n_words": 7}
+{"id": 443, "category": "workflow_phrases", "reference": "scaffold a fast api service with async endpoints", "n_words": 8}
+{"id": 444, "category": "acronyms_numbers", "reference": "http localhost one one four three four serves the ollama a p i", "n_words": 13}
+{"id": 445, "category": "shell_commands", "reference": "git rebase dash i onto the main branch", "n_words": 8}
+{"id": 446, "category": "dev_tools", "reference": "the cuda toolkit accelerates whisper large v three inference", "n_words": 9}
+{"id": 447, "category": "linux_internals", "reference": "the cgroups v two hierarchy accounts per process resource usage", "n_words": 10}
+{"id": 448, "category": "workflow_phrases", "reference": "create a new git branch called feature slash auth", "n_words": 9}
+{"id": 449, "category": "acronyms_numbers", "reference": "quantize the model to q four k m for six gigabytes of ram", "n_words": 13}
+{"id": 450, "category": "shell_commands", "reference": "systemctl restart the nginx service and check its status", "n_words": 9}
+{"id": 451, "category": "dev_tools", "reference": "open the integrated terminal in visual studio code", "n_words": 8}
+{"id": 452, "category": "linux_internals", "reference": "apparmor confines the daemon to a read only home directory", "n_words": 10}
+{"id": 453, "category": "workflow_phrases", "reference": "generate a docstring for every public method in this class", "n_words": 10}
+{"id": 454, "category": "acronyms_numbers", "reference": "quantize the model to q four k m for six gigabytes of ram", "n_words": 13}
+{"id": 455, "category": "shell_commands", "reference": "systemctl restart the nginx service and check its status", "n_words": 9}
+{"id": 456, "category": "dev_tools", "reference": "open the integrated terminal in visual studio code", "n_words": 8}
+{"id": 457, "category": "linux_internals", "reference": "the ebpf program attaches to the perf event source", "n_words": 9}
+{"id": 458, "category": "workflow_phrases", "reference": "build the release binary and strip the debug symbols", "n_words": 9}
+{"id": 459, "category": "acronyms_numbers", "reference": "quantize the model to q four k m for six gigabytes of ram", "n_words": 13}
+{"id": 460, "category": "shell_commands", "reference": "curl dash f s s L the install script and pipe it to bash", "n_words": 14}
+{"id": 461, "category": "dev_tools", "reference": "the ollama runtime serves llama three point one on localhost", "n_words": 10}
+{"id": 462, "category": "linux_internals", "reference": "the ebpf program attaches to the perf event source", "n_words": 9}
+{"id": 463, "category": "workflow_phrases", "reference": "build the release binary and strip the debug symbols", "n_words": 9}
+{"id": 464, "category": "acronyms_numbers", "reference": "quantize the model to q four k m for six gigabytes of ram", "n_words": 13}
+{"id": 465, "category": "shell_commands", "reference": "docker compose up dash d and tail the logs", "n_words": 9}
+{"id": 466, "category": "dev_tools", "reference": "open the integrated terminal in visual studio code", "n_words": 8}
+{"id": 467, "category": "linux_internals", "reference": "at spi provides the accessibility tree for gtk four apps", "n_words": 10}
+{"id": 468, "category": "workflow_phrases", "reference": "add type hints to the parameters and return value", "n_words": 9}
+{"id": 469, "category": "acronyms_numbers", "reference": "the g p u is an r t x three zero six zero with twelve gigabytes", "n_words": 16}
+{"id": 470, "category": "shell_commands", "reference": "systemctl restart the nginx service and check its status", "n_words": 9}
+{"id": 471, "category": "dev_tools", "reference": "the cuda toolkit accelerates whisper large v three inference", "n_words": 9}
+{"id": 472, "category": "linux_internals", "reference": "apparmor confines the daemon to a read only home directory", "n_words": 10}
+{"id": 473, "category": "workflow_phrases", "reference": "set up a django project with my usual virtual environment", "n_words": 10}
+{"id": 474, "category": "acronyms_numbers", "reference": "http localhost one one four three four serves the ollama a p i", "n_words": 13}
+{"id": 475, "category": "shell_commands", "reference": "kill dash nine the process id four two seven one", "n_words": 10}
+{"id": 476, "category": "dev_tools", "reference": "the language server protocol handles autocomplete and refactoring", "n_words": 8}
+{"id": 477, "category": "linux_internals", "reference": "apparmor confines the daemon to a read only home directory", "n_words": 10}
+{"id": 478, "category": "workflow_phrases", "reference": "build the release binary and strip the debug symbols", "n_words": 9}
+{"id": 479, "category": "acronyms_numbers", "reference": "the a s r daemon emits j s o n over a unix socket", "n_words": 14}
+{"id": 480, "category": "shell_commands", "reference": "grep dash r for the string TODO across the source tree", "n_words": 11}
+{"id": 481, "category": "dev_tools", "reference": "the ollama runtime serves llama three point one on localhost", "n_words": 10}
+{"id": 482, "category": "linux_internals", "reference": "d bus exposes the network manager interface over the session bus", "n_words": 11}
+{"id": 483, "category": "workflow_phrases", "reference": "build the release binary and strip the debug symbols", "n_words": 9}
+{"id": 484, "category": "acronyms_numbers", "reference": "http localhost one one four three four serves the ollama a p i", "n_words": 13}
+{"id": 485, "category": "shell_commands", "reference": "kill dash nine the process id four two seven one", "n_words": 10}
+{"id": 486, "category": "dev_tools", "reference": "chromadb stores the embeddings from the mini l m model", "n_words": 10}
+{"id": 487, "category": "linux_internals", "reference": "the cgroups v two hierarchy accounts per process resource usage", "n_words": 10}
+{"id": 488, "category": "workflow_phrases", "reference": "add type hints to the parameters and return value", "n_words": 9}
+{"id": 489, "category": "acronyms_numbers", "reference": "the c p u load is at ninety five percent on eight cores", "n_words": 13}
+{"id": 490, "category": "shell_commands", "reference": "systemctl restart the nginx service and check its status", "n_words": 9}
+{"id": 491, "category": "dev_tools", "reference": "the pytest suite reports coverage for every module", "n_words": 8}
+{"id": 492, "category": "linux_internals", "reference": "read proc meminfo to check the available memory", "n_words": 8}
+{"id": 493, "category": "workflow_phrases", "reference": "build the release binary and strip the debug symbols", "n_words": 9}
+{"id": 494, "category": "acronyms_numbers", "reference": "the a s r daemon emits j s o n over a unix socket", "n_words": 14}
+{"id": 495, "category": "shell_commands", "reference": "run sudo apt install pipewire and wireplumber", "n_words": 7}
+{"id": 496, "category": "dev_tools", "reference": "open the integrated terminal in visual studio code", "n_words": 8}
+{"id": 497, "category": "linux_internals", "reference": "inotify watches the documents directory for new files", "n_words": 8}
+{"id": 498, "category": "workflow_phrases", "reference": "add type hints to the parameters and return value", "n_words": 9}
+{"id": 499, "category": "acronyms_numbers", "reference": "the r a g engine retrieves the top five chunks by cosine similarity", "n_words": 13}

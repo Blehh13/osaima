@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OSAIMA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="src/style.css" />
+</head>
+<body>
+
+  <!-- AMBIENT DESKTOP LAYER -->
+  <div id="desktop">
+    <!-- Starfield canvas background -->
+    <canvas id="starfield"></canvas>
+
+    <!-- Deep Space Gradients -->
+    <div class="nebula nebula-primary"></div>
+    <div class="nebula nebula-secondary"></div>
+    <div class="nebula nebula-tertiary"></div>
+
+    <!-- Top status bar -->
+    <header id="status-bar">
+      <div class="status-left">
+        <div id="os-logo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="url(#logo-grad)" stroke-width="2"/>
+            <circle cx="12" cy="12" r="4" fill="url(#logo-grad)"/>
+            <line x1="12" y1="2" x2="12" y2="6" stroke="url(#logo-grad)" stroke-width="2"/>
+            <line x1="12" y1="18" x2="12" y2="22" stroke="url(#logo-grad)" stroke-width="2"/>
+            <line x1="2" y1="12" x2="6" y2="12" stroke="url(#logo-grad)" stroke-width="2"/>
+            <line x1="18" y1="12" x2="22" y2="12" stroke="url(#logo-grad)" stroke-width="2"/>
+            <defs>
+              <linearGradient id="logo-grad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#5de4f0"/>
+                <stop offset="1" stop-color="#a78bfa"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <span class="logo-text">OSAIMA</span>
+        </div>
+      </div>
+      <div class="status-center">
+        <div id="clock">
+          <span id="clock-time">00:00</span>
+          <span id="clock-date">Mon, Jan 1</span>
+        </div>
+      </div>
+      <div class="status-right">
+        <div id="daemon-indicator" class="indicator offline" title="MCP Daemon Status">
+          <span class="dot"></span>
+          <span class="label">AI Core Offline</span>
+        </div>
+        <div class="status-pill" id="cpu-pill">CPU <span id="cpu-val">—</span></div>
+        <div class="status-pill" id="mem-pill">MEM <span id="mem-val">—</span></div>
+      </div>
+    </header>
+
+    <!-- TEST HUB PANEL (For user verification) -->
+    <div id="test-hub" class="glass-panel floating-panel">
+      <div class="panel-header">
+        <span class="panel-title">System Test Hub</span>
+        <span class="panel-badge">DEBUG</span>
+      </div>
+      <div class="panel-body">
+        <p class="test-desc">Click these buttons to verify the backend components in real-time.</p>
+        <div class="test-buttons">
+          <button class="glass-btn btn-primary" onclick="window.testPing()">1. Ping Daemon (Rust)</button>
+          <button class="glass-btn btn-secondary" onclick="window.testUI()">2. Test UI Automator (AT-SPI)</button>
+          <button class="glass-btn btn-accent" onclick="window.testRAG()">3. Test RAG / LLM Quota</button>
+        </div>
+        <div id="test-output" class="console-box">Waiting for test execution...</div>
+      </div>
+    </div>
+
+    <!-- Window manager surface -->
+    <div id="wm-surface"></div>
+
+    <!-- Center ambient message -->
+    <div id="ambient-center">
+      <p id="ambient-hint">Press <kbd>Space</kbd> to open AI Core &nbsp;·&nbsp; <kbd>Alt</kbd>+<kbd>↵</kbd> for Terminal</p>
+    </div>
+
+    <!-- Bottom dock -->
+    <footer id="dock">
+      <div class="dock-section dock-apps" id="dock-apps"></div>
+      <div class="dock-divider"></div>
+      <div class="dock-section dock-windows" id="dock-windows"></div>
+      <div class="dock-spacer"></div>
+      <div class="dock-section dock-workspaces" id="dock-workspaces"></div>
+    </footer>
+
+  </div>
+
+  <!-- AI COMMAND HUB (activated by Space) -->
+  <div id="launcher" class="hidden">
+    <div id="launcher-backdrop" onclick="closeLauncher()"></div>
+    <div id="launcher-panel" class="glass-panel">
+      <div id="launcher-header">
+        <div id="launcher-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                  stroke="url(#orb-grad)" stroke-width="2" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="orb-grad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#ff7eb3"/>
+                <stop offset="1" stop-color="#a78bfa"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <input
+          id="launcher-input"
+          type="text"
+          placeholder="Ask your OS anything..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <div id="launcher-close" onclick="closeLauncher()">ESC</div>
+      </div>
+
+      <div id="launcher-suggestions">
+        <div class="suggestion-group-label">QUICK ACTIONS</div>
+        <div class="suggestions-grid">
+          <button class="suggestion-chip" onclick="runSuggestion(this)">Show system stats</button>
+          <button class="suggestion-chip" onclick="runSuggestion(this)">Open terminal</button>
+          <button class="suggestion-chip" onclick="runSuggestion(this)">List active processes</button>
+        </div>
+      </div>
+
+      <div id="launcher-response" class="hidden">
+        <div class="response-label">AI RESPONSE</div>
+        <div id="response-content"></div>
+      </div>
+
+      <div id="launcher-footer">
+        <span class="footer-hint"><kbd>↵</kbd> Execute &nbsp;·&nbsp; <kbd>Esc</kbd> Close</span>
+        <span id="daemon-status-text">Connecting to AI Core...</span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
