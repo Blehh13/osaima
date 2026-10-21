@@ -115,7 +115,22 @@ score came from an easy test, which is why the training now includes crowded rou
 
 `bench/run.sh` runs a 60 fps style task (6 ms of CPU every 16.7 ms) alone, against three
 CPU hogs per CPU, and against the same hogs with the daemon running, and counts the frames
-that finish more than a frame late. The `Scheduler benchmark` workflow runs it.
+that finish more than a frame late. The `Scheduler benchmark` workflow runs it. On a
+4-CPU GitHub runner, with 12 hogs (run 39688081379):
+
+| Run | Frames done (of 1500) | Median | 95th | 99th | Worst | Late frames |
+|---|---|---|---|---|---|---|
+| idle (no hogs) | 1500 | 6.08 ms | 6.08 ms | 6.09 ms | 6.12 ms | 0.0% |
+| loaded, no scheduler | 1259 | 18.61 ms | 24.95 ms | 26.6 ms | 43.91 ms | 79.2% |
+| loaded + scheduler (rules) | 1500 | 6.07 ms | 8.33 ms | 10.96 ms | 21.2 ms | 0.1% |
+| loaded + scheduler (trained model) | 1500 | 6.07 ms | 8.23 ms | 9.57 ms | 13.88 ms | 0.0% |
+
+Times are how long a frame took from when it was due. Without the daemon four in five
+frames are late and a quarter of the frames are never drawn; with it, the frame task runs
+almost as if the machine were idle. Both the rules and the model judged all 12 hogs batch
+(nice 10, `SCHED_BATCH`) and the frame task media (nice -3); the model's worst frame is
+better. This is one run on a shared CI machine, and the hogs are synthetic: it shows the
+mechanism works, not how much a particular desktop gains.
 
 ## What it does not do
 
