@@ -48,7 +48,12 @@ fn rust_and_python_rules_agree() {
     let (_, examples) = load();
     for (i, ex) in examples.iter().enumerate() {
         if let Some(expected) = ex.rules {
-            assert_eq!(rules(&ex.features), expected, "example {i}: {:?}", ex.features);
+            assert_eq!(
+                rules(&ex.features),
+                expected,
+                "example {i}: {:?}",
+                ex.features
+            );
         }
     }
 }
