@@ -25,7 +25,7 @@ if not) and about 6 GB free RAM for the guest.
    zoom-to-fit.
 3. Wait about a minute. The top bar (waybar) shows `AI: starting` while the
    on-device model loads (model load from the ISO was measured at 58 s), then
-   `AI: on this computer`, or `AI: Gemini` once a key is set.
+   `AI: on this computer`. (`AI: Gemini` appears only if a key was added and Fast mode chosen.)
 4. The guest uses QEMU user networking, so it needs the host to be online for
    Gemini. The guest's shell server is also forwarded to
    `http://localhost:8778` and SSH to `localhost:2222` (key in `out/vm/id_osaima`).

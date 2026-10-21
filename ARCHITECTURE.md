@@ -239,8 +239,8 @@ The red-team did not target the agent loop specifically.
 
 | Mode | Order tried | Notes |
 |---|---|---|
-| Fast (default once a key is set) | Gemini 3.5 Flash-Lite, then two other Flash-Lite models on the same key, then the local model | 8 s cloud timeout; IPv4-only client; a few seconds typical |
-| Private | Local llama.cpp server first (port 8080), cloud only if it fails | Nothing leaves the machine when it works; 10-150 s per answer on a CPU laptop |
+| Private (default) | Local llama.cpp server first (port 8080); a cloud model only if the user added a key and the local one fails | Free, no account; nothing leaves the machine when it works; 10-150 s per answer on a CPU laptop |
+| Fast (optional) | Gemini 3.5 Flash-Lite, then two other Flash-Lite models on the same key, then the local model | Needs the user's own key; adding a key does not switch to it, the user chooses it in Settings; 8 s cloud timeout; IPv4-only client |
 
 Switch at runtime with `system.set_llm_mode` (Settings). The router and all gates run
 locally in both modes. The local model is started by `ai-core/llm/start-llm.sh`,

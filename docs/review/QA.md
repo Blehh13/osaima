@@ -21,9 +21,9 @@ set of scripts on top of someone else's.
 **3. Why Gemini and not a local model? The PDR says fully local.**
 Speed. On our hardware (Ryzen 5, no fast GPU) the on-device model took 10-150 s
 per answer; Gemini 3.5 Flash-Lite answers in a few seconds (median 3.7 s in the
-evaluation). A shell that takes 30 seconds to answer is not usable. So Fast
-(Gemini) is the default once a key is set, and Private mode keeps everything
-on the machine at the cost of speed. The router that handles most simple
+evaluation). A shell that takes 30 seconds to answer is not usable. So
+Fast (Gemini) is available as an option with the user's own key, and Private
+mode, the free default, keeps everything on the machine at the cost of speed. The router that handles most simple
 commands is always local. We say openly that this departs from the PDR's
 "fully local" goal.
 

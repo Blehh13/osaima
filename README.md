@@ -118,9 +118,11 @@ items are grouped by area. Commit hashes are in [§14](#14-commit-history-of-thi
 That is not usable for a demo or for daily use.
 
 **Change.**
-- `llm.rs` now has two modes. **Cloud** is the default: Gemini 3.5 Flash-Lite
-  through its OpenAI-compatible endpoint. **Local** (Private mode) uses llama.cpp.
-  Local is also the offline fallback.
+- `llm.rs` has two modes. **Local** (Private mode) is the default: a model on
+  this computer through llama.cpp, free and needing no account. **Cloud**
+  (optional) is Gemini 3.5 Flash-Lite through its OpenAI-compatible endpoint, and
+  only works with a key the user adds and chooses in Settings. Adding a key does
+  not switch to it by itself.
 - The API key is saved only in `~/.config/osaima/llm.env` with mode 0600. It is
   never stored in the repo or in the ISO. Settings has a field to paste and check
   the key.

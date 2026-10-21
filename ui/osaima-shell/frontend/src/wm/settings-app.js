@@ -144,14 +144,14 @@ export function makeSettings(services) {
           <fieldset class="mode-pick">
             <legend>How should OSAIMA think?</legend>
             <label class="mode-option">
-              <input type="radio" name="st-mode" value="cloud" />
-              <span class="mode-name">Fast</span>
-              <span class="mode-desc">Uses Google Gemini. Answers in a few seconds. What you type is sent to Google; commands still run only on this computer, after you approve them.</span>
+              <input type="radio" name="st-mode" value="local" />
+              <span class="mode-name">Private (free, the default)</span>
+              <span class="mode-desc">Uses a model on this computer. Free, needs no account, and nothing you type leaves the machine. Answers take longer.</span>
             </label>
             <label class="mode-option">
-              <input type="radio" name="st-mode" value="local" />
-              <span class="mode-name">Private</span>
-              <span class="mode-desc">Uses a model on this computer. Nothing you type leaves the machine, but answers take longer.</span>
+              <input type="radio" name="st-mode" value="cloud" />
+              <span class="mode-name">Fast (optional, needs your own key)</span>
+              <span class="mode-desc">Uses Google Gemini with a key you add. Answers in a few seconds. What you type is sent to Google; commands still run only on this computer, after you approve them.</span>
             </label>
           </fieldset>
           <div class="cloud-key st-key" hidden>
@@ -172,7 +172,7 @@ export function makeSettings(services) {
         const msg = box.querySelector('.st-msg');
         const save = box.querySelector('.st-save');
         let status = null;
-        const chosen = () => (modes.find((m) => m.checked) || {}).value || 'cloud';
+        const chosen = () => (modes.find((m) => m.checked) || {}).value || 'local';
 
         const render = () => {
           const cloud = (status?.cloud_fallbacks || []).length > 0;
@@ -190,7 +190,7 @@ export function makeSettings(services) {
         };
         const refresh = async (setMode) => {
           try { status = await services.invoke('ai_status'); } catch { status = null; }
-          if (setMode) modes.forEach((m) => { m.checked = m.value === (status?.mode || 'cloud'); });
+          if (setMode) modes.forEach((m) => { m.checked = m.value === (status?.mode || 'local'); });
           render();
         };
         modes.forEach((m) => m.addEventListener('change', render));

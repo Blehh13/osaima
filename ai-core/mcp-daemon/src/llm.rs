@@ -130,13 +130,23 @@ pub(crate) fn save_env_key(name: &str, value: &str) -> std::io::Result<()> {
     std::io::Write::write_all(&mut f, (lines.join("\n") + "\n").as_bytes())
 }
 
-/// Which backend is asked first. `cloud` (the default once a key is set) puts
-/// the user's cloud endpoints first and keeps the local model as the offline
-/// fallback; `local` keeps everything on the device unless it fails.
+/// Which backend is asked first. `local` (the default) keeps everything on the
+/// device and free; the cloud endpoints, if the user added a key, are only a
+/// fallback. `cloud` puts them first and keeps the local model as the offline
+/// fallback. It is chosen explicitly (Settings, or OSAIMA_LLM_MODE=cloud); a key
+/// alone never switches to it.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Mode {
     Cloud,
     Local,
+}
+
+/// The mode at start-up: local, unless the cloud was asked for by name.
+fn initial_mode(requested: Option<&str>) -> Mode {
+    match requested {
+        Some("cloud") => Mode::Cloud,
+        _ => Mode::Local,
+    }
 }
 
 /// Chat client over the local model and any cloud endpoints the user has
@@ -178,12 +188,7 @@ impl LlmClient {
         if let Some(k) = env::var("GROQ_API_KEY").ok().filter(|k| !k.is_empty()) {
             cloud.push(Endpoint::groq(k));
         }
-        let mode = match env::var("OSAIMA_LLM_MODE").as_deref() {
-            Ok("local") => Mode::Local,
-            Ok("cloud") => Mode::Cloud,
-            _ if cloud.is_empty() => Mode::Local,
-            _ => Mode::Cloud,
-        };
+        let mode = initial_mode(env::var("OSAIMA_LLM_MODE").ok().as_deref());
 
         Ok(Self { client, local: Endpoint::local_from_env(), cloud: RwLock::new(cloud), mode: RwLock::new(mode) })
     }
@@ -229,8 +234,11 @@ impl LlmClient {
             }
         }
         drop(cloud);
-        let has_cloud = !self.cloud.read().await.is_empty();
-        self.set_mode(if has_cloud { Mode::Cloud } else { Mode::Local }).await;
+        // Adding a key makes the cloud available; it does not make it the first
+        // choice. Removing the last key leaves nothing to prefer.
+        if self.cloud.read().await.is_empty() {
+            self.set_mode(Mode::Local).await;
+        }
     }
 
     /// Opt in to (or, with an empty key, out of) Groq as a fallback.
@@ -506,6 +514,14 @@ mod tests {
     /// fixed prompt must leave room for file listings, knowledge passages and the
     /// answer. About 4 characters per token (measured on Phi-4-mini: a 17.2k-char
     /// prompt was 4268 tokens, which overflowed the old 4096 context).
+    #[test]
+    fn the_local_model_is_the_default_even_when_a_key_is_saved() {
+        assert_eq!(initial_mode(None), Mode::Local);
+        assert_eq!(initial_mode(Some("local")), Mode::Local);
+        assert_eq!(initial_mode(Some("anything else")), Mode::Local);
+        assert_eq!(initial_mode(Some("cloud")), Mode::Cloud);
+    }
+
     #[test]
     fn system_prompts_fit_the_local_context() {
         for task in [Task::Classify, Task::Write, Task::Command] {
