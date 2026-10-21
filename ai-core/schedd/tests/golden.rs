@@ -3,7 +3,7 @@
 //! `train/train.py`); a mismatch means the two sides disagree about the maths.
 
 use osaima_schedd::features::Features;
-use osaima_schedd::model::{Class, Model};
+use osaima_schedd::model::{rules, Class, Model};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -11,6 +11,9 @@ struct Example {
     features: Features,
     class: Class,
     probability: f64,
+    /// What train.py's copy of the built-in rules said (older files do not have it).
+    #[serde(default)]
+    rules: Option<Class>,
 }
 
 fn load() -> (Model, Vec<Example>) {
@@ -36,6 +39,17 @@ fn rust_agrees_with_the_trained_model() {
             "example {i}: probability {p}, trained model said {}",
             ex.probability
         );
+    }
+}
+
+#[test]
+fn rust_and_python_rules_agree() {
+    // the report compares the model with the rules, so both copies must be the same rules
+    let (_, examples) = load();
+    for (i, ex) in examples.iter().enumerate() {
+        if let Some(expected) = ex.rules {
+            assert_eq!(rules(&ex.features), expected, "example {i}: {:?}", ex.features);
+        }
     }
 }
 

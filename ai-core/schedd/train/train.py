@@ -35,12 +35,13 @@ def model_inputs(raw: np.ndarray) -> np.ndarray:
 def rules(raw: np.ndarray) -> list[str]:
     """The daemon's built-in rules (src/model.rs), for comparison."""
     out = []
-    for cpu, vol, _invol, slice_ms, _wait in raw:
-        if cpu < 0.02:
+    for cpu, vol, _invol, slice_ms, wait in raw:
+        demand = cpu * (1.0 + wait)
+        if demand < 0.02:
             out.append("background")
-        elif cpu >= 0.6 and vol < 30:
+        elif demand >= 0.6 and vol < 30:
             out.append("batch")
-        elif cpu < 0.25 and slice_ms < 4:
+        elif demand < 0.25 and slice_ms < 4:
             out.append("interactive")
         else:
             out.append("media")
@@ -107,6 +108,7 @@ def main() -> int:
             "class": str(clf.classes_[int(np.argmax(p))]),
             "probability": float(np.max(p)),
             "probabilities": {str(c): float(v) for c, v in zip(clf.classes_, p)},
+            "rules": rules(raw[i : i + 1])[0],
         }
         for i, p in zip(picks, probabilities)
     ]
