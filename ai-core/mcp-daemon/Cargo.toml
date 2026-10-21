@@ -1,33 +1,20 @@
 [package]
 name = "mcp-daemon"
-version = "0.2.0"
+version = "0.1.0"
 edition = "2021"
-rust-version = "1.75"
-description = "OSAIMA AI Core: Model Context Protocol server exposing live system context"
-license = "GPL-3.0-or-later"
-repository = "https://github.com/Blehh13/osaima"
-
-[lib]
-name = "mcp_daemon"
-path = "src/lib.rs"
-
-[[bin]]
-name = "mcp-daemon"
-path = "src/main.rs"
+description = "OSAIMA Model Context Protocol Daemon"
 
 [dependencies]
-libc = "0.2"
+tokio = { version = "1.35", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-sysinfo = { version = "0.30", default-features = false }
-tokio = { version = "1.35", features = ["io-std", "io-util", "macros", "net", "process", "rt-multi-thread", "signal", "sync", "time"] }
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-
-[dev-dependencies]
-tempfile = "3"
-
-[profile.release]
-lto = true
-codegen-units = 1
-strip = true
+sysinfo = "0.30"
+futures = "0.3"
+reqwest = { version = "0.11", features = ["json"] }
+zbus = "4.0"
+regex = "1.10"
+sha2 = "0.10"
+rusqlite = { version = "0.32", features = ["bundled"] }
+landlock = "0.4"
+seccompiler = "0.4"
+libc = "0.2"

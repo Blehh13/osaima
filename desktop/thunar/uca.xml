@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Thunar custom actions shipped with OSAIMA (right-click menu). -->
+<actions>
+<action>
+	<icon>dialog-question</icon>
+	<name>Ask OSAIMA</name>
+	<submenu></submenu>
+	<unique-id>osaima-ask-1</unique-id>
+	<command>osaima-ask %F</command>
+	<description>Ask the assistant about the selected files</description>
+	<range></range>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+</actions>

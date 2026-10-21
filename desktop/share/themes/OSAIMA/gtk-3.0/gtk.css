@@ -1,0 +1,91 @@
+/* OSAIMA GTK 3 theme: GTK's own dark theme, recoloured with the OSAIMA palette
+   (ink #0f1b2d, surface #16243a, line #2a3d5a, frost #e6edf3, mist #93a5ba,
+   accent #3bb0a0), so Thunar, Mousepad and dialogs match the OSAIMA apps. */
+@import url("resource:///org/gtk/libgtk/theme/Adwaita/gtk-contained-dark.css");
+
+@define-color theme_bg_color #16243a;
+@define-color theme_fg_color #e6edf3;
+@define-color theme_base_color #0f1b2d;
+@define-color theme_text_color #e6edf3;
+@define-color theme_selected_bg_color #3bb0a0;
+@define-color theme_selected_fg_color #0b1f1c;
+@define-color borders #2a3d5a;
+@define-color accent_color #3bb0a0;
+
+* { font-family: "Atkinson Hyperlegible Next", "DejaVu Sans", sans-serif; }
+
+window, .background, dialog, popover, popover.background, menu, .menu, .context-menu {
+  background-color: #16243a;
+  color: #e6edf3;
+}
+headerbar, .titlebar, .titlebar:not(headerbar) {
+  background: #0f1b2d;
+  border-bottom: 1px solid #2a3d5a;
+  box-shadow: none;
+  color: #e6edf3;
+}
+headerbar:backdrop, .titlebar:backdrop { background: #0f1b2d; }
+toolbar, .toolbar, .primary-toolbar { background: #16243a; border-bottom: 1px solid #2a3d5a; }
+menubar { background: #0f1b2d; box-shadow: inset 0 -1px #2a3d5a; }
+menubar > menuitem:hover { box-shadow: inset 0 -3px #3bb0a0; color: #e6edf3; }
+menu menuitem:hover, .menu menuitem:hover, modelbutton.flat:hover { background-color: #1d2e48; color: #e6edf3; }
+
+/* file views, lists, text */
+.view, iconview, treeview.view, textview text, .thunar .view {
+  background-color: #0f1b2d;
+  color: #e6edf3;
+}
+.view:selected, iconview:selected, treeview.view:selected, .view text selection,
+textview text selection, entry selection, label selection, row:selected {
+  background-color: #3bb0a0;
+  color: #0b1f1c;
+}
+.view:hover, row:hover { background-color: #1d2e48; }
+treeview.view header button { background: #16243a; color: #93a5ba; border-color: #2a3d5a; }
+
+/* side panes */
+.sidebar, placessidebar, .sidebar .view, placessidebar list, .shortcuts-pane, paned > separator {
+  background-color: #16243a;
+  border-color: #2a3d5a;
+}
+placessidebar row:selected, .sidebar .view:selected { background-color: rgba(59, 176, 160, 0.25); color: #e6edf3; }
+
+/* inputs and buttons */
+entry, spinbutton:not(.vertical), .linked > entry {
+  background: #0f1b2d;
+  color: #e6edf3;
+  border: 1px solid #2a3d5a;
+  border-radius: 8px;
+  box-shadow: none;
+}
+entry:focus { border-color: #3bb0a0; box-shadow: inset 0 0 0 1px #3bb0a0; }
+button {
+  background: #1d2e48;
+  color: #e6edf3;
+  border: 1px solid #2a3d5a;
+  border-radius: 8px;
+  box-shadow: none;
+  text-shadow: none;
+}
+button:hover { background: #24395a; border-color: #3a5378; }
+button:active, button:checked { background: #2a4266; }
+button.suggested-action, button.default { background: #3bb0a0; color: #0b1f1c; border-color: #3bb0a0; }
+button.destructive-action { background: #e5675f; color: #2a0b08; border-color: #e5675f; }
+button.flat, headerbar button.flat { background: transparent; border-color: transparent; }
+button.flat:hover { background: #1d2e48; }
+
+/* chrome bits */
+scrollbar { background: transparent; border: none; }
+scrollbar slider { background-color: #2a3d5a; border-radius: 6px; min-width: 7px; min-height: 7px; }
+scrollbar slider:hover { background-color: #3a5378; }
+statusbar, .statusbar { background: #0f1b2d; color: #93a5ba; border-top: 1px solid #2a3d5a; }
+tooltip, tooltip.background { background: #e6edf3; color: #0f1b2d; border-radius: 6px; }
+tooltip label { color: #0f1b2d; }
+notebook > header { background: #0f1b2d; border-color: #2a3d5a; }
+notebook > header tab:checked { box-shadow: inset 0 -3px #3bb0a0; color: #e6edf3; }
+progressbar progress, scale highlight, switch:checked, check:checked, radio:checked {
+  background-color: #3bb0a0;
+  border-color: #3bb0a0;
+  color: #0b1f1c;
+}
+*:focus { outline-color: rgba(59, 176, 160, 0.7); }

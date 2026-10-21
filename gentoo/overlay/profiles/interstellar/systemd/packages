@@ -1,0 +1,3 @@
+# Interstellar identity. The OSAIMA components are installed by the image
+# builder from the working tree until their ebuilds build local sources.
+*app-misc/interstellar-release

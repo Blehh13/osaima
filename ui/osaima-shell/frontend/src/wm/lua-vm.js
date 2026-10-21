@@ -1,7 +1,7 @@
 /**
  * lua-vm.js — a compact, dependency-free Lua interpreter for the browser.
  *
- * This is the heart of Interstellar OS's "Lua-based" window manager: the shell
+ * This is the heart of OSAIMA's "Lua-based" window manager: the shell
  * reads a real `.lua` config file and executes it here to drive the WM engine.
  *
  * It implements a practical subset of Lua 5.x — enough to express window-manager

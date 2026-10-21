@@ -1,0 +1,36 @@
+/* OSAIMA top bar: same palette and type as the apps */
+* {
+  font-family: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", sans-serif;
+  font-size: 13px;
+  min-height: 0;
+  border: none;
+  border-radius: 0;
+}
+window#waybar {
+  background: #0f1b2d;
+  color: #e6edf3;
+  border-bottom: 1px solid #2a3d5a;
+}
+#custom-logo { padding: 0 12px; font-weight: 700; color: #e6edf3; }
+#workspaces button {
+  padding: 0 9px;
+  margin: 5px 2px;
+  color: #93a5ba;
+  background: transparent;
+  border-radius: 7px;
+}
+#workspaces button.focused { background: #3bb0a0; color: #0b1f1c; font-weight: 700; }
+#workspaces button:hover { background: #1d2e48; box-shadow: none; text-shadow: none; }
+#clock { font-weight: 600; }
+#custom-osaima, #custom-sound, #custom-net, #battery {
+  padding: 0 10px;
+  margin: 5px 0;
+  color: #c3cfdc;
+}
+#custom-osaima { border-radius: 13px; background: #16243a; color: #e6edf3; }
+#custom-osaima.wait { color: #f2b630; }
+#custom-osaima.bad { color: #f3a39c; }
+#battery.low:not(.charging) { color: #f3a39c; }
+#custom-net.off { color: #93a5ba; }
+tooltip { background: #16243a; border: 1px solid #2a3d5a; border-radius: 8px; }
+tooltip label { color: #e6edf3; }

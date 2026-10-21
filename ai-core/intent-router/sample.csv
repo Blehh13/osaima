@@ -1,0 +1,201 @@
+id,utterance,track,intent,edge_case
+0,my notes please,SYSTEM_COMMAND,list_notes,False
+1,can you add drink water to my lecture notes note,CONTENT_GENERATION,edit_note,False
+2,i'd like to show clipboard history now,SYSTEM_COMMAND,clipboard_control,False
+3,i want to use Firefox now,SYSTEM_COMMAND,open_app,False
+4,set up node with nvm for me,WORKFLOW_GENERATION,env_setup,False
+5,please how hot is my cpu?,SYSTEM_COMMAND,system_status,False
+6,i want to kill the process using the most cpu,SYSTEM_COMMAND,process_kill,False
+7,i want to launch the web server,WORKFLOW_GENERATION,deploy_workflow,False
+8,go ahead and compile and watch for changes asap,WORKFLOW_GENERATION,build_compile,False
+9,quickly kick cups,SYSTEM_COMMAND,service_control,False
+10,empty the clipboaed please,SYSTEM_COMMAND,clipboard_control,False
+11,Kannada translation of this please,CONTENT_GENERATION,translate_text,False
+12,can you terminate the calculator window asap,SYSTEM_COMMAND,close_window,False
+13,hey osaima connect to my speaker asap,SYSTEM_COMMAND,bluetooth_control,False
+14,will it rain tonight thanks,SYSTEM_COMMAND,weather,False
+15,can you locate the thesis draft thanks,SYSTEM_COMMAND,file_search,False
+16,i want to enable wireless,SYSTEM_COMMAND,wifi_control,False
+17,i'd like to forecast for Delhi!,SYSTEM_COMMAND,weather,False
+18,can you find notes about viva prep,SYSTEM_COMMAND,search_notes,False
+19,quickly add a reminder for check the build thanks,SYSTEM_COMMAND,reminder,False
+20,alt tab to Chrome thanks,SYSTEM_COMMAND,focus_app,False
+21,"would you mind if you my disk os full, clean it!",SYSTEM_COMMAND,clean_storage,False
+22,can you summarize the meeting notes for me,CONTENT_GENERATION,summarize_text,False
+23,could you i want to use Discord asap,SYSTEM_COMMAND,open_app,False
+24,would you mond if you 1000 minus 387 for me,SYSTEM_COMMAND,calculator,False
+25,ok minimise everything,SYSTEM_COMMAND,minimize_all,False
+26,ok kill whatever is eating memory for me,SYSTEM_COMMAND,process_kill,False
+27,volume down right now,SYSTEM_COMMAND,volume_control,False
+28,look for the budget spreadsheet in the home directoey?,SYSTEM_COMMAND,file_search,False
+29,"hey, turn off notification sounds asap",SYSTEM_COMMAND,notification_ctrl,False
+30,I want to alt tab to the system monitor,SYSTEM_COMMAND,focus_app,False
+31,please list notes please,SYSTEM_COMMAND,list_notes,False
+32,could you set up a Go project thanks,WORKFLOW_GENERATION,project_scaffold,False
+33,clear the countdown please,SYSTEM_COMMAND,stop_timer,False
+34,go ahead and wake me in 25 minutes please,SYSTEM_COMMAND,timer,False
+35,go ahead and power down please,SYSTEM_COMMAND,power_control,False
+36,copy thos!,SYSTEM_COMMAND,clipboard_control,False
+37,check disk usage right now,SYSTEM_COMMAND,system_status,False
+38,hey osaima search my files for invoice,SYSTEM_COMMAND,file_search,False
+39,no more timer!,SYSTEM_COMMAND,stop_timer,False
+40,can you full brightness?,SYSTEM_COMMAND,brightness_control,False
+41,i'd like to what's on my schedule now,SYSTEM_COMMAND,calendar,False
+42,"osaima, how does what a mutex is work?",CONTENT_GENERATION,explain_concept,False
+43,"hey, my computer is lagging for me",SYSTEM_COMMAND,optimize_cpu,False
+44,add standup to my calendar at 6?,SYSTEM_COMMAND,schedule_event,False
+45,"hey osaima i'm lost, help me",SYSTEM_COMMAND,help,False
+46,start a ideas note please,CONTENT_GENERATION,create_note,False
+47,could you show me running apps asap,SYSTEM_COMMAND,process_list,False
+48,whay kind of things can i ask you thanks,SYSTEM_COMMAND,help,False
+49,could you start the dev server now,WORKFLOW_GENERATION,deploy_workflow,False
+50,go ahead and shpw my notes?,SYSTEM_COMMAND,list_notes,False
+51,"osaima, clean storage",SYSTEM_COMMAND,clean_storage,False
+52,show system vitals?,SYSTEM_COMMAND,system_status,False
+53,ok edit the todo note thanks,CONTENT_GENERATION,edit_note,False
+54,i want to can you remind me 9 am to check the build,SYSTEM_COMMAND,reminder,False
+55,go ahead and get rid of the shopping list note,SYSTEM_COMMAND,delete_note,False
+56,go ahead and what can you do for me,SYSTEM_COMMAND,help,False
+57,end task LibreOffice,SYSTEM_COMMAND,process_kill,False
+58,would you mind if you good evening,SYSTEM_COMMAND,greeting,False
+59,i'd like to describe what a mutex is.,CONTENT_GENERATION,explain_concept,False
+60,quickly what are the key points of notes.txt,CONTENT_GENERATION,summarize_text,False
+61,ok disable neyworkmanager,SYSTEM_COMMAND,service_control,False
+62,hey osaima volume 70.,SYSTEM_COMMAND,volume_control,False
+63,i'd like to wake me in 20 secs please,SYSTEM_COMMAND,timer,False
+64,Quickly generate a bash script to back up my src directory!,CONTENT_GENERATION,code_generate,False
+65,go ahead and quit this app please,SYSTEM_COMMAND,close_window,False
+66,ok weather in New York.,SYSTEM_COMMAND,weather,False
+67,go ahead and restart the system now,SYSTEM_COMMAND,power_control,False
+68,could you open the usb stick,SYSTEM_COMMAND,mount_control,False
+69,"hey, put windows in monocle arrangement",SYSTEM_COMMAND,layout,False
+70,ok cargo build --release please,WORKFLOW_GENERATION,build_compile,False
+71,can you what notes do i have thanks,SYSTEM_COMMAND,list_notes,False
+72,GIVE ME A SUMMARY OF MY RESUME,CONTENT_GENERATION,summarize_text,False
+73,i want to new calendar event project review half past four thanks,SYSTEM_COMMAND,schedule_event,False
+74,could you translate this to German for me,CONTENT_GENERATION,translate_text,False
+75,close that asap,SYSTEM_COMMAND,close_window,False
+76,would you mind if you how long will my battery last?,SYSTEM_COMMAND,battery_status,False
+77,i'd like to display the readme,SYSTEM_COMMAND,file_open,False
+78,show my calendar please,SYSTEM_COMMAND,calendar,False
+79,can you what's the date today please,SYSTEM_COMMAND,calendar,False
+80,hey osaima make it louder,SYSTEM_COMMAND,volume_control,False
+81,"hey, alt tab to the task manager",SYSTEM_COMMAND,focus_app,False
+82,could you mount the backup disk for me,SYSTEM_COMMAND,mount_control,False
+83,please change the viva prep note to say email the professor asap,CONTENT_GENERATION,edit_note,False
+84,"Osaima, turn on wifi right now",SYSTEM_COMMAND,wifi_control,False
+85,I want to time 90 seconds for me right now,SYSTEM_COMMAND,timer,False
+86,would you mind if you go back to the music player asap,SYSTEM_COMMAND,focus_app,False
+87,quickly take a screenshot!,SYSTEM_COMMAND,screenshot,False
+88,HEY OSAIMA SET UP A C++ PROJECT FOR ME,WORKFLOW_GENERATION,project_scaffold,False
+89,"hey, put dentist appointment in the calendar",SYSTEM_COMMAND,schedule_event,False
+90,hey osaima toggle vpn!,SYSTEM_COMMAND,vpn_control,False
+91,create a Go class for a bank account.,CONTENT_GENERATION,code_generate,False
+92,can you quick note pad please please,SYSTEM_COMMAND,scratchpad,False
+93,could you mute notifications now,SYSTEM_COMMAND,notification_ctrl,False
+94,get rid of the lecture notes note now,SYSTEM_COMMAND,delete_note,False
+95,"osaima, clean storage for me",SYSTEM_COMMAND,clean_storage,False
+96,quickly search the web for llama.cpp tool calling,SYSTEM_COMMAND,search_web,False
+97,set brightness to 60 percent for me,SYSTEM_COMMAND,brightness_control,False
+98,could you temperature in Tokyo,SYSTEM_COMMAND,weather,False
+99,"hey, organize Downloads by file type",WORKFLOW_GENERATION,file_batch_op,False
+100,mount my pendrive now,SYSTEM_COMMAND,mount_control,False
+101,"hey, clear the desktop thanks",SYSTEM_COMMAND,close_all_windows,False
+102,could you open the recipes note,SYSTEM_COMMAND,view_note,False
+103,"HEY, OPEN THE BUDGET SPREADSHEET THANKS",SYSTEM_COMMAND,file_open,False
+104,screen os too bright,SYSTEM_COMMAND,brightness_control,False
+105,i'd like to git push?,WORKFLOW_GENERATION,git_workflow,False
+106,how much storage is left,SYSTEM_COMMAND,system_status,False
+107,compile the project asap,WORKFLOW_GENERATION,build_compile,False
+108,please change the tiling to tiling thanks,SYSTEM_COMMAND,layout,False
+109,ok explain this function in a docstring right now,CONTENT_GENERATION,docstring_gen,False
+110,calculate 45 * 3.5 now,SYSTEM_COMMAND,calculator,False
+111,go ahead and list your commands,SYSTEM_COMMAND,help,False
+112,hey osaima look through my notes for ideas,SYSTEM_COMMAND,search_notes,False
+113,close thos window.,SYSTEM_COMMAND,close_window,False
+114,would you mind if you my notes please please,SYSTEM_COMMAND,list_notes,False
+115,hey osaima dnd on right now,SYSTEM_COMMAND,notification_ctrl,False
+116,GO AHEAD AND SET THE WINDOW LAYOUT TO MONOCLE,SYSTEM_COMMAND,layout,False
+117,quickly what's the charge level,SYSTEM_COMMAND,battery_status,False
+118,quickly minimize all and then open the calendar?,WORKFLOW_GENERATION,orchestrate,False
+119,Make a conda env with numpy,WORKFLOW_GENERATION,env_setup,False
+120,go ahead and copy this,SYSTEM_COMMAND,clipboard_control,False
+121,hey osaima make a boilerplate Java project in my src directory,WORKFLOW_GENERATION,project_scaffold,False
+122,would you mind if you which apps are running right now.,SYSTEM_COMMAND,process_list,False
+123,i want to temperature in here!,SYSTEM_COMMAND,weather,False
+124,"osaima, email Banu about the project status!",CONTENT_GENERATION,email_draft,False
+125,capture what's on my screen now,SYSTEM_COMMAND,screenshot,False
+126,"Osaima, new note: pay the electricity bill",CONTENT_GENERATION,create_note,False
+127,could you create a note called meeting notes,CONTENT_GENERATION,create_note,False
+128,lay out the windows as float,SYSTEM_COMMAND,layout,False
+129,summarize this page,CONTENT_GENERATION,summarize_text,False
+130,search notes shopping list?,SYSTEM_COMMAND,search_notes,False
+131,search for todo.md thanks,SYSTEM_COMMAND,file_search,False
+132,can you search notes book list,SYSTEM_COMMAND,search_notes,False
+133,solve the square root of 144 asap,SYSTEM_COMMAND,calculator,False
+134,i'd like to what programs are running right now,SYSTEM_COMMAND,process_list,False
+135,run pytest for me,WORKFLOW_GENERATION,run_tests,False
+136,I want to what's in my lecture notes note!,SYSTEM_COMMAND,view_note,False
+137,can you create a django project called myspp,WORKFLOW_GENERATION,project_scaffold,False
+138,please gap size 16,SYSTEM_COMMAND,set_gaps,False
+139,could you search my files for invoice,SYSTEM_COMMAND,file_search,False
+140,explain recursion,CONTENT_GENERATION,explain_concept,False
+141,go ahead and use the floating layout,SYSTEM_COMMAND,layout,False
+142,i'd like to focus Thunderbird right now,SYSTEM_COMMAND,focus_app,False
+143,would you mind if you stop the alarm please,SYSTEM_COMMAND,stop_timer,False
+144,can you trash my project plan note?,SYSTEM_COMMAND,delete_note,False
+145,i want to clear the cache thanks,SYSTEM_COMMAND,clean_storage,False
+146,i'd like to i need to jot something down!,SYSTEM_COMMAND,scratchpad,False
+147,could you organize the current directory by file type asap,WORKFLOW_GENERATION,file_batch_op,False
+148,build the C++ code.,WORKFLOW_GENERATION,build_compile,False
+149,can you focus on the next window!,SYSTEM_COMMAND,focus_app,False
+150,ok summarize my diff as a commit,CONTENT_GENERATION,commit_message,False
+151,please show desktop please,SYSTEM_COMMAND,minimize_all,False
+152,can you set a reminder to take my medicine,SYSTEM_COMMAND,reminder,False
+153,view notes.txt now,SYSTEM_COMMAND,file_open,False
+154,go ahead and put all windows away?,SYSTEM_COMMAND,minimize_all,False
+155,"osaoma, focus mode on?",SYSTEM_COMMAND,notification_ctrl,False
+156,remove the gaps,SYSTEM_COMMAND,set_gaps,False
+157,I'D LIKE TO SET A REMINDER TO DRINK WATER,SYSTEM_COMMAND,reminder,False
+158,could you how much cpu am i using please,SYSTEM_COMMAND,system_status,False
+159,make the gaps 8px thanks,SYSTEM_COMMAND,set_gaps,False
+160,Kick apache asap,SYSTEM_COMMAND,service_control,False
+161,disconnect vpn now,SYSTEM_COMMAND,vpn_control,False
+162,"osaima, timer 45 mins for me",SYSTEM_COMMAND,timer,False
+163,"ok my disk is full, clean it",SYSTEM_COMMAND,clean_storage,False
+164,can you unmount the drive now,SYSTEM_COMMAND,mount_control,False
+165,"osaima, append call mom to passwords hint thanks",CONTENT_GENERATION,edit_note,False
+166,dnd on!,SYSTEM_COMMAND,notification_ctrl,False
+167,go ahead and where did i save main.rs!,SYSTEM_COMMAND,file_search,False
+168,go ahead and minimize all windows,SYSTEM_COMMAND,minimize_all,False
+169,quickly connect my headphones,SYSTEM_COMMAND,bluetooth_control,False
+170,go ahead and can you explain transformers simply please,CONTENT_GENERATION,explain_concept,False
+171,"osaima, open the file notes.txt",SYSTEM_COMMAND,file_open,False
+172,"hry, connect to the vpn please",SYSTEM_COMMAND,vpn_control,False
+173,unfeeeze my apps?,SYSTEM_COMMAND,wake_apps,False
+174,"hey, lay out the windows as monocle asap",SYSTEM_COMMAND,layout,False
+175,"hry, add comments to this code now",CONTENT_GENERATION,docstring_gen,False
+176,i'd like to write down check the build in a note.,CONTENT_GENERATION,create_note,False
+177,could you bring back the sleeping apps asap,SYSTEM_COMMAND,wake_apps,False
+178,quickly rename all images in this folder!,WORKFLOW_GENERATION,file_batch_op,False
+179,could you compile the project.,WORKFLOW_GENERATION,build_compile,False
+180,ok summarize the meeting notes,CONTENT_GENERATION,summarize_text,False
+181,please code a simple web server in Rust,CONTENT_GENERATION,code_generate,False
+182,could you put all windows away!,SYSTEM_COMMAND,minimize_all,False
+183,"HEY, REBASE ON MASTER ASAP",WORKFLOW_GENERATION,git_workflow,False
+184,"osaima, which apps are running right now now",SYSTEM_COMMAND,process_list,False
+185,minimize all windows ssap,SYSTEM_COMMAND,minimize_all,False
+186,i want to forecast for New York,SYSTEM_COMMAND,weather,False
+187,"osaima, prepare the dev environment asap",WORKFLOW_GENERATION,env_setup,False
+188,what's using all my memory please,SYSTEM_COMMAND,system_status,False
+189,lower the volume,SYSTEM_COMMAND,volume_control,False
+190,"hey, set brightness to 90 percent",SYSTEM_COMMAND,brightness_control,False
+191,go ahead and lower the volume,SYSTEM_COMMAND,volume_control,False
+192,write a note with a pasta recipe.,CONTENT_GENERATION,create_note,False
+193,quickly good morning,SYSTEM_COMMAND,greeting,False
+194,hey osaima shutdown the computer,SYSTEM_COMMAND,power_control,False
+195,i'd like to turn down the brightness for me,SYSTEM_COMMAND,brightness_control,False
+196,quickly web search tauri docs.,SYSTEM_COMMAND,search_web,False
+197,summarize my diff as a commit?,CONTENT_GENERATION,commit_message,False
+198,jump back to the task manager,SYSTEM_COMMAND,focus_app,False
+199,hey osaima write an email to HR about the deadline?,CONTENT_GENERATION,email_draft,False

@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+"""Waybar module: where OSAIMA's answers come from right now, as JSON."""
+import json, os, socket
+
+def rpc(method):
+    path = os.path.join(os.environ.get("XDG_RUNTIME_DIR", "/tmp"), "osaima", "mcp.sock")
+    with socket.socket(socket.AF_UNIX) as s:
+        s.settimeout(3)
+        s.connect(path)
+        s.sendall(json.dumps({"jsonrpc": "2.0", "id": "1", "method": method, "params": {}}).encode() + b"\n")
+        buf = b""
+        while not buf.endswith(b"\n"):
+            chunk = s.recv(65536)
+            if not chunk:
+                break
+            buf += chunk
+    return json.loads(buf)["result"]
+
+try:
+    st = rpc("system.llm_status")
+    cloud = bool(st.get("cloud_fallbacks"))
+    local = (st.get("local") or {}).get("reachable")
+    if st.get("mode") == "cloud" and cloud:
+        out = {"text": "AI: Gemini", "class": "ok", "tooltip": "Fast mode: answers from Google Gemini. Click for Settings."}
+    elif local:
+        out = {"text": "AI: on this computer", "class": "ok", "tooltip": "Private mode: nothing leaves this computer."}
+    else:
+        out = {"text": "AI: starting", "class": "wait", "tooltip": "The language model is still loading."}
+    # background tasks: say when one is working or waiting for the user
+    tasks = rpc("system.tasks").get("tasks", [])
+    waiting = [t for t in tasks if t["status"] in ("awaiting_scope", "awaiting_approval")]
+    working = [t for t in tasks if t["status"] in ("planning", "running")]
+    if waiting:
+        out = {"text": "AI: needs your OK", "class": "wait", "tooltip": "Waiting for you: " + waiting[0]["title"]}
+    elif working:
+        out = {"text": f"AI: working ({len(working)})", "class": "ok", "tooltip": "Working on: " + ", ".join(t["title"] for t in working)}
+except Exception:
+    out = {"text": "AI: offline", "class": "bad", "tooltip": "The AI core isn't running."}
+print(json.dumps(out))

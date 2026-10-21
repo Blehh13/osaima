@@ -1,5 +1,5 @@
 /**
- * window-manager.js — Interstellar OS window manager engine.
+ * window-manager.js — OSAIMA window manager engine.
  *
  * A dynamic tiling/floating window manager (dwm/i3-inspired) whose behaviour is
  * driven entirely by a Lua configuration file. This module is the engine; the
@@ -20,9 +20,10 @@ function defaultConfig() {
     masterCount: 1,
     modkey: 'Alt',
     borderWidth: 2,
-    borderFocused: '#78b4ff',
+    borderFocused: '#3bb0a0',
     borderUnfocused: 'rgba(100,160,255,0.12)',
     barReserve: 44,          // px reserved at top for the status bar
+    dockReserve: 72,         // px reserved at the bottom for the dock
     workspaceNames: ['1', '2', '3', '4', '5'],
   };
 }
@@ -75,7 +76,7 @@ export class WindowManager {
     const T = 40;               // edge sensitivity
     const gap = this.config.gaps;
     const top = this.config.barReserve + gap;
-    const area = { x: gap, y: top, w: rect.width - gap * 2, h: rect.height - top - gap };
+    const area = { x: gap, y: top, w: rect.width - gap * 2, h: rect.height - top - gap - this.config.dockReserve };
     const halfW = (area.w - gap) / 2;
     const halfH = (area.h - gap) / 2;
 
@@ -172,11 +173,13 @@ export class WindowManager {
     else if (key === 'ArrowUp') key = 'Up';
     else if (key === 'ArrowDown') key = 'Down';
     else if (key === 'Tab') key = 'Tab';
+    else if (/^F\d+$/i.test(key)) key = key.toUpperCase();
     else if (key.length === 1) key = key.toUpperCase();
     else return null; // ignore lone modifier presses etc.
 
-    // A bare key with no modifier is never a WM binding (avoids stealing input).
-    if (mods.length === 0) return null;
+    // A bare key with no modifier is never a WM binding (avoids stealing input),
+    // EXCEPT function keys like F9 which are dedicated global shortcut keys.
+    if (mods.length === 0 && !/^F\d+$/i.test(key)) return null;
     return [...mods, key].join('+');
   }
 
@@ -236,6 +239,10 @@ export class WindowManager {
       case 'increase_master_count': this.config.masterCount++; this.layout(); break;
       case 'decrease_master_count': this.config.masterCount = Math.max(1, this.config.masterCount - 1); this.layout(); break;
       case 'open_launcher': if (window.openLauncher) window.openLauncher(); break;
+      case 'voxtype':
+      case 'voxtype_toggle':
+        if (window.VOXTYPE) window.VOXTYPE.toggle();
+        break;
       case 'quit': this.minimizeAll(); break;
       default: console.warn('unknown WM action:', action);
     }
@@ -252,6 +259,7 @@ export class WindowManager {
     const el = document.createElement('div');
     el.className = 'wm-window';
     el.dataset.wid = id;
+    el.dataset.app = appId;
     el.innerHTML = `
       <div class="wm-titlebar">
         <span class="wm-title-icon">${app.icon || '▣'}</span>
@@ -302,10 +310,7 @@ export class WindowManager {
     try {
       app.mount(contentEl, { wm: this, win });
     } catch (err) {
-      const msg = document.createElement('div');
-      msg.className = 'wm-error';
-      msg.textContent = 'App failed to start: ' + err.message;
-      contentEl.replaceChildren(msg);
+      contentEl.innerHTML = `<div class="wm-error">App failed to start: ${err.message}</div>`;
     }
 
     this.focus(id);
@@ -437,7 +442,7 @@ export class WindowManager {
       x: gap,
       y: top,
       w: rect.width - gap * 2,
-      h: rect.height - top - gap,
+      h: rect.height - top - gap - this.config.dockReserve,
     };
 
     // Hide windows not on the current workspace or minimized.

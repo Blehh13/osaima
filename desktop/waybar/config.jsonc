@@ -1,0 +1,53 @@
+// OSAIMA top bar
+{
+  "layer": "top",
+  "position": "top",
+  "height": 34,
+  "spacing": 6,
+  "modules-left": ["custom/logo", "sway/workspaces", "sway/mode"],
+  "modules-center": ["clock"],
+  "modules-right": ["custom/osaima", "custom/sound", "custom/net", "battery"],
+
+  "custom/logo": {
+    "format": "<span color='#3bb0a0'>&gt;_</span>  OSAIMA",
+    "tooltip": false,
+    "on-click": "osaima-open assistant"
+  },
+  "sway/workspaces": {
+    "disable-scroll": false,
+    "all-outputs": true,
+    "format": "{name}"
+  },
+  "clock": {
+    "format": "{:%a %d %b  %H:%M}",
+    "tooltip-format": "<tt>{calendar}</tt>",
+    "on-click": "osaima-open calendar"
+  },
+  // Where answers come from right now; click for Settings.
+  "custom/osaima": {
+    "exec": "osaima-status",
+    "return-type": "json",
+    "interval": 5,
+    "on-click": "osaima-open settings"
+  },
+  // sound via wpctl: shows nothing when there is no audio (the built-in
+  // pulseaudio module stops the whole bar without an audio server)
+  "custom/sound": {
+    "exec": "osaima-sound",
+    "return-type": "json",
+    "interval": 3,
+    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+  },
+  // custom scripts rather than waybar's own network/tray modules, which
+  // distribution builds often leave out
+  "custom/net": {
+    "exec": "osaima-net",
+    "return-type": "json",
+    "interval": 10
+  },
+  "battery": {
+    "format": "Battery {capacity}%",
+    "format-charging": "Charging {capacity}%",
+    "states": { "low": 20 }
+  }
+}

@@ -1,0 +1,8 @@
+#!/bin/sh
+# Waybar module: online or not, and the Wi-Fi name when there is one.
+if ip route get 1.1.1.1 >/dev/null 2>&1; then
+	ssid=$(iwgetid -r 2>/dev/null || nmcli -t -f active,ssid dev wifi 2>/dev/null | sed -n 's/^yes://p' | head -1)
+	[ -n "$ssid" ] && echo "{\"text\":\"Wi-Fi $ssid\"}" || echo '{"text":"Online"}'
+else
+	echo '{"text":"Offline","class":"off"}'
+fi

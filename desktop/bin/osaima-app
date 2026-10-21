@@ -1,0 +1,6 @@
+#!/bin/sh
+# osaima-app <app> — start one OSAIMA app (assistant, settings, notes, ...) as its own window.
+case "$1" in
+	''|*[!a-z]*) echo "usage: osaima-app <app name, lowercase letters>" >&2; exit 2 ;;
+esac
+exec "${OSAIMA_SHELL:-osaima-shell}" --app "$1"

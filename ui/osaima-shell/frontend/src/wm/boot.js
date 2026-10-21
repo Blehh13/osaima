@@ -8,12 +8,11 @@
  */
 
 import { WindowManager } from './window-manager.js';
+import { WidgetManager } from './widget-manager.js';
 import { LuaVM } from './lua-vm.js';
 import { createWmApi } from './api.js';
 import { registerApps } from './apps.js';
 import { DEFAULT_WM_LUA } from './default-config.js';
-import { AgentClient } from './agent-client.js';
-import { resolveShellSettings, DEFAULTS } from './shell-settings.js';
 
 // Candidate locations for the Lua config, tried in order. Works whether the
 // shell is served from the project root (tauri/static server) or elsewhere.
@@ -51,11 +50,10 @@ async function fetchShippedConfig() {
  * @param {object} opts
  * @param {HTMLElement} opts.surface  container to render windows into
  * @param {Function} opts.invoke      Tauri-style invoke(cmd) for MCP data
- * @param {object} opts.agentTransport transport for the agent service (Tauri, or the demo agent)
  * @param {object} [opts.hooks]       engine hooks (focus/layout/workspace/windows)
  * @returns {Promise<{ engine: WindowManager, reload: Function }>}
  */
-export async function initWindowManager({ surface, invoke, agentTransport, hooks = {}, rag = null, behavior = null }) {
+export async function initWindowManager({ surface, invoke, hooks = {}, rag = null, behavior = null }) {
   const engine = new WindowManager(surface, hooks);
 
   const shippedSource = await fetchShippedConfig();
@@ -63,10 +61,9 @@ export async function initWindowManager({ surface, invoke, agentTransport, hooks
 
   const services = {
     invoke,
-    agent: new AgentClient(agentTransport),
-    settings: () => engine.shellSettings ?? DEFAULTS,
     rag,        // RagEngine (retrieval-augmented knowledge)
     behavior,   // BehaviorStore (learned user profile)
+    widgets: new WidgetManager({ invoke }),
     getConfigSource: () => currentSource,
     setConfigSource: (s) => { currentSource = s; },
     // Apply without persisting (live preview).
@@ -96,10 +93,6 @@ export async function initWindowManager({ surface, invoke, agentTransport, hooks
       vm.run(source, 'wm.lua');
       currentSource = source;
       engine.applyConfig();
-      const { settings, warnings } = resolveShellSettings(engine.config.shell);
-      engine.shellSettings = settings;
-      for (const warning of warnings) console.warn('[wm.lua] wm.shell:', warning);
-      if (hooks.onConfigApplied) hooks.onConfigApplied(settings, warnings);
       if (boot) engine.bootAutostart();
       else engine.layout();
       return { ok: true };
@@ -117,5 +110,5 @@ export async function initWindowManager({ surface, invoke, agentTransport, hooks
     applyLua(DEFAULT_WM_LUA, { boot: true });
   }
 
-  return { engine, reload: (src) => applyLua(src, { boot: false }) };
+  return { engine, reload: (src) => applyLua(src, { boot: false }), services };
 }

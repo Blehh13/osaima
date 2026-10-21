@@ -1,0 +1,19 @@
+# OSAIMA notifications
+font=sans-serif 11
+background-color=#16243aF2
+text-color=#e6edf3
+border-color=#3bb0a0
+border-size=2
+border-radius=12
+padding=12,16
+margin=12
+width=380
+default-timeout=6000
+anchor=top-right
+
+[urgency=critical]
+border-color=#e5675f
+default-timeout=0
+
+[mode=do-not-disturb]
+invisible=1

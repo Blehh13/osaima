@@ -1,0 +1,1000 @@
+{"id": 0, "utterance": "dim the display", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 1, "utterance": "hunt down every python file in the home directory", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 2, "utterance": "turn every png in Documents into jpg", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false}
+{"id": 3, "utterance": "kill bluetooth", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 4, "utterance": "write my team a status update", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 5, "utterance": "handle this one", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 6, "utterance": "handle this one", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 7, "utterance": "crank the volume", "track": "SYSTEM_COMMAND", "intent": "volume_control", "edge_case": false}
+{"id": 8, "utterance": "can you force quit the hung program", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 9, "utterance": "annotate these parameters with types", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false}
+{"id": 10, "utterance": "wrap it up", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": true}
+{"id": 11, "utterance": "how do I say this in Spanish", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false}
+{"id": 12, "utterance": "would you give me a Rust function that reverses a string", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 13, "utterance": "would you bootstrap a flask app named api", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 14, "utterance": "can you switch wifi on", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 15, "utterance": "can you flip the vpn", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 16, "utterance": "can you build a conda environment with scipy", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false}
+{"id": 17, "utterance": "hey hit me with the key points of this readme", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 18, "utterance": "I need Spotify open", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false}
+{"id": 19, "utterance": "save this out", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": true}
+{"id": 20, "utterance": "can you restructure this code", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 21, "utterance": "hey bootstrap a flask app named api", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 22, "utterance": "can you ship this to staging", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 23, "utterance": "can you write a docstring for this", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false}
+{"id": 24, "utterance": "can you cut a new feature branch", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 25, "utterance": "can you lower the screen brightness a bit", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 26, "utterance": "handle this one", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 27, "utterance": "give me the gist of this file", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 28, "utterance": "tidy up this function", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 29, "utterance": "show me everything running", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 30, "utterance": "would you put together an email to my manager about the deadline", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 31, "utterance": "would you show me everything running", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 32, "utterance": "can you move focus over", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 33, "utterance": "would you run pytest and tell me what breaks", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false}
+{"id": 34, "utterance": "can you crank the volume", "track": "SYSTEM_COMMAND", "intent": "volume_control", "edge_case": false}
+{"id": 35, "utterance": "can you give me the process list", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 36, "utterance": "can you where is my resume file", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 37, "utterance": "osaima add commit and push all of this", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 38, "utterance": "would you restructure this code", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 39, "utterance": "secure the screen", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 40, "utterance": "can you cut a new feature branch", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 41, "utterance": "can you enable do not disturb", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 42, "utterance": "I need the Files app open", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false}
+{"id": 43, "utterance": "pop out the sd card", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false}
+{"id": 44, "utterance": "osaima force quit the hung program", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 45, "utterance": "osaima snap the current screen", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 46, "utterance": "give me the process list", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 47, "utterance": "can you snap the current screen", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 48, "utterance": "can you break this big function apart", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 49, "utterance": "dismiss VS Code", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 50, "utterance": "bounce docker", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 51, "utterance": "would you cut a new feature branch", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 52, "utterance": "wipe my notifications", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 53, "utterance": "would you boot the dev server on port five thousand", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 54, "utterance": "wipe my notifications", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 55, "utterance": "would you cook up a file-renaming script", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 56, "utterance": "hey battery level please", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 57, "utterance": "would you come up with a commit message for this", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false}
+{"id": 58, "utterance": "osaima switch bluetooth on", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 59, "utterance": "exit Spotify", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 60, "utterance": "get it going", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": true}
+{"id": 61, "utterance": "how much memory is free", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 62, "utterance": "hey pull in this project's dependencies", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 63, "utterance": "can you shift this window to desktop one", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false}
+{"id": 64, "utterance": "join the office network", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 65, "utterance": "boot the dev server on port five thousand", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 66, "utterance": "would you walk me through how a hash map works", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 67, "utterance": "would you kick off the test suite", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false}
+{"id": 68, "utterance": "osaima get torch installed with gpu support", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 69, "utterance": "shut it", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": true}
+{"id": 70, "utterance": "how's my battery doing", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 71, "utterance": "take it down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": true}
+{"id": 72, "utterance": "save this out", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": true}
+{"id": 73, "utterance": "hey turn this diff into a commit line", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false}
+{"id": 74, "utterance": "osaima break down what this command is doing", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 75, "utterance": "handle this one", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 76, "utterance": "hey put the machine on lock", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 77, "utterance": "show me everything running", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 78, "utterance": "hey write my manager a status update", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 79, "utterance": "kill bluetooth", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 80, "utterance": "would you stop the runaway process", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 81, "utterance": "move focus over", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 82, "utterance": "hey shut nginx down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 83, "utterance": "osaima dim the display", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 84, "utterance": "build it and rebuild on every change", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 85, "utterance": "osaima grab a screenshot", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 86, "utterance": "osaima boot the dev server on port five thousand", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 87, "utterance": "hey power off the machine", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 88, "utterance": "can you reply to the professor turning down the meeting", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 89, "utterance": "can you add commit and push all of this", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 90, "utterance": "would you run pytest and tell me what breaks", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false}
+{"id": 91, "utterance": "hey battery level please", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 92, "utterance": "can you pull in this project's dependencies", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 93, "utterance": "hey safely remove the external drive", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false}
+{"id": 94, "utterance": "where is my resume file", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 95, "utterance": "cut a new feature branch", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 96, "utterance": "would you drop in what I copied", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false}
+{"id": 97, "utterance": "break this big function apart", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 98, "utterance": "would you put it to sleep", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 99, "utterance": "bring up the usb stick", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false}
+{"id": 100, "utterance": "can you boot the dev server on port five thousand", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 101, "utterance": "osaima pair my earbuds", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 102, "utterance": "osaima dim the display", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 103, "utterance": "condense this document", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 104, "utterance": "would you show me everything running", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 105, "utterance": "where is my resume file", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 106, "utterance": "hey number all the photos in order", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false}
+{"id": 107, "utterance": "bring up the usb stick", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false}
+{"id": 108, "utterance": "switch wifi on", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 109, "utterance": "would you what's in my clipboard", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false}
+{"id": 110, "utterance": "would you bounce docker", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 111, "utterance": "osaima reply to the client turning down the meeting", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 112, "utterance": "build it and rebuild on every change", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 113, "utterance": "spin up a venv and turn it on", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false}
+{"id": 114, "utterance": "sort the home directory into folders by type", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false}
+{"id": 115, "utterance": "osaima maximise this one", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 116, "utterance": "can you ship this to staging", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 117, "utterance": "clean this", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 118, "utterance": "can you bring my notes on screen", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 119, "utterance": "can you silence the sound", "track": "SYSTEM_COMMAND", "intent": "volume_control", "edge_case": false}
+{"id": 120, "utterance": "osaima lock up", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 121, "utterance": "hey bring my notes on screen", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 122, "utterance": "what's this error telling me", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 123, "utterance": "can you make an environment and pull the requirements", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false}
+{"id": 124, "utterance": "build it and rebuild on every change", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 125, "utterance": "what's my cpu load", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 126, "utterance": "osaima enable do not disturb", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 127, "utterance": "cook up a file-renaming script", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 128, "utterance": "get Slack on screen", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false}
+{"id": 129, "utterance": "pull in this project's dependencies", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 130, "utterance": "hey what's my cpu load", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 131, "utterance": "can you boot the dev server on port five thousand", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 132, "utterance": "osaima kill bluetooth", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 133, "utterance": "put the machine on lock", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 134, "utterance": "shut it", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": true}
+{"id": 135, "utterance": "turn every png in the home directory into jpg", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false}
+{"id": 136, "utterance": "save this out", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": true}
+{"id": 137, "utterance": "dim the display", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 138, "utterance": "osaima walk me through how a hash map works", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 139, "utterance": "can you pair my earbuds", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 140, "utterance": "osaima turn this diff into a commit line", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false}
+{"id": 141, "utterance": "hey tidy up this function", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 142, "utterance": "start a fresh next.js app with my setup", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 143, "utterance": "would you switch wifi on", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 144, "utterance": "can you stop the runaway process", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 145, "utterance": "switch bluetooth on", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 146, "utterance": "osaima give me the process list", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 147, "utterance": "put together an email to the group about the deadline", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 148, "utterance": "is the ssh service running", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 149, "utterance": "would you arrange the windows side by side", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 150, "utterance": "enable do not disturb", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 151, "utterance": "can you walk me through how a hash map works", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 152, "utterance": "can you show me everything running", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 153, "utterance": "force quit the hung program", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 154, "utterance": "osaima cook up a file-renaming script", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 155, "utterance": "switch bluetooth on", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 156, "utterance": "put this on the clipboard", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false}
+{"id": 157, "utterance": "hey build it and rebuild on every change", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 158, "utterance": "drop it", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": true}
+{"id": 159, "utterance": "cook up a file-renaming script", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 160, "utterance": "force quit the hung program", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 161, "utterance": "hit me with the key points of this readme", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 162, "utterance": "ping them", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": true}
+{"id": 163, "utterance": "stop the track", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 164, "utterance": "cycle to the window before this", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 165, "utterance": "would you take me to workspace five", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false}
+{"id": 166, "utterance": "hey where's my disk space going", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 167, "utterance": "osaima nuke that task", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 168, "utterance": "ping them", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": true}
+{"id": 169, "utterance": "condense this document", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 170, "utterance": "can you commit my work the way I usually word it", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 171, "utterance": "ship this to staging", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 172, "utterance": "osaima pop out the sd card", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false}
+{"id": 173, "utterance": "osaima is the laptop charging", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 174, "utterance": "hey give me a Rust function that reverses a string", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 175, "utterance": "would you jump to the next tune", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 176, "utterance": "can you walk me through how a hash map works", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 177, "utterance": "shut it", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": true}
+{"id": 178, "utterance": "maximise this one", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 179, "utterance": "hey ship this to staging", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 180, "utterance": "restructure this code", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 181, "utterance": "osaima add documentation to this class", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false}
+{"id": 182, "utterance": "osaima throw this to workspace four", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false}
+{"id": 183, "utterance": "pull in this project's dependencies", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 184, "utterance": "put this into French", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false}
+{"id": 185, "utterance": "osaima pair my earbuds", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 186, "utterance": "hey join the office network", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 187, "utterance": "bring the vpn up", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 188, "utterance": "lock up", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 189, "utterance": "maximise this one", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 190, "utterance": "can you start a fresh next.js app with my setup", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 191, "utterance": "what's this error telling me", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 192, "utterance": "shut it", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": true}
+{"id": 193, "utterance": "can you wipe my notifications", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 194, "utterance": "osaima containerise this and launch it", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 195, "utterance": "spin up a JavaScript project the way I like it", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 196, "utterance": "would you power off the machine", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 197, "utterance": "hey bring my notes on screen", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 198, "utterance": "boot the dev server on port five thousand", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 199, "utterance": "phrase a commit the way I normally do", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false}
+{"id": 200, "utterance": "would you dismiss Spotify", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 201, "utterance": "osaima wipe my notifications", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 202, "utterance": "would you execute the tests with a coverage report", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false}
+{"id": 203, "utterance": "hey hit me with the key points of this readme", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 204, "utterance": "can you bring up the usb stick", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false}
+{"id": 205, "utterance": "can you bootstrap a flask app named api", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 206, "utterance": "force quit the hung program", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 207, "utterance": "would you lock up", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 208, "utterance": "osaima turn this diff into a commit line", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false}
+{"id": 209, "utterance": "what processes are active", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 210, "utterance": "give me a JavaScript function that reverses a string", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 211, "utterance": "enable do not disturb", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 212, "utterance": "hey annotate these parameters with types", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false}
+{"id": 213, "utterance": "where is my resume file", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 214, "utterance": "drop it", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": true}
+{"id": 215, "utterance": "get it going", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": true}
+{"id": 216, "utterance": "hook me up", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": true}
+{"id": 217, "utterance": "compile this TypeScript codebase", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 218, "utterance": "wrap it up", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": true}
+{"id": 219, "utterance": "would you drop in what I copied", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false}
+{"id": 220, "utterance": "drop it", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": true}
+{"id": 221, "utterance": "clean this", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 222, "utterance": "hey containerise this and launch it", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 223, "utterance": "osaima wipe my notifications", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 224, "utterance": "osaima put this on the right half", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 225, "utterance": "fire up Spotify", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false}
+{"id": 226, "utterance": "osaima reopen the file I just closed", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 227, "utterance": "can you stop the track", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 228, "utterance": "clean this", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 229, "utterance": "osaima drop in what I copied", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false}
+{"id": 230, "utterance": "osaima how do I say this in Spanish", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false}
+{"id": 231, "utterance": "can you snap the current screen", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 232, "utterance": "maximise this one", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 233, "utterance": "would you spin up a venv and turn it on", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false}
+{"id": 234, "utterance": "compile this Python codebase", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 235, "utterance": "jump to the next window", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 236, "utterance": "can you stop the track", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 237, "utterance": "reopen the file I just closed", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 238, "utterance": "hey how much memory is free", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 239, "utterance": "how's my battery doing", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 240, "utterance": "break down what this command is doing", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 241, "utterance": "add requests and flask here", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 242, "utterance": "would you hunt down every python file in my projects folder", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 243, "utterance": "hey restructure this code", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 244, "utterance": "hey hunt down every python file in Downloads", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 245, "utterance": "ship this to staging", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 246, "utterance": "enable do not disturb", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 247, "utterance": "move focus over", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 248, "utterance": "lock up", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 249, "utterance": "would you get Spotify on screen", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false}
+{"id": 250, "utterance": "what's my cpu load", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 251, "utterance": "osaima walk me through how a hash map works", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 252, "utterance": "osaima put together an email to my manager about the deadline", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 253, "utterance": "would you put this on the right half", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 254, "utterance": "pull in this project's dependencies", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 255, "utterance": "would you look for anything called report", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 256, "utterance": "get rid of Spotify", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 257, "utterance": "give me the gist of this file", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 258, "utterance": "hey shut nginx down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 259, "utterance": "hook me up", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": true}
+{"id": 260, "utterance": "drop it", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": true}
+{"id": 261, "utterance": "kick off the test suite", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false}
+{"id": 262, "utterance": "what's in my clipboard", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false}
+{"id": 263, "utterance": "nuke that task", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 264, "utterance": "run pytest and tell me what breaks", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false}
+{"id": 265, "utterance": "can you give me a TypeScript function that reverses a string", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 266, "utterance": "can you maximise this one", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 267, "utterance": "osaima drop the vpn", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 268, "utterance": "cut a new feature branch", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 269, "utterance": "would you drop in what I copied", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false}
+{"id": 270, "utterance": "can you drop the vpn", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 271, "utterance": "hey boot the dev server on port five thousand", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 272, "utterance": "osaima shut cups down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 273, "utterance": "osaima bring the vpn up", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 274, "utterance": "hey nuke that task", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 275, "utterance": "would you make an environment and pull the requirements", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false}
+{"id": 276, "utterance": "get it going", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": true}
+{"id": 277, "utterance": "what's this error telling me", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 278, "utterance": "save this out", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": true}
+{"id": 279, "utterance": "osaima throw this to workspace four", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false}
+{"id": 280, "utterance": "do a full restart", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 281, "utterance": "bounce cups", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 282, "utterance": "write a docstring for this", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false}
+{"id": 283, "utterance": "hey give me a JavaScript function that reverses a string", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 284, "utterance": "hey run pytest and tell me what breaks", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false}
+{"id": 285, "utterance": "shut the ssh service down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 286, "utterance": "grab a screenshot", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 287, "utterance": "drop it", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": true}
+{"id": 288, "utterance": "how's my battery doing", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 289, "utterance": "condense this document", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 290, "utterance": "bring my notes on screen", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 291, "utterance": "would you nuke that task", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 292, "utterance": "commit my work the way I usually word it", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 293, "utterance": "hey reply to my manager turning down the meeting", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 294, "utterance": "hey render this paragraph in Hindi", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false}
+{"id": 295, "utterance": "bounce nginx", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 296, "utterance": "reopen the file I just closed", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 297, "utterance": "what's my cpu load", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 298, "utterance": "hey bring the vpn up", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 299, "utterance": "can you grab a screenshot", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 300, "utterance": "hook me up", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": true}
+{"id": 301, "utterance": "add requests and flask here", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 302, "utterance": "how much memory is free", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 303, "utterance": "would you give me a Rust function that reverses a string", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 304, "utterance": "drop the volume to twenty percent", "track": "SYSTEM_COMMAND", "intent": "volume_control", "edge_case": false}
+{"id": 305, "utterance": "get it going", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": true}
+{"id": 306, "utterance": "produce the release build", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 307, "utterance": "ping them", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": true}
+{"id": 308, "utterance": "clean this", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 309, "utterance": "cut a new feature branch", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 310, "utterance": "get it going", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": true}
+{"id": 311, "utterance": "bootstrap a flask app named api", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 312, "utterance": "hey drop in what I copied", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false}
+{"id": 313, "utterance": "switch wifi on", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 314, "utterance": "ping them", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": true}
+{"id": 315, "utterance": "grab a screenshot", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 316, "utterance": "osaima put together an email to my team about the deadline", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 317, "utterance": "drop the vpn", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 318, "utterance": "can you drop the vpn", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 319, "utterance": "osaima reopen the file I just closed", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 320, "utterance": "hey is docker running", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 321, "utterance": "osaima what's this error telling me", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 322, "utterance": "kick off the test suite", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false}
+{"id": 323, "utterance": "maximise this one", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 324, "utterance": "snap the current screen", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 325, "utterance": "break down what this command is doing", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 326, "utterance": "shut cups down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 327, "utterance": "would you spin up a TypeScript project the way I like it", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 328, "utterance": "can you what's this error telling me", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 329, "utterance": "hey run pytest and tell me what breaks", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false}
+{"id": 330, "utterance": "hey walk me through how a hash map works", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 331, "utterance": "would you is docker running", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 332, "utterance": "can you kill bluetooth", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 333, "utterance": "get torch installed with gpu support", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 334, "utterance": "take it down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": true}
+{"id": 335, "utterance": "can you write my manager a status update", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 336, "utterance": "would you max out the brightness", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 337, "utterance": "hey containerise this and launch it", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 338, "utterance": "bring the vpn up", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 339, "utterance": "ping them", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": true}
+{"id": 340, "utterance": "would you spin up a Go project the way I like it", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 341, "utterance": "clean this", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 342, "utterance": "arrange the windows side by side", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 343, "utterance": "hey hit me with the key points of this readme", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 344, "utterance": "wrap it up", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": true}
+{"id": 345, "utterance": "would you exit GNOME Settings", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 346, "utterance": "flip the vpn", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 347, "utterance": "hey pull up the readme", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 348, "utterance": "would you where's my disk space going", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 349, "utterance": "shut it", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": true}
+{"id": 350, "utterance": "osaima jump to the next window", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 351, "utterance": "hey silence the alerts", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 352, "utterance": "can you come up with a commit message for this", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false}
+{"id": 353, "utterance": "crank the volume", "track": "SYSTEM_COMMAND", "intent": "volume_control", "edge_case": false}
+{"id": 354, "utterance": "hey I need the Files app open", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false}
+{"id": 355, "utterance": "osaima secure the screen", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 356, "utterance": "hey I need the terminal open", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false}
+{"id": 357, "utterance": "handle this one", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 358, "utterance": "cycle to the window before this", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 359, "utterance": "clean this", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 360, "utterance": "hey add requests and flask here", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 361, "utterance": "is the laptop charging", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 362, "utterance": "ship this to staging", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 363, "utterance": "build a conda environment with scipy", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false}
+{"id": 364, "utterance": "containerise this and launch it", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 365, "utterance": "can you jump to the next tune", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 366, "utterance": "put the machine on lock", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 367, "utterance": "grab a screenshot", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 368, "utterance": "hey crank the volume", "track": "SYSTEM_COMMAND", "intent": "volume_control", "edge_case": false}
+{"id": 369, "utterance": "would you exit GNOME Settings", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 370, "utterance": "hey how's my battery doing", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 371, "utterance": "can you condense this document", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 372, "utterance": "hey dismiss the terminal", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 373, "utterance": "tidy up this function", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 374, "utterance": "get it going", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": true}
+{"id": 375, "utterance": "can you arrange the windows side by side", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 376, "utterance": "hey dismiss Firefox", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 377, "utterance": "battery level please", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 378, "utterance": "can you put it to sleep", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 379, "utterance": "add commit and push all of this", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 380, "utterance": "start a fresh next.js app with my setup", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 381, "utterance": "can you get torch installed with gpu support", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 382, "utterance": "switch wifi on", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 383, "utterance": "can you put this into French", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false}
+{"id": 384, "utterance": "hey get the terminal on screen", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false}
+{"id": 385, "utterance": "bring the vpn up", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 386, "utterance": "come up with a commit message for this", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false}
+{"id": 387, "utterance": "can you drop the vpn", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 388, "utterance": "drop it", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": true}
+{"id": 389, "utterance": "hit me with the key points of this readme", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 390, "utterance": "take a picture of this window", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 391, "utterance": "hey grab a screenshot", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 392, "utterance": "produce the release build", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 393, "utterance": "reopen the file I just closed", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 394, "utterance": "containerise this and launch it", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 395, "utterance": "osaima drop the wireless connection", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 396, "utterance": "shut postgresql down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 397, "utterance": "would you switch wifi on", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 398, "utterance": "hey hunt down every python file in ~/code", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 399, "utterance": "would you start a fresh next.js app with my setup", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 400, "utterance": "wrap it up", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": true}
+{"id": 401, "utterance": "I need the terminal open", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false}
+{"id": 402, "utterance": "osaima cook up a file-renaming script", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 403, "utterance": "condense this document", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 404, "utterance": "condense this document", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 405, "utterance": "can you how much memory is free", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 406, "utterance": "save this out", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": true}
+{"id": 407, "utterance": "how's my battery doing", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 408, "utterance": "take a picture of this window", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 409, "utterance": "can you sort Downloads into folders by type", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false}
+{"id": 410, "utterance": "resume playback", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 411, "utterance": "is postgresql running", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 412, "utterance": "put this on the right half", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 413, "utterance": "can you how's my battery doing", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 414, "utterance": "get it going", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": true}
+{"id": 415, "utterance": "would you show me everything running", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 416, "utterance": "hey turn every png in ~/code into jpg", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false}
+{"id": 417, "utterance": "hey put this on the clipboard", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false}
+{"id": 418, "utterance": "reply to my team turning down the meeting", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 419, "utterance": "osaima bring up the usb stick", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false}
+{"id": 420, "utterance": "osaima arrange the windows side by side", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 421, "utterance": "can you commit my work the way I usually word it", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 422, "utterance": "pair my earbuds", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 423, "utterance": "osaima cut a new feature branch", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 424, "utterance": "hey drop in what I copied", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false}
+{"id": 425, "utterance": "put together an email to the client about the deadline", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 426, "utterance": "osaima silence the alerts", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 427, "utterance": "hey turn every png in Downloads into jpg", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false}
+{"id": 428, "utterance": "would you get torch installed with gpu support", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 429, "utterance": "would you cook up a file-renaming script", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 430, "utterance": "can you arrange the windows side by side", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 431, "utterance": "handle this one", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 432, "utterance": "hey put this on the clipboard", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false}
+{"id": 433, "utterance": "switch bluetooth on", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 434, "utterance": "how much memory is free", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 435, "utterance": "take it down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": true}
+{"id": 436, "utterance": "can you how do I say this in Spanish", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false}
+{"id": 437, "utterance": "how's my battery doing", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 438, "utterance": "osaima render this paragraph in Hindi", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false}
+{"id": 439, "utterance": "write my manager a status update", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 440, "utterance": "fire up the terminal", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false}
+{"id": 441, "utterance": "shut nginx down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 442, "utterance": "would you switch bluetooth on", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 443, "utterance": "put this into French", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false}
+{"id": 444, "utterance": "tidy up this function", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 445, "utterance": "crank the volume", "track": "SYSTEM_COMMAND", "intent": "volume_control", "edge_case": false}
+{"id": 446, "utterance": "hey power off the machine", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 447, "utterance": "hook me up", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": true}
+{"id": 448, "utterance": "take it down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": true}
+{"id": 449, "utterance": "would you stop the runaway process", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 450, "utterance": "hey secure the screen", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 451, "utterance": "containerise this and launch it", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 452, "utterance": "take it down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": true}
+{"id": 453, "utterance": "osaima get rid of Firefox", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 454, "utterance": "fire up Firefox", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false}
+{"id": 455, "utterance": "can you nuke that task", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 456, "utterance": "can you snap the current screen", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 457, "utterance": "take a picture of this window", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 458, "utterance": "power off the machine", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 459, "utterance": "drop it", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": true}
+{"id": 460, "utterance": "write the group a status update", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 461, "utterance": "would you move focus over", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 462, "utterance": "how's my battery doing", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 463, "utterance": "would you turn this diff into a commit line", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false}
+{"id": 464, "utterance": "would you bring up the usb stick", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false}
+{"id": 465, "utterance": "ping them", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": true}
+{"id": 466, "utterance": "what's this error telling me", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 467, "utterance": "can you add requests and flask here", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 468, "utterance": "would you where is my resume file", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 469, "utterance": "osaima tidy up this function", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 470, "utterance": "would you tidy up this function", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 471, "utterance": "can you come up with a commit message for this", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false}
+{"id": 472, "utterance": "would you containerise this and launch it", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 473, "utterance": "hey dim the display", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 474, "utterance": "osaima take me to workspace five", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false}
+{"id": 475, "utterance": "can you reopen the file I just closed", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 476, "utterance": "clean this", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 477, "utterance": "what's this error telling me", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 478, "utterance": "execute the tests with a coverage report", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false}
+{"id": 479, "utterance": "handle this one", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 480, "utterance": "cut a new feature branch", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 481, "utterance": "would you join the office network", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 482, "utterance": "would you maximise this one", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 483, "utterance": "would you jump to the next tune", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 484, "utterance": "hey crank the volume", "track": "SYSTEM_COMMAND", "intent": "volume_control", "edge_case": false}
+{"id": 485, "utterance": "hey phrase a commit the way I normally do", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false}
+{"id": 486, "utterance": "osaima enable do not disturb", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 487, "utterance": "can you commit my work the way I usually word it", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 488, "utterance": "osaima resume playback", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 489, "utterance": "hey drop the wireless connection", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 490, "utterance": "osaima boot the dev server on port five thousand", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 491, "utterance": "would you arrange the windows side by side", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 492, "utterance": "can you bring the vpn up", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 493, "utterance": "can you what's in my clipboard", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false}
+{"id": 494, "utterance": "can you containerise this and launch it", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 495, "utterance": "spin up a venv and turn it on", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false}
+{"id": 496, "utterance": "would you make an environment and pull the requirements", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false}
+{"id": 497, "utterance": "bring the vpn up", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 498, "utterance": "pull up the readme", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 499, "utterance": "clean this", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 500, "utterance": "hey jump to the next window", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 501, "utterance": "hey resume playback", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 502, "utterance": "hey silence the alerts", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 503, "utterance": "osaima boot the dev server on port five thousand", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 504, "utterance": "add requests and flask here", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 505, "utterance": "can you exit the terminal", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 506, "utterance": "hey exit the terminal", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 507, "utterance": "hey put this into French", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false}
+{"id": 508, "utterance": "ping them", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": true}
+{"id": 509, "utterance": "can you what processes are active", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 510, "utterance": "hey exit GNOME Settings", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 511, "utterance": "can you cycle to the window before this", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 512, "utterance": "hey arrange the windows side by side", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 513, "utterance": "take it down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": true}
+{"id": 514, "utterance": "hit me with the key points of this readme", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 515, "utterance": "compile this Rust codebase", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 516, "utterance": "can you break down what this command is doing", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 517, "utterance": "how much memory is free", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 518, "utterance": "tidy up this function", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 519, "utterance": "can you build a conda environment with scipy", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false}
+{"id": 520, "utterance": "osaima stop the track", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 521, "utterance": "battery level please", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 522, "utterance": "wrap it up", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": true}
+{"id": 523, "utterance": "maximise this one", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 524, "utterance": "get it going", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": true}
+{"id": 525, "utterance": "hey spin up a venv and turn it on", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false}
+{"id": 526, "utterance": "can you put together an email to my team about the deadline", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 527, "utterance": "give me a Go function that reverses a string", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 528, "utterance": "can you nuke that task", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 529, "utterance": "take a picture of this window", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 530, "utterance": "shut postgresql down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 531, "utterance": "can you drop the vpn", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 532, "utterance": "can you cycle to the window before this", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 533, "utterance": "hey shift this window to desktop one", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false}
+{"id": 534, "utterance": "would you put it to sleep", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 535, "utterance": "osaima spin up a venv and turn it on", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false}
+{"id": 536, "utterance": "what processes are active", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 537, "utterance": "can you lower the screen brightness a bit", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 538, "utterance": "would you render this paragraph in Hindi", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false}
+{"id": 539, "utterance": "run pytest and tell me what breaks", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false}
+{"id": 540, "utterance": "start a fresh next.js app with my setup", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 541, "utterance": "would you give me a Rust function that reverses a string", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 542, "utterance": "hook me up", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": true}
+{"id": 543, "utterance": "can you exit VS Code", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 544, "utterance": "put together an email to the professor about the deadline", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 545, "utterance": "can you cook up a file-renaming script", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 546, "utterance": "can you secure the screen", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 547, "utterance": "hey stop the track", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 548, "utterance": "take a picture of this window", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 549, "utterance": "annotate these parameters with types", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false}
+{"id": 550, "utterance": "can you produce the release build", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 551, "utterance": "crank the volume", "track": "SYSTEM_COMMAND", "intent": "volume_control", "edge_case": false}
+{"id": 552, "utterance": "osaima bring the vpn up", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 553, "utterance": "would you join the office network", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 554, "utterance": "osaima dismiss Spotify", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 555, "utterance": "can you bring my notes on screen", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 556, "utterance": "pull in this project's dependencies", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 557, "utterance": "would you bring up the usb stick", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false}
+{"id": 558, "utterance": "osaima arrange the windows side by side", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 559, "utterance": "pop out the sd card", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false}
+{"id": 560, "utterance": "osaima containerise this and launch it", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 561, "utterance": "start a fresh next.js app with my setup", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 562, "utterance": "would you arrange the windows side by side", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 563, "utterance": "restructure this code", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 564, "utterance": "hey bring my notes on screen", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 565, "utterance": "commit my work the way I usually word it", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 566, "utterance": "hey where's my disk space going", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 567, "utterance": "osaima move focus over", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 568, "utterance": "look for anything called report", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 569, "utterance": "hunt down every python file in Documents", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 570, "utterance": "osaima dim the display", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 571, "utterance": "write the professor a status update", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 572, "utterance": "is docker running", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 573, "utterance": "what's in my clipboard", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false}
+{"id": 574, "utterance": "osaima give me a Rust function that reverses a string", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 575, "utterance": "hey battery level please", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 576, "utterance": "would you show me everything running", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 577, "utterance": "would you snap the current screen", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 578, "utterance": "hey hunt down every python file in my projects folder", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 579, "utterance": "kill bluetooth", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 580, "utterance": "cycle to the window before this", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 581, "utterance": "write a docstring for this", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false}
+{"id": 582, "utterance": "bootstrap a flask app named api", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 583, "utterance": "is the laptop charging", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 584, "utterance": "look for anything called report", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 585, "utterance": "hey secure the screen", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 586, "utterance": "hey what processes are active", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 587, "utterance": "shut it", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": true}
+{"id": 588, "utterance": "shut it", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": true}
+{"id": 589, "utterance": "hook me up", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": true}
+{"id": 590, "utterance": "tidy up this function", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 591, "utterance": "pull up the readme", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 592, "utterance": "put the machine on lock", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 593, "utterance": "can you how much memory is free", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 594, "utterance": "bring my notes on screen", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 595, "utterance": "stop the runaway process", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 596, "utterance": "hey how do I say this in Spanish", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false}
+{"id": 597, "utterance": "break this big function apart", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 598, "utterance": "hey boot the dev server on port five thousand", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 599, "utterance": "wrap it up", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": true}
+{"id": 600, "utterance": "hey throw this to workspace four", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false}
+{"id": 601, "utterance": "get it going", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": true}
+{"id": 602, "utterance": "osaima sort the home directory into folders by type", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false}
+{"id": 603, "utterance": "hey condense this document", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 604, "utterance": "can you resume playback", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 605, "utterance": "pull up the readme", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 606, "utterance": "can you pull in this project's dependencies", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 607, "utterance": "can you wipe my notifications", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 608, "utterance": "osaima kill bluetooth", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 609, "utterance": "would you drop the wireless connection", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 610, "utterance": "hey bring the vpn up", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 611, "utterance": "annotate these parameters with types", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false}
+{"id": 612, "utterance": "hey lower the screen brightness a bit", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 613, "utterance": "power off the machine", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 614, "utterance": "hey walk me through how a hash map works", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 615, "utterance": "grab a screenshot", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 616, "utterance": "can you tidy up this function", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 617, "utterance": "force quit the hung program", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 618, "utterance": "what's my cpu load", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 619, "utterance": "hey look for anything called report", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 620, "utterance": "commit my work the way I usually word it", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 621, "utterance": "drop it", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": true}
+{"id": 622, "utterance": "hey dim the display", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 623, "utterance": "osaima commit my work the way I usually word it", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 624, "utterance": "throw this to workspace four", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false}
+{"id": 625, "utterance": "shut the ssh service down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 626, "utterance": "enable do not disturb", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 627, "utterance": "compile this JavaScript codebase", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 628, "utterance": "can you dim the display", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 629, "utterance": "render this paragraph in Hindi", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false}
+{"id": 630, "utterance": "do a full restart", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 631, "utterance": "crank the volume", "track": "SYSTEM_COMMAND", "intent": "volume_control", "edge_case": false}
+{"id": 632, "utterance": "would you start a fresh next.js app with my setup", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 633, "utterance": "put together an email to my team about the deadline", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 634, "utterance": "can you max out the brightness", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 635, "utterance": "condense this document", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 636, "utterance": "take me to workspace five", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false}
+{"id": 637, "utterance": "hook me up", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": true}
+{"id": 638, "utterance": "can you cycle to the window before this", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 639, "utterance": "would you cycle to the window before this", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 640, "utterance": "can you shut cups down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 641, "utterance": "can you nuke that task", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 642, "utterance": "hey tidy up this function", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 643, "utterance": "osaima break this big function apart", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 644, "utterance": "put together an email to the group about the deadline", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 645, "utterance": "kick off the test suite", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false}
+{"id": 646, "utterance": "put this on the clipboard", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false}
+{"id": 647, "utterance": "osaima get the Files app on screen", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false}
+{"id": 648, "utterance": "write a docstring for this", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false}
+{"id": 649, "utterance": "maximise this one", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 650, "utterance": "do a full restart", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 651, "utterance": "maximise this one", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 652, "utterance": "osaima pop out the sd card", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false}
+{"id": 653, "utterance": "how much memory is free", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 654, "utterance": "shut it", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": true}
+{"id": 655, "utterance": "hey drop the wireless connection", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 656, "utterance": "can you where is my resume file", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 657, "utterance": "osaima throw this to workspace four", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false}
+{"id": 658, "utterance": "give me the process list", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 659, "utterance": "wrap it up", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": true}
+{"id": 660, "utterance": "would you where is my resume file", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 661, "utterance": "stop the track", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 662, "utterance": "nuke that task", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 663, "utterance": "osaima tidy up this function", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 664, "utterance": "dismiss GNOME Settings", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 665, "utterance": "shut it", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": true}
+{"id": 666, "utterance": "how's my battery doing", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 667, "utterance": "osaima hunt down every python file in Downloads", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 668, "utterance": "osaima annotate these parameters with types", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false}
+{"id": 669, "utterance": "hey switch wifi on", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 670, "utterance": "drop the wireless connection", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 671, "utterance": "put this into French", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false}
+{"id": 672, "utterance": "get rid of GNOME Settings", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 673, "utterance": "bring the vpn up", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 674, "utterance": "can you nuke that task", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 675, "utterance": "bounce cups", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 676, "utterance": "break down what this command is doing", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 677, "utterance": "would you is nginx running", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 678, "utterance": "would you jump to the next tune", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 679, "utterance": "put this into French", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false}
+{"id": 680, "utterance": "would you write a docstring for this", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false}
+{"id": 681, "utterance": "hey pull in this project's dependencies", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 682, "utterance": "silence the alerts", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 683, "utterance": "bring my notes on screen", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 684, "utterance": "take a picture of this window", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 685, "utterance": "take me to workspace five", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false}
+{"id": 686, "utterance": "would you kick off the test suite", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false}
+{"id": 687, "utterance": "take it down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": true}
+{"id": 688, "utterance": "commit my work the way I usually word it", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 689, "utterance": "would you commit my work the way I usually word it", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 690, "utterance": "osaima start a fresh next.js app with my setup", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 691, "utterance": "can you I need Firefox open", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false}
+{"id": 692, "utterance": "get rid of GNOME Settings", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 693, "utterance": "phrase a commit the way I normally do", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false}
+{"id": 694, "utterance": "hey reopen the file I just closed", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 695, "utterance": "hey get rid of the Files app", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 696, "utterance": "osaima jump to the next window", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 697, "utterance": "arrange the windows side by side", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 698, "utterance": "walk me through how a hash map works", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 699, "utterance": "can you show me everything running", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 700, "utterance": "would you join the office network", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 701, "utterance": "what's my cpu load", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 702, "utterance": "maximise this one", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 703, "utterance": "would you restructure this code", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 704, "utterance": "switch bluetooth on", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 705, "utterance": "can you enable do not disturb", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 706, "utterance": "phrase a commit the way I normally do", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false}
+{"id": 707, "utterance": "drop it", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": true}
+{"id": 708, "utterance": "can you cook up a file-renaming script", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 709, "utterance": "osaima switch wifi on", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 710, "utterance": "spin up a Rust project the way I like it", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 711, "utterance": "osaima look for anything called report", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 712, "utterance": "pull in this project's dependencies", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 713, "utterance": "can you take me to workspace five", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false}
+{"id": 714, "utterance": "would you silence the sound", "track": "SYSTEM_COMMAND", "intent": "volume_control", "edge_case": false}
+{"id": 715, "utterance": "drop the vpn", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 716, "utterance": "put the machine on lock", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 717, "utterance": "hey ship this to staging", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 718, "utterance": "is the laptop charging", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 719, "utterance": "kill bluetooth", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 720, "utterance": "would you number all the photos in order", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false}
+{"id": 721, "utterance": "osaima get rid of VS Code", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 722, "utterance": "save this out", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": true}
+{"id": 723, "utterance": "hook me up", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": true}
+{"id": 724, "utterance": "boot the dev server on port five thousand", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 725, "utterance": "hey battery level please", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 726, "utterance": "would you produce the release build", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 727, "utterance": "turn this diff into a commit line", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false}
+{"id": 728, "utterance": "silence the alerts", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 729, "utterance": "hey put this on the right half", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 730, "utterance": "hey hunt down every python file in ~/code", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 731, "utterance": "would you write a docstring for this", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false}
+{"id": 732, "utterance": "phrase a commit the way I normally do", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false}
+{"id": 733, "utterance": "osaima bring my notes on screen", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 734, "utterance": "give me a Rust function that reverses a string", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 735, "utterance": "can you enable do not disturb", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 736, "utterance": "would you throw this to workspace four", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false}
+{"id": 737, "utterance": "hey give me a Go function that reverses a string", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 738, "utterance": "switch wifi on", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 739, "utterance": "start a fresh next.js app with my setup", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 740, "utterance": "would you get torch installed with gpu support", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 741, "utterance": "kill bluetooth", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 742, "utterance": "pull in this project's dependencies", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 743, "utterance": "dim the display", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 744, "utterance": "how do I say this in Spanish", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false}
+{"id": 745, "utterance": "osaima resume playback", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 746, "utterance": "hey how's my battery doing", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 747, "utterance": "would you take me to workspace five", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false}
+{"id": 748, "utterance": "osaima reopen the file I just closed", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 749, "utterance": "would you pull in this project's dependencies", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 750, "utterance": "osaima come up with a commit message for this", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false}
+{"id": 751, "utterance": "handle this one", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 752, "utterance": "safely remove the external drive", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false}
+{"id": 753, "utterance": "can you put the machine on lock", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 754, "utterance": "osaima safely remove the external drive", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false}
+{"id": 755, "utterance": "osaima add documentation to this class", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false}
+{"id": 756, "utterance": "secure the screen", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 757, "utterance": "can you get GNOME Settings on screen", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false}
+{"id": 758, "utterance": "secure the screen", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 759, "utterance": "look for anything called report", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 760, "utterance": "hey take me to workspace five", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false}
+{"id": 761, "utterance": "take it down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": true}
+{"id": 762, "utterance": "would you show me everything running", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 763, "utterance": "would you fire up Spotify", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false}
+{"id": 764, "utterance": "hey produce the release build", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 765, "utterance": "hey containerise this and launch it", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 766, "utterance": "hey do a full restart", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 767, "utterance": "hey flip the vpn", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 768, "utterance": "can you containerise this and launch it", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 769, "utterance": "can you give me the process list", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 770, "utterance": "hey drop in what I copied", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false}
+{"id": 771, "utterance": "force quit the hung program", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 772, "utterance": "osaima drop the vpn", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 773, "utterance": "hey stop the runaway process", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 774, "utterance": "can you cycle to the window before this", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 775, "utterance": "break down what this command is doing", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 776, "utterance": "would you compile this JavaScript codebase", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 777, "utterance": "restructure this code", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 778, "utterance": "lower the screen brightness a bit", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 779, "utterance": "osaima what processes are active", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 780, "utterance": "would you add documentation to this class", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false}
+{"id": 781, "utterance": "osaima reply to the group turning down the meeting", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 782, "utterance": "add commit and push all of this", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 783, "utterance": "get torch installed with gpu support", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 784, "utterance": "bounce postgresql", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 785, "utterance": "join the office network", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 786, "utterance": "start a fresh next.js app with my setup", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 787, "utterance": "safely remove the external drive", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false}
+{"id": 788, "utterance": "hey bring the vpn up", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 789, "utterance": "osaima bounce nginx", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 790, "utterance": "get it going", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": true}
+{"id": 791, "utterance": "wrap it up", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": true}
+{"id": 792, "utterance": "start a fresh next.js app with my setup", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 793, "utterance": "resume playback", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 794, "utterance": "osaima run pytest and tell me what breaks", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false}
+{"id": 795, "utterance": "hey get Firefox on screen", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false}
+{"id": 796, "utterance": "switch wifi on", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 797, "utterance": "drop it", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": true}
+{"id": 798, "utterance": "would you exit the terminal", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 799, "utterance": "turn every png in the home directory into jpg", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false}
+{"id": 800, "utterance": "max out the brightness", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 801, "utterance": "ping them", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": true}
+{"id": 802, "utterance": "hey add documentation to this class", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false}
+{"id": 803, "utterance": "look for anything called report", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 804, "utterance": "can you annotate these parameters with types", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false}
+{"id": 805, "utterance": "can you start a fresh next.js app with my setup", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 806, "utterance": "I need GNOME Settings open", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false}
+{"id": 807, "utterance": "snap the current screen", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 808, "utterance": "hey break down what this command is doing", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 809, "utterance": "would you break this big function apart", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 810, "utterance": "annotate these parameters with types", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false}
+{"id": 811, "utterance": "add requests and flask here", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 812, "utterance": "can you power off the machine", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 813, "utterance": "wrap it up", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": true}
+{"id": 814, "utterance": "hey annotate these parameters with types", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false}
+{"id": 815, "utterance": "ping them", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": true}
+{"id": 816, "utterance": "can you enable do not disturb", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 817, "utterance": "hey max out the brightness", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 818, "utterance": "clean this", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 819, "utterance": "can you kill bluetooth", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 820, "utterance": "spin up a venv and turn it on", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false}
+{"id": 821, "utterance": "hey containerise this and launch it", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 822, "utterance": "hey shift this window to desktop one", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false}
+{"id": 823, "utterance": "would you pair my earbuds", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 824, "utterance": "take it down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": true}
+{"id": 825, "utterance": "save this out", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": true}
+{"id": 826, "utterance": "osaima hit me with the key points of this readme", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 827, "utterance": "osaima safely remove the external drive", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false}
+{"id": 828, "utterance": "would you tidy up this function", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 829, "utterance": "osaima flip the vpn", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 830, "utterance": "how much memory is free", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 831, "utterance": "make an environment and pull the requirements", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false}
+{"id": 832, "utterance": "hey compile this Python codebase", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 833, "utterance": "osaima add requests and flask here", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 834, "utterance": "restructure this code", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 835, "utterance": "give me the gist of this file", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 836, "utterance": "osaima compile this Go codebase", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 837, "utterance": "kick off the test suite", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false}
+{"id": 838, "utterance": "would you run pytest and tell me what breaks", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false}
+{"id": 839, "utterance": "dim the display", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 840, "utterance": "switch wifi on", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 841, "utterance": "would you turn this diff into a commit line", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false}
+{"id": 842, "utterance": "nuke that task", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 843, "utterance": "hey walk me through how a hash map works", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 844, "utterance": "stop the runaway process", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 845, "utterance": "jump to the next window", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 846, "utterance": "put it to sleep", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 847, "utterance": "can you nuke that task", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 848, "utterance": "would you put the machine on lock", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 849, "utterance": "wrap it up", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": true}
+{"id": 850, "utterance": "handle this one", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 851, "utterance": "would you restructure this code", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 852, "utterance": "can you lock up", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 853, "utterance": "put this on the right half", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 854, "utterance": "can you produce the release build", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 855, "utterance": "can you put this into French", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false}
+{"id": 856, "utterance": "put it to sleep", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 857, "utterance": "where's my disk space going", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 858, "utterance": "osaima stop the track", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 859, "utterance": "can you compile this Go codebase", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 860, "utterance": "would you dim the display", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 861, "utterance": "where's my disk space going", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 862, "utterance": "turn every png in Documents into jpg", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false}
+{"id": 863, "utterance": "hey dim the display", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 864, "utterance": "can you make an environment and pull the requirements", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false}
+{"id": 865, "utterance": "ship this to staging", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 866, "utterance": "osaima resume playback", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 867, "utterance": "move focus over", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 868, "utterance": "would you ship this to staging", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 869, "utterance": "osaima put it to sleep", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 870, "utterance": "take a picture of this window", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 871, "utterance": "save this out", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": true}
+{"id": 872, "utterance": "would you jump to the next tune", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 873, "utterance": "cut a new feature branch", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 874, "utterance": "exit the terminal", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 875, "utterance": "clean this", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 876, "utterance": "hey stop the track", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 877, "utterance": "silence the sound", "track": "SYSTEM_COMMAND", "intent": "volume_control", "edge_case": false}
+{"id": 878, "utterance": "stop the runaway process", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 879, "utterance": "dim the display", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 880, "utterance": "osaima lower the screen brightness a bit", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 881, "utterance": "can you flip the vpn", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 882, "utterance": "show me everything running", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 883, "utterance": "take it down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": true}
+{"id": 884, "utterance": "hey how's my battery doing", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 885, "utterance": "hey compile this TypeScript codebase", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 886, "utterance": "osaima put it to sleep", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 887, "utterance": "hunt down every python file in my projects folder", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 888, "utterance": "can you produce the release build", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 889, "utterance": "hey where's my disk space going", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 890, "utterance": "turn every png in ~/code into jpg", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false}
+{"id": 891, "utterance": "can you jump to the next tune", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 892, "utterance": "produce the release build", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 893, "utterance": "would you ship this to staging", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 894, "utterance": "hey start a fresh next.js app with my setup", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 895, "utterance": "osaima bring up the usb stick", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false}
+{"id": 896, "utterance": "kill bluetooth", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 897, "utterance": "hey battery level please", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 898, "utterance": "hey put together an email to my manager about the deadline", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 899, "utterance": "nuke that task", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 900, "utterance": "give me the process list", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 901, "utterance": "can you containerise this and launch it", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 902, "utterance": "hey walk me through how a hash map works", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 903, "utterance": "osaima what's this error telling me", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 904, "utterance": "hey grab a screenshot", "track": "SYSTEM_COMMAND", "intent": "screenshot", "edge_case": false}
+{"id": 905, "utterance": "osaima reopen the file I just closed", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 906, "utterance": "osaima cook up a file-renaming script", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": false}
+{"id": 907, "utterance": "hey restructure this code", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 908, "utterance": "make an environment and pull the requirements", "track": "WORKFLOW_GENERATION", "intent": "env_setup", "edge_case": false}
+{"id": 909, "utterance": "silence the alerts", "track": "SYSTEM_COMMAND", "intent": "notification_ctrl", "edge_case": false}
+{"id": 910, "utterance": "hey stop the runaway process", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 911, "utterance": "put this on the right half", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 912, "utterance": "hey do a full restart", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 913, "utterance": "osaima pull in this project's dependencies", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 914, "utterance": "would you lower the screen brightness a bit", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 915, "utterance": "how's my battery doing", "track": "SYSTEM_COMMAND", "intent": "battery_status", "edge_case": false}
+{"id": 916, "utterance": "osaima dismiss the Files app", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 917, "utterance": "shut it", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": true}
+{"id": 918, "utterance": "can you produce the release build", "track": "WORKFLOW_GENERATION", "intent": "build_compile", "edge_case": false}
+{"id": 919, "utterance": "would you secure the screen", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 920, "utterance": "bring my notes on screen", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 921, "utterance": "stop the runaway process", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 922, "utterance": "hey resume playback", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 923, "utterance": "kill bluetooth", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 924, "utterance": "hey do a full restart", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 925, "utterance": "restructure this code", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 926, "utterance": "turn every png in my projects folder into jpg", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false}
+{"id": 927, "utterance": "hey restructure this code", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 928, "utterance": "cycle to the window before this", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 929, "utterance": "start a fresh next.js app with my setup", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 930, "utterance": "can you hunt down every python file in Documents", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 931, "utterance": "power off the machine", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 932, "utterance": "would you put this into French", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false}
+{"id": 933, "utterance": "osaima take me to workspace five", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false}
+{"id": 934, "utterance": "condense this document", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 935, "utterance": "would you kick off the test suite", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false}
+{"id": 936, "utterance": "can you bounce docker", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 937, "utterance": "hey stop the runaway process", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 938, "utterance": "how do I say this in Spanish", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false}
+{"id": 939, "utterance": "can you switch wifi on", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 940, "utterance": "would you put together an email to the client about the deadline", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": false}
+{"id": 941, "utterance": "hey containerise this and launch it", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 942, "utterance": "hunt down every python file in Downloads", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 943, "utterance": "ping them", "track": "CONTENT_GENERATION", "intent": "email_draft", "edge_case": true}
+{"id": 944, "utterance": "switch bluetooth on", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 945, "utterance": "hey start a fresh next.js app with my setup", "track": "WORKFLOW_GENERATION", "intent": "project_scaffold", "edge_case": false}
+{"id": 946, "utterance": "save this out", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": true}
+{"id": 947, "utterance": "would you switch wifi on", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 948, "utterance": "hey throw this to workspace four", "track": "SYSTEM_COMMAND", "intent": "window_move_ws", "edge_case": false}
+{"id": 949, "utterance": "can you join the office network", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 950, "utterance": "hook me up", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": true}
+{"id": 951, "utterance": "hey get torch installed with gpu support", "track": "WORKFLOW_GENERATION", "intent": "package_install", "edge_case": false}
+{"id": 952, "utterance": "shut cups down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 953, "utterance": "hey power off the machine", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 954, "utterance": "exit Spotify", "track": "SYSTEM_COMMAND", "intent": "app_close", "edge_case": false}
+{"id": 955, "utterance": "force quit the hung program", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 956, "utterance": "would you lower the screen brightness a bit", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 957, "utterance": "can you drop the volume to twenty percent", "track": "SYSTEM_COMMAND", "intent": "volume_control", "edge_case": false}
+{"id": 958, "utterance": "fire up GNOME Settings", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false}
+{"id": 959, "utterance": "would you bring my notes on screen", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 960, "utterance": "can you break this big function apart", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": false}
+{"id": 961, "utterance": "would you how much memory is free", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 962, "utterance": "power off the machine", "track": "SYSTEM_COMMAND", "intent": "power_control", "edge_case": false}
+{"id": 963, "utterance": "bring the vpn up", "track": "SYSTEM_COMMAND", "intent": "vpn_control", "edge_case": false}
+{"id": 964, "utterance": "execute the tests with a coverage report", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false}
+{"id": 965, "utterance": "osaima where is my resume file", "track": "SYSTEM_COMMAND", "intent": "file_search", "edge_case": false}
+{"id": 966, "utterance": "would you condense this document", "track": "CONTENT_GENERATION", "intent": "summarize_text", "edge_case": false}
+{"id": 967, "utterance": "would you safely remove the external drive", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false}
+{"id": 968, "utterance": "hey stop the track", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 969, "utterance": "hey what's this error telling me", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 970, "utterance": "resume playback", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 971, "utterance": "can you ship this to staging", "track": "WORKFLOW_GENERATION", "intent": "deploy_workflow", "edge_case": false}
+{"id": 972, "utterance": "would you force quit the hung program", "track": "SYSTEM_COMMAND", "intent": "process_kill", "edge_case": false}
+{"id": 973, "utterance": "can you sort the home directory into folders by type", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false}
+{"id": 974, "utterance": "hey shut the ssh service down", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 975, "utterance": "hey put this on the right half", "track": "SYSTEM_COMMAND", "intent": "window_tile", "edge_case": false}
+{"id": 976, "utterance": "how do I say this in Spanish", "track": "CONTENT_GENERATION", "intent": "translate_text", "edge_case": false}
+{"id": 977, "utterance": "handle this one", "track": "CONTENT_GENERATION", "intent": "code_refactor", "edge_case": true}
+{"id": 978, "utterance": "save this out", "track": "CONTENT_GENERATION", "intent": "code_generate", "edge_case": true}
+{"id": 979, "utterance": "osaima pop out the sd card", "track": "SYSTEM_COMMAND", "intent": "mount_control", "edge_case": false}
+{"id": 980, "utterance": "would you cycle to the window before this", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
+{"id": 981, "utterance": "walk me through how a hash map works", "track": "CONTENT_GENERATION", "intent": "explain_concept", "edge_case": false}
+{"id": 982, "utterance": "hey I need the terminal open", "track": "SYSTEM_COMMAND", "intent": "app_launch", "edge_case": false}
+{"id": 983, "utterance": "put the machine on lock", "track": "SYSTEM_COMMAND", "intent": "lock_screen", "edge_case": false}
+{"id": 984, "utterance": "show me everything running", "track": "SYSTEM_COMMAND", "intent": "process_list", "edge_case": false}
+{"id": 985, "utterance": "dim the display", "track": "SYSTEM_COMMAND", "intent": "brightness_control", "edge_case": false}
+{"id": 986, "utterance": "bring my notes on screen", "track": "SYSTEM_COMMAND", "intent": "file_open", "edge_case": false}
+{"id": 987, "utterance": "drop in what I copied", "track": "SYSTEM_COMMAND", "intent": "clipboard_control", "edge_case": false}
+{"id": 988, "utterance": "can you what's my cpu load", "track": "SYSTEM_COMMAND", "intent": "system_stats", "edge_case": false}
+{"id": 989, "utterance": "hook me up", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": true}
+{"id": 990, "utterance": "drop the wireless connection", "track": "SYSTEM_COMMAND", "intent": "wifi_control", "edge_case": false}
+{"id": 991, "utterance": "kick off the test suite", "track": "WORKFLOW_GENERATION", "intent": "run_tests", "edge_case": false}
+{"id": 992, "utterance": "sort my projects folder into folders by type", "track": "WORKFLOW_GENERATION", "intent": "file_batch_op", "edge_case": false}
+{"id": 993, "utterance": "can you add commit and push all of this", "track": "WORKFLOW_GENERATION", "intent": "git_workflow", "edge_case": false}
+{"id": 994, "utterance": "would you resume playback", "track": "SYSTEM_COMMAND", "intent": "media_playback", "edge_case": false}
+{"id": 995, "utterance": "add documentation to this class", "track": "CONTENT_GENERATION", "intent": "docstring_gen", "edge_case": false}
+{"id": 996, "utterance": "hey kill bluetooth", "track": "SYSTEM_COMMAND", "intent": "bluetooth_control", "edge_case": false}
+{"id": 997, "utterance": "can you turn this diff into a commit line", "track": "CONTENT_GENERATION", "intent": "commit_message", "edge_case": false}
+{"id": 998, "utterance": "hey bounce cups", "track": "SYSTEM_COMMAND", "intent": "service_control", "edge_case": false}
+{"id": 999, "utterance": "move focus over", "track": "SYSTEM_COMMAND", "intent": "window_focus", "edge_case": false}
