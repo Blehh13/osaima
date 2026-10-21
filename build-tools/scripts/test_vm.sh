@@ -40,17 +40,18 @@ schedd_log | grep -m1 "^osaima-schedd:"
 check "scheduler reads the eBPF telemetry" "schedd_log | grep -q 'on eBPF data'"
 check "scheduler uses the trained model" "schedd_log | grep -q '^osaima-schedd: trained'"
 # a program of the user that only computes should be judged batch and given a worse priority
-hog="python3 -c while True: pass"
+# matched by its arguments: Gentoo's python3 is a wrapper that runs python3.N
+hog="^[^ ]*python[0-9.]* -c while True: pass$"
 as_user timeout 120 python3 -c 'while True: pass' > /dev/null 2>&1 &
 hog_nice=""
 for _ in $(seq 1 30); do
-	p=$(pgrep -u osaima -xf "$hog" | head -1)
+	p=$(pgrep -u osaima -f "$hog" | head -1)
 	[ -n "$p" ] && hog_nice=$(ps -o ni= -p "$p" | tr -d ' ') && [ "${hog_nice:-0}" -gt 0 ] 2>/dev/null && break
 	sleep 2
 done
 check "a CPU hog of the user gets a worse priority (nice ${hog_nice:-?})" "[ '${hog_nice:-0}' -gt 0 ]"
 schedd_log | grep -- '->' | tail -3
-pkill -u osaima -xf "$hog"
+pkill -u osaima -f "$hog"
 
 echo "== Waiting for the model to load"
 for _ in $(seq 1 90); do curl -sf http://127.0.0.1:8080/v1/models >/dev/null && break; sleep 2; done

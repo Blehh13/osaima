@@ -10,7 +10,10 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import os
+import shutil
 import signal
+import sys
 from collections.abc import Callable, Sequence
 from pathlib import Path
 
@@ -32,6 +35,17 @@ WAV_HEADER_BYTES = 44
 BYTES_PER_SECOND = 16000 * 2  # 16 kHz, 16-bit, mono
 
 Which = Callable[[str], str | None]
+
+
+def find_program(program: str) -> str | None:
+    """`shutil.which`, but also beside this Python: a virtual environment's programs (Piper,
+    installed with the voice extra) are often not on the PATH of the service running it."""
+    found = shutil.which(program)
+    if found is None and os.sep not in program:
+        beside = Path(sys.executable).parent / program
+        if beside.is_file() and os.access(beside, os.X_OK):
+            found = str(beside)
+    return found
 
 
 class AudioError(Exception):

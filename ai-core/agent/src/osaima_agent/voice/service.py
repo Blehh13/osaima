@@ -26,6 +26,7 @@ from .audio import (
     Playback,
     Recording,
     Which,
+    find_program,
     recorded_seconds,
     resolve_command,
 )
@@ -62,7 +63,7 @@ class VoiceService:
         *,
         transcriber: Transcriber | None = None,
         synthesizer: Synthesizer | None = None,
-        which: Which = shutil.which,
+        which: Which = find_program,
     ) -> None:
         self._cfg = cfg
         self._work_root = work_dir
