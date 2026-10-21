@@ -18,8 +18,7 @@ set -euo pipefail
 
 SCHEDD=${1:?usage: run.sh SCHEDD [MODEL.json]}
 MODEL=${2:-}
-HERE=$(cd "$(dirname "$0")" && pwd)
-TRAIN=$HERE/../train
+SRC=$(cd "$(dirname "$0")/.." && pwd)
 USER_NAME=osaima-bench
 UID_BENCH=1500
 HOGS=$(( $(nproc) * 3 ))
@@ -29,12 +28,20 @@ OUT=$(mktemp -d)
 id "$USER_NAME" > /dev/null 2>&1 || useradd -u "$UID_BENCH" -M -s /usr/sbin/nologin "$USER_NAME"
 as_bench() { setpriv --reuid="$UID_BENCH" --regid="$UID_BENCH" --clear-groups "$@"; }
 
+# The checkout may sit in a home folder the benchmark user cannot read, so run copies.
+WORK=$OUT/scripts
+mkdir -p "$WORK"
+cp "$SRC/bench/frames.py" "$SRC/train/workload.py" "$WORK/"
+chmod 755 "$OUT" "$WORK"
+chmod 644 "$WORK"/*.py
+cd "$WORK"
+
 one_run() {
 	local label=$1 mode=$2
 	local hog_pids=() daemon=""
 	if [ "$mode" != idle ]; then
 		for i in $(seq 1 "$HOGS"); do
-			as_bench python3 "$TRAIN/workload.py" batch --seed "$i" &
+			as_bench python3 "$WORK/workload.py" batch --seed "$i" &
 			hog_pids+=("$!")
 		done
 	fi
@@ -42,7 +49,7 @@ one_run() {
 		rules) "$SCHEDD" run --min-uid "$UID_BENCH" --interval 1 --hysteresis 2 --source proc > "$OUT/$label.daemon.log" 2>&1 & daemon=$! ;;
 		model) "$SCHEDD" run --min-uid "$UID_BENCH" --interval 1 --hysteresis 2 --source proc --model "$MODEL" > "$OUT/$label.daemon.log" 2>&1 & daemon=$! ;;
 	esac
-	as_bench python3 "$HERE/frames.py" --label "$label" > "$OUT/$label.json"
+	as_bench python3 "$WORK/frames.py" --label "$label" > "$OUT/$label.json"
 	if [ -n "$daemon" ]; then kill -TERM "$daemon"; wait "$daemon" || true; fi
 	if [ "${#hog_pids[@]}" -gt 0 ]; then kill -KILL "${hog_pids[@]}" 2> /dev/null || true; wait "${hog_pids[@]}" 2> /dev/null || true; fi
 	cat "$OUT/$label.json"

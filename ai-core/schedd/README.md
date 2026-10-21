@@ -88,6 +88,21 @@ model, compares it with the built-in rules by 5-fold cross-validation, and write
 are known to agree. The `Train the process classifier` workflow runs the whole thing on a
 CI runner.
 
+The shipped model (`model/`) was trained on 1200 measurements, 300 of each kind, taken on
+a 4-CPU GitHub runner. By 5-fold cross-validation:
+
+| | Accuracy |
+|---|---|
+| Trained model | 98.6% |
+| Built-in rules | 72.1% |
+
+The rules fail exactly where it matters: when programs compete for the CPU, a hog that
+keeps getting preempted looks like steady deadline work, and the rules call 275 of 300
+batch programs "media" and would favour them. The model gets 295 of them right; its
+only real confusion is 12 of 300 media windows taken for batch (`model/report.md` has the
+full tables and the weights). `tests/golden.rs` checks that the Rust daemon computes the
+same verdicts and probabilities as the trained scikit-learn model.
+
 ## Benchmark
 
 `bench/run.sh` runs a 60 fps style task (6 ms of CPU every 16.7 ms) alone, against three

@@ -119,7 +119,10 @@ pub fn per_process(threads: &[ThreadStats], now_ns: u64) -> HashMap<u32, Counter
 
 /// The kernel's monotonic clock in nanoseconds, the clock the telemetry stamps events with.
 fn monotonic_ns() -> u64 {
-    let mut ts = libc::timespec { tv_sec: 0, tv_nsec: 0 };
+    let mut ts = libc::timespec {
+        tv_sec: 0,
+        tv_nsec: 0,
+    };
     unsafe { libc::clock_gettime(libc::CLOCK_MONOTONIC, &mut ts) };
     ts.tv_sec as u64 * 1_000_000_000 + ts.tv_nsec as u64
 }
@@ -298,15 +301,29 @@ mod tests {
             tid: 1,
             tgid: 1,
             comm: "x".into(),
-            counters: Counters { run_ns: 1000, wait_ns: 0, slices: 1, voluntary: 0, involuntary: 0 },
+            counters: Counters {
+                run_ns: 1000,
+                wait_ns: 0,
+                slices: 1,
+                voluntary: 0,
+                involuntary: 0,
+            },
             wake_lat_max_ns: 0,
             run_start_ns: 5_000,
             runnable_since_ns: 0,
         };
         assert_eq!(t.as_of(9_000).run_ns, 5_000, "1000 finished + 4000 so far");
         assert_eq!(t.as_of(5_000).run_ns, 1_000, "nothing has passed");
-        assert_eq!(t.as_of(1_000).run_ns, 1_000, "a clock that appears to go back adds nothing");
-        let waiting = ThreadStats { run_start_ns: 0, runnable_since_ns: 2_000, ..t };
+        assert_eq!(
+            t.as_of(1_000).run_ns,
+            1_000,
+            "a clock that appears to go back adds nothing"
+        );
+        let waiting = ThreadStats {
+            run_start_ns: 0,
+            runnable_since_ns: 2_000,
+            ..t
+        };
         assert_eq!(waiting.as_of(2_500).wait_ns, 500);
         assert_eq!(waiting.as_of(2_500).run_ns, 1_000);
     }

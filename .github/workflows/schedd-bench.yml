@@ -9,6 +9,7 @@ on:
     branches: ["feat/m4-sched"]
     paths:
       - "ai-core/schedd/bench/**"
+      - "ai-core/schedd/model/**"
       - ".github/workflows/schedd-bench.yml"
 
 permissions:
@@ -30,6 +31,7 @@ jobs:
       - run: cargo build --locked --release
       - name: Run the benchmark
         run: |
+          set -o pipefail
           model=""
           [ -f model/model.json ] && model="$PWD/model/model.json"
           sudo bash bench/run.sh "$PWD/target/release/osaima-schedd" $model 2>&1 | tee "$RUNNER_TEMP/bench.txt"

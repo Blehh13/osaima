@@ -1,0 +1,410 @@
+[
+  {
+    "features": {
+      "cpu_util": 0.038307,
+      "vol_rate": 9.9996,
+      "invol_rate": 19.9993,
+      "slice_ms": 1.277,
+      "wait_ratio": 1.6508
+    },
+    "class": "interactive",
+    "probability": 0.9971601687677445,
+    "probabilities": {
+      "background": 0.0014496285869924934,
+      "batch": 3.5134985425253586e-07,
+      "interactive": 0.9971601687677445,
+      "media": 0.0013898512954087464
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.337875,
+      "vol_rate": 0.0,
+      "invol_rate": 168.4153,
+      "slice_ms": 2.012,
+      "wait_ratio": 1.9556
+    },
+    "class": "batch",
+    "probability": 0.5107204130112237,
+    "probabilities": {
+      "background": 0.0020848074980241017,
+      "batch": 0.5107204130112237,
+      "interactive": 0.005946364031731128,
+      "media": 0.48124841545902103
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.726225,
+      "vol_rate": 0.0,
+      "invol_rate": 347.7281,
+      "slice_ms": 2.0914,
+      "wait_ratio": 0.3843
+    },
+    "class": "batch",
+    "probability": 0.9999996245805259,
+    "probabilities": {
+      "background": 4.0222150101460117e-13,
+      "batch": 0.9999996245805259,
+      "interactive": 1.8426994664639205e-16,
+      "media": 3.7541907172133376e-07
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.036441,
+      "vol_rate": 9.2419,
+      "invol_rate": 14.5925,
+      "slice_ms": 1.5289,
+      "wait_ratio": 1.8961
+    },
+    "class": "interactive",
+    "probability": 0.9975614472415343,
+    "probabilities": {
+      "background": 0.0008128070661204948,
+      "batch": 6.313315354385769e-08,
+      "interactive": 0.9975614472415343,
+      "media": 0.0016256825591916798
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.403751,
+      "vol_rate": 19.9341,
+      "invol_rate": 185.2413,
+      "slice_ms": 1.9678,
+      "wait_ratio": 1.2548
+    },
+    "class": "media",
+    "probability": 0.9996769191817199,
+    "probabilities": {
+      "background": 2.324191605400532e-09,
+      "batch": 0.00032096863869614576,
+      "interactive": 2.109855392320237e-06,
+      "media": 0.9996769191817199
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.450619,
+      "vol_rate": 0.0,
+      "invol_rate": 203.9458,
+      "slice_ms": 2.2095,
+      "wait_ratio": 1.1986
+    },
+    "class": "batch",
+    "probability": 0.9944565502982721,
+    "probabilities": {
+      "background": 1.1940793290523674e-06,
+      "batch": 0.9944565502982721,
+      "interactive": 4.1022336446880225e-07,
+      "media": 0.005541845399034395
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.039683,
+      "vol_rate": 11.2384,
+      "invol_rate": 14.1701,
+      "slice_ms": 1.5618,
+      "wait_ratio": 2.2079
+    },
+    "class": "interactive",
+    "probability": 0.9965485327531693,
+    "probabilities": {
+      "background": 0.00041317501421276454,
+      "batch": 9.560672693436542e-09,
+      "interactive": 0.9965485327531693,
+      "media": 0.003038282671945137
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.198379,
+      "vol_rate": 103.4963,
+      "invol_rate": 3.9999,
+      "slice_ms": 1.8455,
+      "wait_ratio": 0.5057
+    },
+    "class": "media",
+    "probability": 0.9907425633621305,
+    "probabilities": {
+      "background": 8.68043060888229e-06,
+      "batch": 0.00011155477044375469,
+      "interactive": 0.009137201436816771,
+      "media": 0.9907425633621305
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.00029,
+      "vol_rate": 0.485,
+      "invol_rate": 0.0,
+      "slice_ms": 0.598,
+      "wait_ratio": 5.506
+    },
+    "class": "background",
+    "probability": 0.9976039865959078,
+    "probabilities": {
+      "background": 0.9976039865959078,
+      "batch": 6.826526495137764e-15,
+      "interactive": 0.002396012324218391,
+      "media": 1.079867079217536e-09
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.037234,
+      "vol_rate": 11.5944,
+      "invol_rate": 12.0775,
+      "slice_ms": 1.5729,
+      "wait_ratio": 1.6441
+    },
+    "class": "interactive",
+    "probability": 0.9970057385975698,
+    "probabilities": {
+      "background": 0.0006960958330197485,
+      "batch": 1.4769169241813283e-07,
+      "interactive": 0.9970057385975698,
+      "media": 0.0022980178777181125
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.216354,
+      "vol_rate": 59.513,
+      "invol_rate": 65.3192,
+      "slice_ms": 1.7332,
+      "wait_ratio": 1.7035
+    },
+    "class": "media",
+    "probability": 0.9977851105566096,
+    "probabilities": {
+      "background": 3.01826620656891e-08,
+      "batch": 9.695004199166027e-08,
+      "interactive": 0.0022147623106862904,
+      "media": 0.9977851105566096
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.000226,
+      "vol_rate": 0.4893,
+      "invol_rate": 0.0,
+      "slice_ms": 0.4611,
+      "wait_ratio": 4.1944
+    },
+    "class": "background",
+    "probability": 0.999426425672081,
+    "probabilities": {
+      "background": 0.999426425672081,
+      "batch": 6.791141525378164e-14,
+      "interactive": 0.0005735741840681822,
+      "media": 1.4378317119645536e-10
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.039064,
+      "vol_rate": 12.1589,
+      "invol_rate": 15.0771,
+      "slice_ms": 1.4343,
+      "wait_ratio": 2.199
+    },
+    "class": "interactive",
+    "probability": 0.9966673403051428,
+    "probabilities": {
+      "background": 0.000528308003124061,
+      "batch": 9.593815736796822e-09,
+      "interactive": 0.9966673403051428,
+      "media": 0.0028043420979173683
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.225625,
+      "vol_rate": 97.3412,
+      "invol_rate": 105.1285,
+      "slice_ms": 1.1144,
+      "wait_ratio": 2.0354
+    },
+    "class": "media",
+    "probability": 0.9987727580775764,
+    "probabilities": {
+      "background": 2.988813206823066e-08,
+      "batch": 1.1145512922108522e-08,
+      "interactive": 0.0012272008887786279,
+      "media": 0.9987727580775764
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.0,
+      "vol_rate": 0.0,
+      "invol_rate": 0.0,
+      "slice_ms": 0.0,
+      "wait_ratio": 0.0
+    },
+    "class": "background",
+    "probability": 0.9999876285608919,
+    "probabilities": {
+      "background": 0.9999876285608919,
+      "batch": 1.2258036427313447e-05,
+      "interactive": 1.1340268005526451e-07,
+      "media": 5.780096981025312e-16
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.031126,
+      "vol_rate": 11.3066,
+      "invol_rate": 10.3235,
+      "slice_ms": 1.439,
+      "wait_ratio": 1.7296
+    },
+    "class": "interactive",
+    "probability": 0.9972863595625306,
+    "probabilities": {
+      "background": 0.0014523889376407157,
+      "batch": 7.497487627000427e-08,
+      "interactive": 0.9972863595625306,
+      "media": 0.0012611765249523083
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.483701,
+      "vol_rate": 0.0,
+      "invol_rate": 226.9066,
+      "slice_ms": 2.1363,
+      "wait_ratio": 1.0681
+    },
+    "class": "batch",
+    "probability": 0.9985900251197425,
+    "probabilities": {
+      "background": 1.9473932759305994e-07,
+      "batch": 0.9985900251197425,
+      "interactive": 2.6591103946062447e-08,
+      "media": 0.001409753549825881
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.000105,
+      "vol_rate": 0.4833,
+      "invol_rate": 0.0,
+      "slice_ms": 0.217,
+      "wait_ratio": 3.9176
+    },
+    "class": "background",
+    "probability": 0.999931318533363,
+    "probabilities": {
+      "background": 0.999931318533363,
+      "batch": 3.082413298353772e-14,
+      "interactive": 6.868145935640312e-05,
+      "media": 7.2497224437038725e-12
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.032439,
+      "vol_rate": 10.7223,
+      "invol_rate": 9.7475,
+      "slice_ms": 1.5847,
+      "wait_ratio": 1.819
+    },
+    "class": "interactive",
+    "probability": 0.9974958473100601,
+    "probabilities": {
+      "background": 0.0009361833853447262,
+      "batch": 4.560683403296946e-08,
+      "interactive": 0.9974958473100601,
+      "media": 0.0015679236977611168
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.543321,
+      "vol_rate": 0.0,
+      "invol_rate": 267.8935,
+      "slice_ms": 2.0281,
+      "wait_ratio": 0.8179
+    },
+    "class": "batch",
+    "probability": 0.999908642869543,
+    "probabilities": {
+      "background": 5.789924943373265e-09,
+      "batch": 0.999908642869543,
+      "interactive": 1.4686155465861956e-10,
+      "media": 9.135119367073112e-05
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.000218,
+      "vol_rate": 0.4863,
+      "invol_rate": 0.0,
+      "slice_ms": 0.4474,
+      "wait_ratio": 2.8127
+    },
+    "class": "background",
+    "probability": 0.9997257649578783,
+    "probabilities": {
+      "background": 0.9997257649578783,
+      "batch": 4.109216371269646e-12,
+      "interactive": 0.0002742349878113922,
+      "media": 5.020109845728746e-11
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.037963,
+      "vol_rate": 10.2048,
+      "invol_rate": 13.1204,
+      "slice_ms": 1.6276,
+      "wait_ratio": 1.5595
+    },
+    "class": "interactive",
+    "probability": 0.9972137156089375,
+    "probabilities": {
+      "background": 0.0006926007535642181,
+      "batch": 3.271127520893008e-07,
+      "interactive": 0.9972137156089375,
+      "media": 0.002093356524746132
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.389483,
+      "vol_rate": 0.4861,
+      "invol_rate": 199.306,
+      "slice_ms": 1.9494,
+      "wait_ratio": 1.5356
+    },
+    "class": "batch",
+    "probability": 0.7928765393274457,
+    "probabilities": {
+      "background": 6.935668905524582e-05,
+      "batch": 0.7928765393274457,
+      "interactive": 0.00013625330384274564,
+      "media": 0.20691785067965623
+    }
+  },
+  {
+    "features": {
+      "cpu_util": 0.0,
+      "vol_rate": 0.0,
+      "invol_rate": 0.0,
+      "slice_ms": 0.0,
+      "wait_ratio": 0.0
+    },
+    "class": "background",
+    "probability": 0.9999876285608919,
+    "probabilities": {
+      "background": 0.9999876285608919,
+      "batch": 1.2258036427313447e-05,
+      "interactive": 1.1340268005526451e-07,
+      "media": 5.780096981025312e-16
+    }
+  }
+]
