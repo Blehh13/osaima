@@ -11,7 +11,6 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-
 from test_voice import FakeStt, FakeTts, make
 
 from osaima_agent import config
@@ -67,9 +66,7 @@ async def serve(
 
 
 @pytest.fixture
-async def peer(
-    socket_dir: Path, tmp_path: Path, helpers: dict[str, Any]
-) -> AsyncIterator[Peer]:
+async def peer(socket_dir: Path, tmp_path: Path, helpers: dict[str, Any]) -> AsyncIterator[Peer]:
     voice = make(tmp_path, helpers, stt=FakeStt("open the terminal"), tts=FakeTts())
     async for client, _task in serve(socket_dir, voice):
         yield client

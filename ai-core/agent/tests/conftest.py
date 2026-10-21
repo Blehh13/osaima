@@ -101,6 +101,7 @@ class FakeTools:
 def audit(tmp_path: Any) -> AuditLog:
     return AuditLog(tmp_path / "audit.jsonl")
 
+
 # ── shared by the voice tests ───────────────────────────────────────────────
 
 RECORDER = textwrap.dedent(
