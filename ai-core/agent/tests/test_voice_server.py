@@ -69,7 +69,9 @@ async def serve(
 
 @pytest.fixture
 async def peer(
-    socket_dir: Path, tmp_path: Path, helpers: dict[str, Any]  # noqa: F811
+    socket_dir: Path,
+    tmp_path: Path,
+    helpers: dict[str, Any],  # noqa: F811
 ) -> AsyncIterator[Peer]:
     voice = make(tmp_path, helpers, stt=FakeStt("open the terminal"), tts=FakeTts())
     async for client, _task in serve(socket_dir, voice):
@@ -97,7 +99,9 @@ async def test_listen_stop_then_read_the_words_from_status(peer: Peer) -> None:
 
 
 async def test_problems_are_reported_in_last(
-    socket_dir: Path, tmp_path: Path, helpers: dict[str, Any]  # noqa: F811
+    socket_dir: Path,
+    tmp_path: Path,
+    helpers: dict[str, Any],  # noqa: F811
 ) -> None:
     voice = make(tmp_path, helpers, stt=FakeStt(RuntimeError("model missing")))
     async for client, _task in serve(socket_dir, voice):
