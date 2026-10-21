@@ -26,6 +26,25 @@ pub struct ThreadStats {
     pub counters: Counters,
     /// The longest single wait for a CPU, in nanoseconds.
     pub wake_lat_max_ns: u64,
+    /// When it was last switched onto a CPU (0 while it is off one), on the kernel's monotonic clock.
+    pub run_start_ns: u64,
+    /// When it last became runnable and started waiting for a CPU (0 while it is running).
+    pub runnable_since_ns: u64,
+}
+
+impl ThreadStats {
+    /// The totals as of `now_ns` (the same monotonic clock): the kernel only adds a run or a
+    /// wait to its totals when it ends, so one that is still going on is added here.
+    pub fn as_of(&self, now_ns: u64) -> Counters {
+        let mut c = self.counters;
+        if self.run_start_ns != 0 && now_ns > self.run_start_ns {
+            c.run_ns += now_ns - self.run_start_ns;
+        }
+        if self.runnable_since_ns != 0 && now_ns > self.runnable_since_ns {
+            c.wait_ns += now_ns - self.runnable_since_ns;
+        }
+        c
+    }
 }
 
 fn number(object: &Value, field: &str) -> u64 {
@@ -76,23 +95,33 @@ pub fn parse_map_dump(json: &str) -> Result<Vec<ThreadStats>, String> {
                 involuntary: number(value, "involuntary"),
             },
             wake_lat_max_ns: number(value, "wake_lat_max_ns"),
+            run_start_ns: number(value, "run_start"),
+            runnable_since_ns: number(value, "runnable_since"),
         });
     }
     Ok(threads)
 }
 
-/// Add the threads of each process up.
-pub fn per_process(threads: &[ThreadStats]) -> HashMap<u32, Counters> {
+/// Add the threads of each process up, as of `now_ns` on the kernel's monotonic clock.
+pub fn per_process(threads: &[ThreadStats], now_ns: u64) -> HashMap<u32, Counters> {
     let mut processes: HashMap<u32, Counters> = HashMap::new();
     for t in threads.iter().filter(|t| t.tgid != 0) {
+        let c = t.as_of(now_ns);
         let sum = processes.entry(t.tgid).or_default();
-        sum.run_ns += t.counters.run_ns;
-        sum.wait_ns += t.counters.wait_ns;
-        sum.slices += t.counters.slices;
-        sum.voluntary += t.counters.voluntary;
-        sum.involuntary += t.counters.involuntary;
+        sum.run_ns += c.run_ns;
+        sum.wait_ns += c.wait_ns;
+        sum.slices += c.slices;
+        sum.voluntary += c.voluntary;
+        sum.involuntary += c.involuntary;
     }
     processes
+}
+
+/// The kernel's monotonic clock in nanoseconds, the clock the telemetry stamps events with.
+fn monotonic_ns() -> u64 {
+    let mut ts = libc::timespec { tv_sec: 0, tv_nsec: 0 };
+    unsafe { libc::clock_gettime(libc::CLOCK_MONOTONIC, &mut ts) };
+    ts.tv_sec as u64 * 1_000_000_000 + ts.tv_nsec as u64
 }
 
 pub struct BpfCollector {
@@ -166,8 +195,9 @@ impl Drop for BpfCollector {
 impl Collector for BpfCollector {
     fn sample(&mut self) -> io::Result<Vec<Sample>> {
         let threads = parse_map_dump(&self.dump()?).map_err(io::Error::other)?;
+        let now = monotonic_ns();
         let mut samples = Vec::new();
-        for (tgid, counters) in per_process(&threads) {
+        for (tgid, counters) in per_process(&threads, now) {
             let dir = self.proc_root.join(tgid.to_string());
             // the process may have exited since the map was written
             let (Ok(stat), Ok(status)) = (
@@ -247,7 +277,7 @@ mod tests {
 
     #[test]
     fn threads_are_added_up_per_process_and_idle_is_dropped() {
-        let totals = per_process(&parse_map_dump(PLAIN).unwrap());
+        let totals = per_process(&parse_map_dump(PLAIN).unwrap(), 0);
         assert_eq!(totals.len(), 1, "the tgid 0 entry (idle) is dropped");
         let firefox = totals[&100];
         assert_eq!(
@@ -260,6 +290,25 @@ mod tests {
                 involuntary: 1
             }
         );
+    }
+
+    #[test]
+    fn a_run_in_progress_is_counted_up_to_now() {
+        let t = ThreadStats {
+            tid: 1,
+            tgid: 1,
+            comm: "x".into(),
+            counters: Counters { run_ns: 1000, wait_ns: 0, slices: 1, voluntary: 0, involuntary: 0 },
+            wake_lat_max_ns: 0,
+            run_start_ns: 5_000,
+            runnable_since_ns: 0,
+        };
+        assert_eq!(t.as_of(9_000).run_ns, 5_000, "1000 finished + 4000 so far");
+        assert_eq!(t.as_of(5_000).run_ns, 1_000, "nothing has passed");
+        assert_eq!(t.as_of(1_000).run_ns, 1_000, "a clock that appears to go back adds nothing");
+        let waiting = ThreadStats { run_start_ns: 0, runnable_since_ns: 2_000, ..t };
+        assert_eq!(waiting.as_of(2_500).wait_ns, 500);
+        assert_eq!(waiting.as_of(2_500).run_ns, 1_000);
     }
 
     #[test]

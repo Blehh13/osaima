@@ -123,7 +123,7 @@ fn ebpf_and_proc_agree_about_a_busy_and_an_idle_process() {
         bpf_hog.cpu_util
     );
     assert!(
-        (bpf_hog.cpu_util - proc_hog.cpu_util).abs() < 0.25,
+        (bpf_hog.cpu_util - proc_hog.cpu_util).abs() < 0.1,
         "eBPF {} against /proc {}",
         bpf_hog.cpu_util,
         proc_hog.cpu_util
