@@ -50,6 +50,7 @@ class VoiceRpcServer:
     def __init__(self, voice: VoiceService) -> None:
         self._voice = voice
         self._seq = 0
+        self._pending: dict[str, Any] | None = None  # a result the service is still wrapping up
         self._last: dict[str, Any] | None = None
 
     async def serve(self, path: Path) -> None:
@@ -115,10 +116,17 @@ class VoiceRpcServer:
         """Remember the result of a recording; ignore state changes (they are in `status`)."""
         if event.get("type") == "voice_transcript":
             self._seq += 1
-            self._last = {"seq": self._seq, "text": str(event.get("text", ""))}
+            self._pending = {"seq": self._seq, "text": str(event.get("text", ""))}
         elif event.get("type") == "voice_error":
             self._seq += 1
-            self._last = {"seq": self._seq, "error": str(event.get("message", ""))}
+            self._pending = {"seq": self._seq, "error": str(event.get("message", ""))}
+
+    def _publish(self) -> dict[str, Any] | None:
+        """The latest result, shown only once the service is idle again, so a caller
+        that reacts to it can start the next recording at once."""
+        if self._pending is not None and self._voice.state != "transcribing":
+            self._last, self._pending = self._pending, None
+        return self._last
 
     async def _dispatch(self, method: str, params: dict[str, Any]) -> Any:
         voice = self._voice
@@ -127,7 +135,7 @@ class VoiceRpcServer:
                 case "initialize" | "ping":
                     return {"name": "osaima-voice", "version": __version__}
                 case "voice.status":
-                    return {**voice.status(), "last": self._last}
+                    return {**voice.status(), "last": self._publish()}
                 case "voice.listen":
                     await voice.start_listening(self._collect)
                 case "voice.stop":

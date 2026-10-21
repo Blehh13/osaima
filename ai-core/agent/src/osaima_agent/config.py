@@ -215,7 +215,7 @@ def agent_socket_path() -> Path:
 
 
 def voice_socket_path() -> Path:
-    """`$OSAIMA_VOICE_SOCKET`, else `voice.sock` in the runtime directory (the shell uses the same)."""
+    """`$OSAIMA_VOICE_SOCKET`, else `voice.sock` in the runtime directory (as the shell)."""
     if override := os.environ.get("OSAIMA_VOICE_SOCKET"):
         return Path(override)
     return runtime_dir() / "voice.sock"

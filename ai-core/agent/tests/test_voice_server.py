@@ -53,9 +53,9 @@ class Peer:
 
 
 async def serve(
-    socket_dir: Path, voice: VoiceService
+    directory: Path, voice: VoiceService
 ) -> AsyncIterator[tuple[Peer, asyncio.Task[None]]]:
-    path = socket_dir / "voice.sock"
+    path = directory / "voice.sock"
     task = asyncio.create_task(VoiceRpcServer(voice).serve(path))
     for _ in range(100):
         if path.exists():
