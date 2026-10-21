@@ -22,7 +22,8 @@ model makes the decision, and the kernel's own scheduler carries it out.
    waiting for one, how often it was given the CPU, and whether it gave the CPU up by
    itself (blocked) or lost it (preempted). It is built against the kernel's own type
    information (CO-RE), so one object runs on any kernel with BTF. Without it, the
-   daemon reads the kernel's `/proc` accounting, which carries similar numbers.
+   daemon reads the kernel's `/proc` accounting, which carries similar numbers (it also
+   falls back to `/proc` by itself when the eBPF program cannot be loaded).
 2. **Features.** Every few seconds, the change in the counters becomes five numbers per
    process: CPU used (in cores), voluntary and involuntary switches per second, the mean
    length of a run, and the time spent waiting relative to the time spent running.
@@ -88,20 +89,27 @@ model, compares it with the built-in rules by 5-fold cross-validation, and write
 are known to agree. The `Train the process classifier` workflow runs the whole thing on a
 CI runner.
 
-The shipped model (`model/`) was trained on 1200 measurements, 300 of each kind, taken on
-a 4-CPU GitHub runner. By 5-fold cross-validation:
+The shipped model (`model/`) was trained on 1440 measurements, 360 of each kind, taken on
+a 4-CPU GitHub runner in rounds that cycle between a quiet machine, a busy one (one extra
+CPU hog per CPU) and a crowded one (three per CPU). By 5-fold cross-validation:
 
 | | Accuracy |
 |---|---|
-| Trained model | 98.6% |
-| Built-in rules | 72.1% |
+| Trained model | 91.4% |
+| Built-in rules | 84.2% |
 
-The rules fail exactly where it matters: when programs compete for the CPU, a hog that
-keeps getting preempted looks like steady deadline work, and the rules call 275 of 300
-batch programs "media" and would favour them. The model gets 295 of them right; its
-only real confusion is 12 of 300 media windows taken for batch (`model/report.md` has the
-full tables and the weights). `tests/golden.rs` checks that the Rust daemon computes the
-same verdicts and probabilities as the trained scikit-learn model.
+Both are perfect on interactive and background programs; the hard part is telling a
+frame loop from a compiler on a crowded machine, where a frame loop that has fallen
+behind never sleeps and looks like a compiler. The rules never take a compiler for a
+frame loop, but take 216 of 360 frame-loop windows for compilers (they would slow a video
+down); the model keeps 269 of 360, and takes 33 of 360 compiler windows for frame loops.
+`model/report.md` has the tables and weights. `tests/golden.rs` checks that the Rust
+daemon computes the same verdicts and probabilities as the trained scikit-learn model,
+and that the Rust and Python copies of the rules agree.
+
+An earlier model, trained only on a moderately busy machine, scored 98.6%, but on the
+crowded benchmark below it took 7 of 12 CPU hogs for interactive programs: the high
+score came from an easy test, which is why the training now includes crowded rounds.
 
 ## Benchmark
 
