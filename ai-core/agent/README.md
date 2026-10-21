@@ -131,9 +131,15 @@ the agent emits `client_tool_call` and waits for `agent.client_tool_result`.
 
 ## Voice
 
-Push-to-talk, entirely on this computer: the shell's microphone button calls
-`agent.voice.listen`, then `agent.voice.stop`; the agent transcribes the
-recording with [faster-whisper](https://github.com/SYSTRAN/faster-whisper) and
+Push-to-talk, entirely on this computer. The desktop shell talks to a small
+standalone service, **`osaima-voice`**, over its own socket (`voice.sock`, or
+`$OSAIMA_VOICE_SOCKET`): `voice.status`, `voice.listen`, `voice.stop`,
+`voice.cancel`, `voice.speak`, `voice.silence`, one request and one reply each.
+Nothing is pushed: after a recording the words appear in `voice.status` under
+`last` (`{seq, text}` or `{seq, error}`; `seq` goes up with each new result).
+The shell's microphone button and its "read replies aloud" toggle use it.
+`osaima-agent serve` offers the same calls as `agent.voice.*` with pushed events.
+In either, the service transcribes the recording with [faster-whisper](https://github.com/SYSTRAN/faster-whisper) and
 returns the words as a `voice_transcript` event, which the chat sends like any
 typed message. Replies can be read aloud with [Piper](https://github.com/OHF-Voice/piper1-gpl).
 Recordings are made with PipeWire (`pw-record`) or ALSA (`arecord`), kept in a

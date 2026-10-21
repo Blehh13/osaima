@@ -6,10 +6,7 @@ from __future__ import annotations
 import asyncio
 import json
 import sys
-import tempfile
-import textwrap
 import wave
-from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Any
 
@@ -26,19 +23,6 @@ from osaima_agent.voice import VoiceError, VoiceService
 from osaima_agent.voice.audio import AudioError, fill, recorded_seconds, resolve_command
 from osaima_agent.voice.engines import CommandSynthesizer, load_audio
 from osaima_agent.voice.service import speakable
-
-RECORDER = textwrap.dedent(
-    """
-    import signal, sys, time
-    stop = []
-    signal.signal(signal.SIGINT, lambda *_: stop.append(1))
-    seconds = float(sys.argv[2])
-    with open(sys.argv[1], "wb") as f:
-        f.write(b"RIFF" + bytes(40) + bytes(int(seconds * 32000)))
-    while not stop:
-        time.sleep(0.02)
-    """
-)
 
 
 class FakeStt:
@@ -95,17 +79,6 @@ class Events:
                 return
             await asyncio.sleep(0.02)
         raise AssertionError(f"never went idle; got {self.items}")
-
-
-@pytest.fixture
-def helpers(tmp_path: Path) -> dict[str, Any]:
-    script = tmp_path / "recorder.py"
-    script.write_text(RECORDER)
-    return {
-        "record": (sys.executable, str(script), "{output}", "1.0"),
-        "play": (sys.executable, "-c", "import time; time.sleep(0.05)", "{input}"),
-        "slow_play": (sys.executable, "-c", "import time; time.sleep(30)", "{input}"),
-    }
 
 
 def make(
@@ -416,12 +389,6 @@ async def test_a_synthesizer_failure_is_reported(tmp_path: Path, helpers: dict[s
 
 
 # ── over the socket ──────────────────────────────────────────────────────────
-
-
-@pytest.fixture
-async def socket_dir() -> AsyncIterator[Path]:
-    with tempfile.TemporaryDirectory(prefix="osa-") as d:
-        yield Path(d)
 
 
 async def rpc(

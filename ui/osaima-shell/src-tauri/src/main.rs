@@ -7,6 +7,8 @@ use std::sync::{Arc, Mutex};
 use portable_pty::{CommandBuilder, NativePtySystem, PtySize, PtySystem, MasterPty};
 use tauri::{AppHandle, Emitter, State};
 
+mod voice;
+
 struct PtyAppState {
     pty_writers: Mutex<HashMap<String, Box<dyn std::io::Write + Send>>>,
     pty_masters: Mutex<HashMap<String, Box<dyn MasterPty + Send>>>,
@@ -723,7 +725,8 @@ fi
             clean_storage,
             fix_network,
             get_wifi_network,
-            shutdown_os
+            shutdown_os,
+            voice::voice_call
         ])
         .run(tauri::generate_context!())
         .expect("error while running osaima-shell");

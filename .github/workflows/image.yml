@@ -1,0 +1,170 @@
+name: Build the OS image
+
+# Builds Interstellar OS into a bootable live ISO on a free runner, boots it in QEMU
+# and runs the VM smoke tests. Everything the image script needs from the outside is
+# built or downloaded here: the daemon, the sandbox helper, the shell, llama.cpp, a
+# language model and the exported intent router. It takes a long time, so it runs by
+# hand, or when the image scripts change on the feat/m5-iso branch.
+#
+# stop_after lets you stop at an earlier stage when something needs fixing:
+#   inputs (the daemon, shell, llama.cpp, model, router), image (the root filesystem),
+#   iso (the ISO), boot (it boots), test (the VM smoke tests, the default).
+
+on:
+  workflow_dispatch:
+    inputs:
+      stop_after:
+        description: "Stage to stop after: inputs, image, iso, boot or test"
+        default: "test"
+  push:
+    branches: ["feat/m5-iso"]
+    paths:
+      - ".github/workflows/image.yml"
+      - "build-tools/scripts/**"
+
+permissions:
+  contents: read
+
+env:
+  STOP: ${{ inputs.stop_after || 'test' }}
+  OUT_VM: ${{ github.workspace }}/out/vm
+
+jobs:
+  image:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 345
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Host packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev libgtk-3-dev librsvg2-dev libayatana-appindicator3-dev \
+            libsoup-3.0-dev libjavascriptcoregtk-4.1-dev \
+            squashfs-tools xorriso mtools grub-pc-bin grub-efi-amd64-bin dosfstools \
+            qemu-system-x86 openssh-client openssl rsync curl xz-utils zstd python3-venv python3-pip
+          df -h / | tail -1
+
+      # ── 1. What the image script expects to find ───────────────────────────
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            ai-core/mcp-daemon
+            ui/osaima-shell/src-tauri
+
+      - name: Build the daemon and the sandbox helper
+        working-directory: ai-core/mcp-daemon
+        run: cargo build --locked --release
+
+      - name: Build the shell
+        working-directory: ui/osaima-shell/src-tauri
+        run: cargo build --locked --release
+
+      - name: Download llama.cpp (the on-device model server)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          dest="$HOME/.local/share/osaima/llama"
+          mkdir -p "$dest"
+          # the newest releases; the plain CPU build for Ubuntu (not the CUDA, Vulkan or ROCm ones)
+          url=$(gh api repos/ggml-org/llama.cpp/releases --jq '[.[0:5][].assets[].browser_download_url | select(test("llama-b[0-9]+-bin-ubuntu-x64[.](zip|tar[.]gz)$"))][0]')
+          echo "llama.cpp: $url"
+          if [ -z "$url" ] || [ "$url" = null ]; then echo "no llama.cpp CPU build found"; exit 1; fi
+          curl -fL --retry 3 -o "$RUNNER_TEMP/llama.pkg" "$url"
+          case "$url" in
+            *.zip) unzip -q "$RUNNER_TEMP/llama.pkg" -d "$dest" ;;
+            *) tar -xzf "$RUNNER_TEMP/llama.pkg" -C "$dest" ;;
+          esac
+          server=$(find "$dest" -name llama-server -type f | head -1)
+          chmod +x "$server"
+          echo "found $server"
+          "$server" --version 2>&1 | head -3 || true
+
+      - name: Download the language model (Phi-4 mini, free)
+        run: |
+          dest="$HOME/.local/share/osaima/models"
+          mkdir -p "$dest"
+          curl -fL --retry 3 -o "$dest/phi-4-mini-Q4_K_M.gguf" \
+            "https://huggingface.co/bartowski/microsoft_Phi-4-mini-instruct-GGUF/resolve/main/microsoft_Phi-4-mini-instruct-Q4_K_M.gguf"
+          ls -lh "$dest"
+          head -c 4 "$dest/phi-4-mini-Q4_K_M.gguf" | grep -q GGUF
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Train and export the intent router
+        working-directory: ai-core/intent-router
+        run: |
+          pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          pip install --quiet transformers sentence-transformers scikit-learn joblib numpy onnx onnxruntime tokenizers
+          python train_embed_classifier.py
+          python export_onnx.py
+          ls -lh intent_embed
+
+      - name: Python packages the image script runs on the host
+        run: sudo /usr/bin/python3 -m pip install --quiet --break-system-packages --ignore-installed onnxruntime tokenizers numpy
+
+      # ── 2. The image ───────────────────────────────────────────────────────
+      - name: Build the root filesystem
+        if: env.STOP != 'inputs'
+        run: |
+          mkdir -p out
+          sudo env SKIP_DISK=1 OUT="$OUT_VM" bash build-tools/scripts/build_vm_image.sh 2>&1 | tee out/build_vm_image.log
+
+      - name: Build the live ISO
+        if: env.STOP != 'inputs' && env.STOP != 'image'
+        run: sudo env OUT="${{ github.workspace }}/out" bash build-tools/scripts/build_iso.sh 2>&1 | tee out/build_iso.log
+
+      # ── 3. Does it boot? ───────────────────────────────────────────────────
+      - name: Boot the ISO
+        if: env.STOP != 'inputs' && env.STOP != 'image' && env.STOP != 'iso'
+        run: |
+          sudo chmod a+rw /dev/kvm
+          sudo chown -R "$USER" out
+          ISO=1 HEADLESS=1 ISO_PATH="$PWD/out/interstellar-os.iso" OUT="$OUT_VM" MEM=8G \
+            nohup bash build-tools/scripts/run_vm.sh > out/run_vm.log 2>&1 &
+          # wait for the login prompt on the serial console
+          for i in $(seq 1 120); do
+            grep -q "login:" "$OUT_VM/serial.log" 2>/dev/null && { echo "booted after about $((i * 5)) s"; exit 0; }
+            sleep 5
+          done
+          echo "no login prompt within 10 minutes"
+          tail -40 "$OUT_VM/serial.log" || true
+          exit 1
+
+      - name: VM smoke tests
+        if: env.STOP == 'test'
+        run: OUT="$OUT_VM" bash build-tools/scripts/test_vm.sh 2>&1 | tee out/test_vm.log
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## Image build (stopped after: $STOP)"
+            echo '```'
+            ls -lh out/*.iso 2>&1 | head -3
+            df -h / | tail -1
+            grep -E "^==> " out/build_vm_image.log out/build_iso.log 2>/dev/null | sed 's#out/##'
+            echo '```'
+            echo "### VM smoke tests"
+            echo '```'
+            grep -E "PASS|FAIL|^==|^==" out/test_vm.log 2>/dev/null | head -60
+            echo '```'
+            echo "### Last of the console"
+            echo '```'
+            tail -25 "$OUT_VM/serial.log" 2>/dev/null || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: image-logs
+          path: |
+            out/*.log
+            out/vm/serial.log
+          retention-days: 7
+          if-no-files-found: ignore
