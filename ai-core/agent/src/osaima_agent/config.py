@@ -6,7 +6,8 @@ with explanations, is in `docs/configuration.md`. Unknown keys are rejected so
 a typo can't silently do nothing.
 
 Socket locations are not in the file: the shell must agree on them, so they come
-from `OSAIMA_AGENT_SOCKET` and `OSAIMA_MCP_SOCKET` (or the shared defaults).
+from `OSAIMA_AGENT_SOCKET`, `OSAIMA_MCP_SOCKET` and `OSAIMA_VOICE_SOCKET` (or the
+shared defaults).
 The Claude API key comes from `ANTHROPIC_API_KEY` or an `ant auth login`
 profile, never from this file.
 """
@@ -181,6 +182,7 @@ class AgentConfig:
     system_prompt: str = DEFAULT_SYSTEM_PROMPT
     socket_path: Path = field(default_factory=lambda: agent_socket_path())
     mcp_socket_path: Path = field(default_factory=lambda: mcp_socket_path())
+    voice_socket_path: Path = field(default_factory=lambda: voice_socket_path())
 
     @property
     def audit_log(self) -> Path:
@@ -210,6 +212,13 @@ def agent_socket_path() -> Path:
     if override := os.environ.get("OSAIMA_AGENT_SOCKET"):
         return Path(override)
     return runtime_dir() / "agent.sock"
+
+
+def voice_socket_path() -> Path:
+    """`$OSAIMA_VOICE_SOCKET`, else `voice.sock` in the runtime directory (the shell uses the same)."""
+    if override := os.environ.get("OSAIMA_VOICE_SOCKET"):
+        return Path(override)
+    return runtime_dir() / "voice.sock"
 
 
 def mcp_socket_path() -> Path:

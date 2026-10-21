@@ -30,6 +30,7 @@ dev = [
 
 [project.scripts]
 osaima-agent = "osaima_agent.__main__:main"
+osaima-voice = "osaima_agent.voice.server:main"
 
 [project.urls]
 Repository = "https://github.com/Blehh13/osaima"

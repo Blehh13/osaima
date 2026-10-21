@@ -1,0 +1,14 @@
+[Unit]
+Description=OSAIMA voice (push-to-talk speech, on this computer)
+Documentation=https://github.com/Blehh13/osaima
+# The desktop user only: root's user manager (e.g. an SSH login) must not start a second copy.
+ConditionUser=!root
+
+[Service]
+ExecStart=/usr/bin/osaima-voice
+Restart=on-failure
+# No privilege gain. The service needs the user's audio session, so it is not given a private /tmp.
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=default.target

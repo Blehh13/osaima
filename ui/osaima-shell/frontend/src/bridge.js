@@ -19,6 +19,8 @@ export async function invoke(cmd, args = {}) {
   // and the task_* calls share one whitelisted command
   if (native) {
     if (cmd === 'tasks' || cmd.startsWith('task_') || cmd.startsWith('automation') || cmd === 'gpu_info' || cmd.startsWith('model_')) return native('task_rpc', { method: 'system.' + cmd, params: args });
+    // voice_status, voice_listen, ... go to the voice service as voice.status, voice.listen, ...
+    if (cmd.startsWith('voice_')) return native('voice_call', { method: 'voice.' + cmd.slice(6), params: args });
     return native(cmd, cmd === 'os_action' ? { request: args } : args);
   }
   const resp = await fetch('/api/invoke', {
