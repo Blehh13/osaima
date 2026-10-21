@@ -74,7 +74,7 @@ run_case() {
 			sh -c 'echo \$\$ > '\$cg'/low/cgroup.procs; exec python3 /tmp/hog.py 5' &
 		done
 		sleep 0.5
-		sh -c 'echo \$\$ > '\$cg'/high/cgroup.procs; exec python3 /tmp/latprobe.py 4' | sed 's/^/$label: /'
+		sh -c 'echo \$\$ > '\$cg'/high/cgroup.procs; exec python3 /tmp/latprobe.py 4' | sed "s|^|$label: |"
 		wait
 		rmdir \$cg/high \$cg/low \$cg 2>/dev/null || true
 	" 2>&1
@@ -96,19 +96,45 @@ else
 fi
 fence
 
-section "Rust eBPF toolchain (aya): does it install, and how long does it take?"
+section "C eBPF toolchain (clang + libbpf + bpftool): can a CO-RE program be built and loaded?"
 fence
-start=$(date +%s)
-if rustup toolchain install nightly --profile minimal --component rust-src > /tmp/nightly.log 2>&1; then
-	echo "nightly with rust-src: ok ($(( $(date +%s) - start )) s)"
+sudo apt-get install -y -qq clang llvm libbpf-dev bpftool linux-libc-dev libelf-dev zlib1g-dev > /tmp/apt.log 2>&1 || tail -5 /tmp/apt.log
+clang --version | head -1
+bpftool --version 2>&1 | head -2
+mkdir -p /tmp/bpfprobe && cd /tmp/bpfprobe
+bpftool btf dump file /sys/kernel/btf/vmlinux format c > vmlinux.h && echo "vmlinux.h: $(wc -l < vmlinux.h) lines"
+cat > probe.bpf.c <<'EOF'
+#include "vmlinux.h"
+#include <bpf/bpf_helpers.h>
+#include <bpf/bpf_tracing.h>
+
+struct { __uint(type, BPF_MAP_TYPE_ARRAY); __uint(max_entries, 1); __type(key, __u32); __type(value, __u64); } count SEC(".maps");
+
+SEC("tp_btf/sched_switch")
+int BPF_PROG(on_switch, bool preempt, struct task_struct *prev, struct task_struct *next)
+{
+	__u32 k = 0;
+	__u64 *v = bpf_map_lookup_elem(&count, &k);
+	if (v) __sync_fetch_and_add(v, 1);
+	return 0;
+}
+char LICENSE[] SEC("license") = "GPL";
+EOF
+if clang -g -O2 -target bpf -D__TARGET_ARCH_x86 -c probe.bpf.c -o probe.bpf.o; then
+	echo "compiled probe.bpf.o ($(stat -c %s probe.bpf.o) bytes)"
+	sudo bpftool prog loadall probe.bpf.o /sys/fs/bpf/probe autoattach 2>&1 | head -3
+	sleep 1
+	sudo bpftool map dump name count 2>&1 | head -6
+	sudo rm -rf /sys/fs/bpf/probe
 else
-	echo "nightly install failed"; tail -5 /tmp/nightly.log
+	echo "BPF C compile failed"
 fi
-start=$(date +%s)
-sudo apt-get install -y -qq llvm clang libclang-dev > /dev/null 2>&1 || true
-if cargo install bpf-linker --locked > /tmp/bpf-linker.log 2>&1; then
-	echo "bpf-linker: ok ($(( $(date +%s) - start )) s)"
-else
-	echo "bpf-linker install failed"; tail -8 /tmp/bpf-linker.log
-fi
+fence
+
+section "sched_ext: what does this kernel expose?"
+fence
+ls /sys/kernel/sched_ext/ 2>&1
+cat /sys/kernel/sched_ext/state 2>&1
+grep -c scx_bpf /sys/kernel/btf/vmlinux 2>/dev/null || true
+bpftool btf dump file /sys/kernel/btf/vmlinux format raw 2>/dev/null | grep -E "FUNC 'scx_bpf_(dsq_insert|dispatch|dsq_move_to_local|consume)'" | head -6
 fence
