@@ -68,3 +68,7 @@ ai-core/agent/evals/results/
 # Not for the repo: committed by mistake upstream
 ui/osaima-shell/node_modules/
 ui/osaima-shell/src-tauri/build_error.txt
+
+# eBPF build output (generated from the running kernel)
+ai-core/schedd/bpf/vmlinux.h
+ai-core/schedd/bpf/*.bpf.o

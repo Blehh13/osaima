@@ -9,11 +9,13 @@
 //! - [`features`]: turns scheduler counters into the numbers the classifier reads
 //! - [`model`]: the classifier (a small trained model, with a rule-based fallback)
 //! - [`policy`]: what priority each kind of process gets
-//! - [`collector`]: where the counters come from (`/proc`, or eBPF telemetry)
+//! - [`collector`]: where the counters come from (`/proc`)
+//! - [`bpf`]: the same from eBPF telemetry, which also sees how long each process waits
 //! - [`actuator`]: how the priority is set, and put back
 //! - [`engine`]: one measurement round, with the safeguards
 
 pub mod actuator;
+pub mod bpf;
 pub mod collector;
 pub mod engine;
 pub mod features;

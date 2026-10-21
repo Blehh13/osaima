@@ -13,6 +13,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use osaima_schedd::actuator::KernelActuator;
+use osaima_schedd::bpf::BpfCollector;
 use osaima_schedd::collector::{Collector, ProcCollector};
 use osaima_schedd::engine::{Config, Engine};
 use osaima_schedd::features::Features;
@@ -30,11 +31,18 @@ Options for run:
   --min-confidence P    ignore verdicts less sure than P, 0 to 1 (default 0.6)
   --model FILE          a trained model (JSON); without one, built-in rules are used
   --policy FILE         priorities per kind of process (JSON), over the defaults
+  --source S            where measurements come from: bpf, proc or auto (default auto:
+                        eBPF when its object file is installed, else /proc)
+  --bpf-object FILE     the compiled eBPF telemetry (default /usr/lib/osaima/schedd/telemetry.bpf.o)
+  --bpftool PATH        the bpftool to load it with (default bpftool)
   --ignore NAME         never touch processes with this name (repeatable)
   --dry-run             decide and report, change nothing
   --once                measure for one window, report, and exit
   -v, --verbose         print a summary every round
 ";
+
+const DEFAULT_BPF_OBJECT: &str = "/usr/lib/osaima/schedd/telemetry.bpf.o";
+const PIN_DIR: &str = "/sys/fs/bpf/osaima-schedd";
 
 static STOP: AtomicBool = AtomicBool::new(false);
 
@@ -51,6 +59,9 @@ struct Opts {
     min_confidence: f64,
     model: Option<String>,
     policy: Option<String>,
+    source: String,
+    bpf_object: String,
+    bpftool: String,
     ignore: Vec<String>,
     dry_run: bool,
     once: bool,
@@ -68,6 +79,9 @@ fn parse(args: &[String]) -> Result<Opts, String> {
         min_confidence: Config::default().min_confidence,
         model: None,
         policy: None,
+        source: "auto".into(),
+        bpf_object: DEFAULT_BPF_OBJECT.into(),
+        bpftool: "bpftool".into(),
         ignore: Vec::new(),
         dry_run: false,
         once: false,
@@ -99,6 +113,9 @@ fn parse(args: &[String]) -> Result<Opts, String> {
             "--min-confidence" => o.min_confidence = number(value(&mut it, arg)?, arg)?,
             "--model" => o.model = Some(value(&mut it, arg)?.clone()),
             "--policy" => o.policy = Some(value(&mut it, arg)?.clone()),
+            "--source" => o.source = value(&mut it, arg)?.clone(),
+            "--bpf-object" => o.bpf_object = value(&mut it, arg)?.clone(),
+            "--bpftool" => o.bpftool = value(&mut it, arg)?.clone(),
             "--ignore" => o.ignore.push(value(&mut it, arg)?.clone()),
             "--pids" => {
                 for part in value(&mut it, arg)?.split(',').filter(|p| !p.is_empty()) {
@@ -115,6 +132,9 @@ fn parse(args: &[String]) -> Result<Opts, String> {
     }
     if !(o.interval >= 0.05 && o.interval <= 3600.0) {
         return Err("--interval must be between 0.05 and 3600 seconds".into());
+    }
+    if !["auto", "bpf", "proc"].contains(&o.source.as_str()) {
+        return Err("--source must be auto, bpf or proc".into());
     }
     if o.hysteresis == 0 {
         return Err("--hysteresis must be at least 1".into());
@@ -170,15 +190,32 @@ fn run(o: &Opts) -> Result<(), String> {
         ..Config::default()
     };
     cfg.ignore.extend(o.ignore.iter().cloned());
-    let mut engine = Engine::new(
-        ProcCollector::new(),
-        KernelActuator,
-        classifier,
-        policy,
-        cfg,
-    );
+    let use_bpf = match o.source.as_str() {
+        "bpf" => true,
+        "proc" => false,
+        _ => std::path::Path::new(&o.bpf_object).exists(),
+    };
+    if use_bpf {
+        let collector = BpfCollector::attach(
+            &o.bpftool,
+            std::path::Path::new(&o.bpf_object),
+            std::path::Path::new(PIN_DIR),
+        )
+        .map_err(|e| format!("cannot start the eBPF telemetry: {e} (use --source proc to go without)"))?;
+        drive(Engine::new(collector, KernelActuator, classifier, policy, cfg), o, "eBPF")
+    } else {
+        drive(
+            Engine::new(ProcCollector::new(), KernelActuator, classifier, policy, cfg),
+            o,
+            "/proc",
+        )
+    }
+}
+
+/// Measure, judge and set priorities until told to stop, then put everything back.
+fn drive<C: Collector>(mut engine: Engine<C, KernelActuator>, o: &Opts, source: &str) -> Result<(), String> {
     println!(
-        "osaima-schedd: {} every {} s, processes of users from {} up{}",
+        "osaima-schedd: {} on {source} data every {} s, processes of users from {} up{}",
         engine.classifier_name(),
         o.interval,
         o.min_uid,
