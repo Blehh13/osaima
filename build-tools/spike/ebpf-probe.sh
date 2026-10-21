@@ -98,11 +98,14 @@ fence
 
 section "C eBPF toolchain (clang + libbpf + bpftool): can a CO-RE program be built and loaded?"
 fence
-sudo apt-get install -y -qq clang llvm libbpf-dev linux-libc-dev libelf-dev zlib1g-dev > /tmp/apt.log 2>&1 || tail -5 /tmp/apt.log
+sudo apt-get install -y -qq clang llvm libbpf-dev linux-libc-dev libelf-dev zlib1g-dev linux-tools-common linux-tools-generic > /tmp/apt.log 2>&1 || tail -5 /tmp/apt.log
+# Ubuntu's /usr/sbin/bpftool is a stub that wants tools for the exact running kernel; the generic ones work on any.
+BPFTOOL=$(find /usr/lib/linux-tools -name bpftool -type f 2> /dev/null | head -1)
+echo "bpftool: ${BPFTOOL:-not found}"
 clang --version | head -1
-bpftool --version 2>&1 | head -2
+$BPFTOOL --version 2>&1 | head -2
 mkdir -p /tmp/bpfprobe && cd /tmp/bpfprobe
-bpftool btf dump file /sys/kernel/btf/vmlinux format c > vmlinux.h && echo "vmlinux.h: $(wc -l < vmlinux.h) lines"
+$BPFTOOL btf dump file /sys/kernel/btf/vmlinux format c > vmlinux.h && echo "vmlinux.h: $(wc -l < vmlinux.h) lines"
 cat > probe.bpf.c <<'EOF'
 #include "vmlinux.h"
 #include <bpf/bpf_helpers.h>
@@ -123,17 +126,17 @@ EOF
 if clang -g -O2 -target bpf -D__TARGET_ARCH_x86 -c probe.bpf.c -o probe.bpf.o 2> clang.log; then
 	echo "compiled probe.bpf.o ($(stat -c %s probe.bpf.o) bytes)"
 	sudo mkdir -p /sys/fs/bpf/osaima-probe/maps
-	sudo bpftool prog loadall probe.bpf.o /sys/fs/bpf/osaima-probe/progs autoattach pinmaps /sys/fs/bpf/osaima-probe/maps 2>&1 | head -5
+	sudo $BPFTOOL prog loadall probe.bpf.o /sys/fs/bpf/osaima-probe/progs autoattach pinmaps /sys/fs/bpf/osaima-probe/maps 2>&1 | head -5
 	echo "pinned:"; sudo find /sys/fs/bpf/osaima-probe | head
 	sleep 1
 	echo "map dump (json):"
-	sudo bpftool -j map dump pinned /sys/fs/bpf/osaima-probe/maps/count 2>&1 | head -c 600; echo
+	sudo $BPFTOOL -j map dump pinned /sys/fs/bpf/osaima-probe/maps/count 2>&1 | head -c 600; echo
 	echo "after the loader has exited, is the program still attached?"
-	sudo bpftool -j prog show 2>/dev/null | python3 -c "import sys,json; print([p['name'] for p in json.load(sys.stdin) if p.get('name') in ('on_switch',)])"
-	sudo bpftool link show 2>&1 | head -4
+	sudo $BPFTOOL -j prog show 2>/dev/null | python3 -c "import sys,json; print([p['name'] for p in json.load(sys.stdin) if p.get('name') in ('on_switch',)])"
+	sudo $BPFTOOL link show 2>&1 | head -4
 	sudo rm -rf /sys/fs/bpf/osaima-probe && echo "unpinned"
 	sleep 1
-	sudo bpftool -j prog show 2>/dev/null | python3 -c "import sys,json; print('still loaded:', [p['name'] for p in json.load(sys.stdin) if p.get('name') in ('on_switch',)])"
+	sudo $BPFTOOL -j prog show 2>/dev/null | python3 -c "import sys,json; print('still loaded:', [p['name'] for p in json.load(sys.stdin) if p.get('name') in ('on_switch',)])"
 else
 	echo "BPF C compile failed"; grep -E "error" clang.log | head -5
 fi
@@ -144,5 +147,5 @@ fence
 ls /sys/kernel/sched_ext/ 2>&1
 cat /sys/kernel/sched_ext/state 2>&1
 grep -c scx_bpf /sys/kernel/btf/vmlinux 2>/dev/null || true
-bpftool btf dump file /sys/kernel/btf/vmlinux format raw 2>/dev/null | grep -E "FUNC 'scx_bpf_(dsq_insert|dispatch|dsq_move_to_local|consume)'" | head -6
+$BPFTOOL btf dump file /sys/kernel/btf/vmlinux format raw 2>/dev/null | grep -E "FUNC 'scx_bpf_(dsq_insert|dispatch|dsq_move_to_local|consume)'" | head -6
 fence
