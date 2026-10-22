@@ -16,6 +16,9 @@ on:
       stop_after:
         description: "Stage to stop after: inputs, image, iso, boot or test"
         default: "test"
+      release_tag:
+        description: "Publish both ISOs as a GitHub release with this tag (e.g. v0.1.0); empty = do not publish. Only after every test passed."
+        default: ""
   push:
     branches: ["feat/m5-iso"]
     paths:
@@ -23,7 +26,7 @@ on:
       - "build-tools/scripts/**"
 
 permissions:
-  contents: read
+  contents: write  # only the publish step uses it, and only when release_tag is given
 
 env:
   STOP: ${{ inputs.stop_after || 'test' }}
@@ -129,7 +132,7 @@ jobs:
 
       - name: Build the live ISO
         if: env.STOP != 'inputs' && env.STOP != 'image'
-        run: sudo env OUT="${{ github.workspace }}/out" bash build-tools/scripts/build_iso.sh 2>&1 | tee out/build_iso.log
+        run: sudo env LITE=1 OUT="${{ github.workspace }}/out" bash build-tools/scripts/build_iso.sh 2>&1 | tee out/build_iso.log
 
       # ── 3. Does it boot? ───────────────────────────────────────────────────
       - name: Boot the ISO
@@ -151,6 +154,79 @@ jobs:
       - name: VM smoke tests
         if: env.STOP == 'test'
         run: OUT="$OUT_VM" bash build-tools/scripts/test_vm.sh 2>&1 | tee out/test_vm.log
+
+      - name: Boot the lite ISO and let it download its model
+        if: env.STOP == 'test'
+        run: |
+          pkill -f qemu-system-x86_64 || true
+          while pgrep -f qemu-system-x86_64 > /dev/null; do sleep 1; done
+          : > "$OUT_VM/serial.log"
+          ISO=1 HEADLESS=1 ISO_PATH="$PWD/out/interstellar-os-lite.iso" OUT="$OUT_VM" MEM=8G \
+            nohup bash build-tools/scripts/run_vm.sh > out/run_vm_lite.log 2>&1 &
+          ssh_vm() { ssh -q -p 2222 -i "$OUT_VM/id_osaima" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@127.0.0.1 "$@"; }
+          for _ in $(seq 1 120); do ssh_vm true 2> /dev/null && break; sleep 5; done
+          echo "booted; waiting for the model download and llama-server (up to 25 minutes)"
+          start=$(date +%s)
+          for _ in $(seq 1 300); do
+            if ssh_vm 'curl -sf http://127.0.0.1:8080/v1/models' > /dev/null 2>&1; then
+              echo "  PASS  lite ISO: model downloaded and llama-server answering after $(( $(date +%s) - start )) s" | tee out/test_lite.log
+              ssh_vm 'ls -l /home/osaima/.local/share/osaima/models/' | tee -a out/test_lite.log
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "  FAIL  lite ISO: no model server within 25 minutes" | tee out/test_lite.log
+          ssh_vm 'journalctl --user -M osaima@ -u osaima-llm --no-pager | tail -20' || true
+          exit 1
+
+      - name: Publish the ISOs as a release
+        if: success() && env.STOP == 'test' && inputs.release_tag != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.release_tag }}
+        run: |
+          cd out
+          rm -rf release && mkdir release
+          sha256sum interstellar-os.iso interstellar-os-lite.iso > release/SHA256SUMS
+          # a release file may be at most 2 GiB: split what is bigger, into parts to join
+          for iso in interstellar-os.iso interstellar-os-lite.iso; do
+            if [ "$(stat -c %s "$iso")" -gt 2000000000 ]; then
+              split -b 1900M -d -a 2 "$iso" "release/$iso.part-"
+            else
+              mv "$iso" release/
+            fi
+          done
+          (cd release && sha256sum *.part-* >> SHA256SUMS 2> /dev/null || true)
+          ls -lh release
+          win=$(cd release && echo interstellar-os.iso.part-* | sed 's/ / + /g')
+          {
+            echo "Interstellar OS (OSAIMA), built and tested by the \`Build the OS image\` workflow (run ${{ github.run_id }}, commit ${GITHUB_SHA::7})."
+            echo
+            echo "Every VM smoke test passed on this build: the desktop, the local LLM, voice, the eBPF scheduler, the kernel sandbox and the audit log."
+            echo
+            echo "### Which one"
+            echo
+            echo "- **interstellar-os.iso** (full, about 4.3 GB): works with no internet. Too big for one release file, so it is in parts; join them first."
+            echo "- **interstellar-os-lite.iso** (about 1.9 GB): the same system without the language model; it downloads the model (about 2.4 GB, free, no account) when it first starts, so it needs the internet. On the live system the download is kept in memory, so it is fetched again after each reboot."
+            echo
+            echo "8 GB of RAM is recommended. Boots on BIOS and UEFI; write it to a USB stick or boot it in a VM."
+            echo
+            echo "### Joining the full ISO"
+            echo
+            echo "Linux or macOS:"
+            echo '```'
+            echo "cat interstellar-os.iso.part-* > interstellar-os.iso"
+            echo "sha256sum -c --ignore-missing SHA256SUMS"
+            echo '```'
+            echo "Windows (Command Prompt):"
+            echo '```'
+            echo "copy /b $win interstellar-os.iso"
+            echo "certutil -hashfile interstellar-os.iso SHA256"
+            echo '```'
+            echo "and compare the result with the line for interstellar-os.iso in SHA256SUMS."
+          } > release-notes.md
+          gh release create "$TAG" release/* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "Interstellar OS $TAG" --notes-file release-notes.md
 
       - name: Summary
         if: always()
