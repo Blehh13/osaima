@@ -20,6 +20,7 @@ as_user() { runuser -u osaima -- env XDG_RUNTIME_DIR=/run/user/$uid "$@"; }
 echo "== System"
 grep PRETTY_NAME /etc/os-release
 check "identifies as Interstellar OS" "grep -qi interstellar /etc/os-release"
+check "SSH refuses passwords (keys only)" "sshd -T 2>/dev/null | grep -qx 'passwordauthentication no'"
 for s in osaima-llm osaima-router osaima-mcp-daemon osaima-voice; do
 	check "$s.service active" "as_user systemctl --user is-active $s"
 done

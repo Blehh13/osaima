@@ -313,6 +313,11 @@ chroot "$ROOTFS" /bin/bash -eu <<CHROOT
 $(cat "$OUT/id_osaima.pub")
 KEY
 	systemctl enable sshd systemd-networkd systemd-resolved >/dev/null 2>&1
+	# SSH: keys only. The test key never leaves the build machine; with passwords allowed,
+	# anyone on the same network could log in as osaima with the published password.
+	install -d /etc/ssh/sshd_config.d
+	grep -q '^Include' /etc/ssh/sshd_config || sed -i '1i Include /etc/ssh/sshd_config.d/*.conf' /etc/ssh/sshd_config
+	printf 'PasswordAuthentication no\nKbdInteractiveAuthentication no\nPermitRootLogin prohibit-password\n' > /etc/ssh/sshd_config.d/10-osaima.conf
 	[ -f /usr/lib/systemd/system/osaima-schedd.service ] && systemctl enable osaima-schedd.service >/dev/null 2>&1 || true
 	printf '[Match]\nName=en*\n[Network]\nDHCP=yes\n' > /etc/systemd/network/20-wired.network
 	# the web backend is only for browser-based development; the desktop apps talk to the daemon directly
