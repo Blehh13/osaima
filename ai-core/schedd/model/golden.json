@@ -1,0 +1,434 @@
+[
+  {
+    "features": {
+      "cpu_util": 0.035812,
+      "vol_rate": 9.4997,
+      "invol_rate": 13.9996,
+      "slice_ms": 1.5239,
+      "wait_ratio": 1.6898
+    },
+    "class": "interactive",
+    "probability": 0.9939452687485157,
+    "probabilities": {
+      "background": 0.0006524847699778271,
+      "batch": 7.439065274653702e-05,
+      "interactive": 0.9939452687485157,
+      "media": 0.005327855828759779
+    },
+    "rules": "interactive"
+  },
+  {
+    "features": {
+      "cpu_util": 0.036203,
+      "vol_rate": 11.2911,
+      "invol_rate": 12.7639,
+      "slice_ms": 1.505,
+      "wait_ratio": 1.0925
+    },
+    "class": "interactive",
+    "probability": 0.9926954160754652,
+    "probabilities": {
+      "background": 0.0006176104770648585,
+      "batch": 7.065581290540039e-05,
+      "interactive": 0.9926954160754652,
+      "media": 0.006616317634564597
+    },
+    "rules": "interactive"
+  },
+  {
+    "features": {
+      "cpu_util": 0.336984,
+      "vol_rate": 6.4998,
+      "invol_rate": 173.4945,
+      "slice_ms": 1.867,
+      "wait_ratio": 2.0137
+    },
+    "class": "media",
+    "probability": 0.9716979891893825,
+    "probabilities": {
+      "background": 1.172315992550717e-08,
+      "batch": 0.028301022099442765,
+      "interactive": 9.769880146084859e-07,
+      "media": 0.9716979891893825
+    },
+    "rules": "batch"
+  },
+  {
+    "features": {
+      "cpu_util": 0.528513,
+      "vol_rate": 0.0,
+      "invol_rate": 302.2515,
+      "slice_ms": 1.7486,
+      "wait_ratio": 0.9046
+    },
+    "class": "batch",
+    "probability": 0.9700915708418373,
+    "probabilities": {
+      "background": 2.679119058486625e-09,
+      "batch": 0.9700915708418373,
+      "interactive": 3.869937584025206e-12,
+      "media": 0.029908426475173635
+    },
+    "rules": "batch"
+  },
+  {
+    "features": {
+      "cpu_util": 0.0,
+      "vol_rate": 0.0,
+      "invol_rate": 0.0,
+      "slice_ms": 0.0,
+      "wait_ratio": 0.0
+    },
+    "class": "background",
+    "probability": 0.9999845570210579,
+    "probabilities": {
+      "background": 0.9999845570210579,
+      "batch": 1.534578623451508e-09,
+      "interactive": 1.544144402574875e-05,
+      "media": 3.3769155575206876e-13
+    },
+    "rules": "background"
+  },
+  {
+    "features": {
+      "cpu_util": 0.03206,
+      "vol_rate": 10.672,
+      "invol_rate": 12.1273,
+      "slice_ms": 1.4062,
+      "wait_ratio": 3.673
+    },
+    "class": "interactive",
+    "probability": 0.998079433403866,
+    "probabilities": {
+      "background": 0.0005360038305388924,
+      "batch": 2.1625708704843207e-05,
+      "interactive": 0.998079433403866,
+      "media": 0.0013629370568904713
+    },
+    "rules": "interactive"
+  },
+  {
+    "features": {
+      "cpu_util": 0.37486,
+      "vol_rate": 59.6205,
+      "invol_rate": 110.3718,
+      "slice_ms": 2.2052,
+      "wait_ratio": 0.5613
+    },
+    "class": "media",
+    "probability": 0.9996755719805273,
+    "probabilities": {
+      "background": 5.366227695351196e-12,
+      "batch": 0.0003243964742513498,
+      "interactive": 3.153985514725399e-08,
+      "media": 0.9996755719805273
+    },
+    "rules": "media"
+  },
+  {
+    "features": {
+      "cpu_util": 0.188218,
+      "vol_rate": 99.3316,
+      "invol_rate": 7.8679,
+      "slice_ms": 1.7558,
+      "wait_ratio": 0.3871
+    },
+    "class": "media",
+    "probability": 0.960317594240786,
+    "probabilities": {
+      "background": 9.12969344728786e-06,
+      "batch": 0.0006069760482605912,
+      "interactive": 0.03906630001750609,
+      "media": 0.960317594240786
+    },
+    "rules": "media"
+  },
+  {
+    "features": {
+      "cpu_util": 0.349986,
+      "vol_rate": 0.0,
+      "invol_rate": 179.1022,
+      "slice_ms": 1.9488,
+      "wait_ratio": 1.8574
+    },
+    "class": "batch",
+    "probability": 0.8363474643983296,
+    "probabilities": {
+      "background": 1.6267321931899433e-06,
+      "batch": 0.8363474643983296,
+      "interactive": 2.2544245609959908e-07,
+      "media": 0.16365068342702102
+    },
+    "rules": "batch"
+  },
+  {
+    "features": {
+      "cpu_util": 0.000395,
+      "vol_rate": 0.9769,
+      "invol_rate": 0.0,
+      "slice_ms": 0.4039,
+      "wait_ratio": 0.0083
+    },
+    "class": "background",
+    "probability": 0.9993432698664835,
+    "probabilities": {
+      "background": 0.9993432698664835,
+      "batch": 3.77024167974502e-08,
+      "interactive": 0.0006566922945759362,
+      "media": 1.3652399659712536e-10
+    },
+    "rules": "background"
+  },
+  {
+    "features": {
+      "cpu_util": 0.042389,
+      "vol_rate": 11.5763,
+      "invol_rate": 15.9175,
+      "slice_ms": 1.5418,
+      "wait_ratio": 3.9351
+    },
+    "class": "interactive",
+    "probability": 0.994916568663349,
+    "probabilities": {
+      "background": 0.00021986754223117318,
+      "batch": 4.1009671268122644e-05,
+      "interactive": 0.994916568663349,
+      "media": 0.004822554123151842
+    },
+    "rules": "interactive"
+  },
+  {
+    "features": {
+      "cpu_util": 0.199844,
+      "vol_rate": 0.0,
+      "invol_rate": 96.1211,
+      "slice_ms": 2.0791,
+      "wait_ratio": 4.0576
+    },
+    "class": "batch",
+    "probability": 0.6097459916553963,
+    "probabilities": {
+      "background": 0.0006477470033269467,
+      "batch": 0.6097459916553963,
+      "interactive": 0.00278480812735806,
+      "media": 0.38682145321391864
+    },
+    "rules": "batch"
+  },
+  {
+    "features": {
+      "cpu_util": 0.920249,
+      "vol_rate": 0.0,
+      "invol_rate": 159.8892,
+      "slice_ms": 5.7555,
+      "wait_ratio": 0.0881
+    },
+    "class": "batch",
+    "probability": 0.9992272146429799,
+    "probabilities": {
+      "background": 2.307214206281637e-16,
+      "batch": 0.9992272146429799,
+      "interactive": 3.039270700980015e-23,
+      "media": 0.0007727853570198475
+    },
+    "rules": "batch"
+  },
+  {
+    "features": {
+      "cpu_util": 0.000331,
+      "vol_rate": 0.4957,
+      "invol_rate": 0.0,
+      "slice_ms": 0.667,
+      "wait_ratio": 5.4321
+    },
+    "class": "background",
+    "probability": 0.9979374636085614,
+    "probabilities": {
+      "background": 0.9979374636085614,
+      "batch": 3.5058905525062776e-08,
+      "interactive": 0.0020625012507845047,
+      "media": 8.174865242919941e-11
+    },
+    "rules": "background"
+  },
+  {
+    "features": {
+      "cpu_util": 0.0,
+      "vol_rate": 0.0,
+      "invol_rate": 0.0,
+      "slice_ms": 0.0,
+      "wait_ratio": 0.0
+    },
+    "class": "background",
+    "probability": 0.9999845570210579,
+    "probabilities": {
+      "background": 0.9999845570210579,
+      "batch": 1.534578623451508e-09,
+      "interactive": 1.544144402574875e-05,
+      "media": 3.3769155575206876e-13
+    },
+    "rules": "background"
+  },
+  {
+    "features": {
+      "cpu_util": 0.029333,
+      "vol_rate": 11.2123,
+      "invol_rate": 9.2624,
+      "slice_ms": 1.4327,
+      "wait_ratio": 2.7587
+    },
+    "class": "interactive",
+    "probability": 0.9980476971881743,
+    "probabilities": {
+      "background": 0.00088976164211139,
+      "batch": 1.9856341389366386e-05,
+      "interactive": 0.9980476971881743,
+      "media": 0.0010426848283247754
+    },
+    "rules": "interactive"
+  },
+  {
+    "features": {
+      "cpu_util": 0.2051,
+      "vol_rate": 0.0,
+      "invol_rate": 99.1016,
+      "slice_ms": 2.0696,
+      "wait_ratio": 3.8795
+    },
+    "class": "batch",
+    "probability": 0.6173443156872318,
+    "probabilities": {
+      "background": 0.0005136784746056325,
+      "batch": 0.6173443156872318,
+      "interactive": 0.0019678093226342306,
+      "media": 0.38017419651552836
+    },
+    "rules": "batch"
+  },
+  {
+    "features": {
+      "cpu_util": 0.186985,
+      "vol_rate": 0.0,
+      "invol_rate": 94.377,
+      "slice_ms": 1.9813,
+      "wait_ratio": 4.3867
+    },
+    "class": "batch",
+    "probability": 0.5969770960871842,
+    "probabilities": {
+      "background": 0.0012749441620687986,
+      "batch": 0.5969770960871842,
+      "interactive": 0.0068158524341707495,
+      "media": 0.39493210731657635
+    },
+    "rules": "batch"
+  },
+  {
+    "features": {
+      "cpu_util": 0.0,
+      "vol_rate": 0.0,
+      "invol_rate": 0.0,
+      "slice_ms": 0.0,
+      "wait_ratio": 0.0
+    },
+    "class": "background",
+    "probability": 0.9999845570210579,
+    "probabilities": {
+      "background": 0.9999845570210579,
+      "batch": 1.534578623451508e-09,
+      "interactive": 1.544144402574875e-05,
+      "media": 3.3769155575206876e-13
+    },
+    "rules": "background"
+  },
+  {
+    "features": {
+      "cpu_util": 0.038427,
+      "vol_rate": 12.3419,
+      "invol_rate": 11.8482,
+      "slice_ms": 1.5885,
+      "wait_ratio": 1.8789
+    },
+    "class": "interactive",
+    "probability": 0.9942818570556562,
+    "probabilities": {
+      "background": 0.0004289391083701793,
+      "batch": 4.957514983151379e-05,
+      "interactive": 0.9942818570556562,
+      "media": 0.005239628686142261
+    },
+    "rules": "interactive"
+  },
+  {
+    "features": {
+      "cpu_util": 0.417918,
+      "vol_rate": 22.485,
+      "invol_rate": 188.6787,
+      "slice_ms": 1.9745,
+      "wait_ratio": 1.1773
+    },
+    "class": "media",
+    "probability": 0.9962897629888327,
+    "probabilities": {
+      "background": 1.987027416380564e-11,
+      "batch": 0.0037102309738006223,
+      "interactive": 6.017496479709538e-09,
+      "media": 0.9962897629888327
+    },
+    "rules": "batch"
+  },
+  {
+    "features": {
+      "cpu_util": 0.20253,
+      "vol_rate": 59.5583,
+      "invol_rate": 64.9283,
+      "slice_ms": 1.6269,
+      "wait_ratio": 1.7642
+    },
+    "class": "media",
+    "probability": 0.9984941904820636,
+    "probabilities": {
+      "background": 9.970604418927989e-09,
+      "batch": 0.0001348531573701202,
+      "interactive": 0.0013709463899620356,
+      "media": 0.9984941904820636
+    },
+    "rules": "media"
+  },
+  {
+    "features": {
+      "cpu_util": 0.201671,
+      "vol_rate": 0.0,
+      "invol_rate": 99.3968,
+      "slice_ms": 2.029,
+      "wait_ratio": 3.938
+    },
+    "class": "batch",
+    "probability": 0.6146475493179938,
+    "probabilities": {
+      "background": 0.0006205744218241029,
+      "batch": 0.6146475493179938,
+      "interactive": 0.0025051003455204106,
+      "media": 0.38222677591466175
+    },
+    "rules": "batch"
+  },
+  {
+    "features": {
+      "cpu_util": 0.000424,
+      "vol_rate": 0.483,
+      "invol_rate": 0.0,
+      "slice_ms": 0.8777,
+      "wait_ratio": 4.7002
+    },
+    "class": "background",
+    "probability": 0.9966776330697249,
+    "probabilities": {
+      "background": 0.9966776330697249,
+      "batch": 8.705904951877466e-08,
+      "interactive": 0.003322279577085493,
+      "media": 2.941399973589549e-10
+    },
+    "rules": "background"
+  }
+]

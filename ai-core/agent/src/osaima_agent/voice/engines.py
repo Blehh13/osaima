@@ -143,6 +143,7 @@ class CommandSynthesizer:
             models_dir=str(self._models_dir),
             output=str(out),
         )
+        argv[0] = self._which(argv[0]) or argv[0]  # the program may not be on PATH
         try:
             proc = await asyncio.create_subprocess_exec(
                 *argv,

@@ -1,0 +1,58 @@
+name: Train the process classifier
+
+# Runs synthetic programs of each kind on a free runner, measures them with the
+# scheduler daemon's own code, and trains the classifier from the data. The model
+# (model.json), worked examples (golden.json), the data and a report are uploaded;
+# commit the model and examples to ai-core/schedd/model/. See ai-core/schedd/train/.
+
+on:
+  workflow_dispatch:
+    inputs:
+      rounds:
+        description: "Groups of programs to measure (about 30 s each; the load cycles quiet, busy, crowded)"
+        default: "12"
+  push:
+    branches: ["feat/m4-sched"]
+    paths:
+      - "ai-core/schedd/train/**"
+      - ".github/workflows/schedd-train.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  train:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: ai-core/schedd
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ai-core/schedd
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet numpy scikit-learn
+      - run: cargo build --locked --release
+      - name: Measure synthetic programs
+        run: |
+          nproc
+          python train/collect.py --schedd target/release/osaima-schedd --out dataset.csv \
+            --rounds "${{ inputs.rounds || '12' }}"
+      - name: Train
+        run: python train/train.py --data dataset.csv --out model-out
+      - name: Report
+        if: always()
+        run: |
+          if [ -f model-out/report.md ]; then cat model-out/report.md >> "$GITHUB_STEP_SUMMARY"; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: schedd-model
+          path: |
+            ai-core/schedd/dataset.csv
+            ai-core/schedd/model-out

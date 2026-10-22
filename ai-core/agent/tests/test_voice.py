@@ -20,7 +20,13 @@ from osaima_agent.config import ConfigError, VoiceConfig
 from osaima_agent.policy import Policy
 from osaima_agent.server import AgentServer
 from osaima_agent.voice import VoiceError, VoiceService
-from osaima_agent.voice.audio import AudioError, fill, recorded_seconds, resolve_command
+from osaima_agent.voice.audio import (
+    AudioError,
+    fill,
+    find_program,
+    recorded_seconds,
+    resolve_command,
+)
 from osaima_agent.voice.engines import CommandSynthesizer, load_audio
 from osaima_agent.voice.service import speakable
 
@@ -131,6 +137,24 @@ def test_commands_are_resolved_and_filled() -> None:
     assert resolve_command(("arecord", "-x"), candidates, which) == ("arecord", "-x")
     assert resolve_command((), candidates, lambda p: None) is None
     assert fill(["a", "{output}", "{keep}"], output="/x") == ["a", "/x", "{keep}"]
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="POSIX executables")
+def test_programs_beside_this_python_are_found(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # a service runs the venv's python by its full path, so the venv's bin is not on PATH
+    venv_bin = tmp_path / "venv" / "bin"
+    venv_bin.mkdir(parents=True)
+    piper = venv_bin / "piper"
+    piper.write_text("#!/bin/sh\n")
+    piper.chmod(0o755)
+    monkeypatch.setattr(sys, "executable", str(venv_bin / "python"))
+    monkeypatch.setenv("PATH", str(tmp_path / "empty"))
+    assert find_program("piper") == str(piper)
+    assert find_program("not-there") is None
+    (venv_bin / "plain").write_text("not executable")
+    assert find_program("plain") is None
 
 
 def test_recorded_length_comes_from_the_file_size(tmp_path: Path) -> None:

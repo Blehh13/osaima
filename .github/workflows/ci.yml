@@ -100,6 +100,84 @@ jobs:
           path: ai-core/mcp-core/target/release/mcp-daemon
           if-no-files-found: ignore
 
+  schedd:
+    name: Scheduler daemon
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ai-core/schedd
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ai-core/schedd
+      - name: Test
+        run: cargo test --locked
+      - name: Clippy
+        if: success() || failure()
+        run: cargo clippy --locked --all-targets -- -D warnings
+      - name: Format
+        if: success() || failure()
+        run: cargo fmt --check || { cargo fmt && git diff > "$RUNNER_TEMP/rustfmt.patch"; exit 1; }
+      - name: Upload rustfmt fix
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rustfmt-patch-schedd
+          path: ${{ runner.temp }}/rustfmt.patch
+          if-no-files-found: ignore
+      - name: Release build
+        if: success() || failure()
+        run: cargo build --locked --release
+      - uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: schedd
+          path: |
+            ai-core/schedd/Cargo.lock
+            ai-core/schedd/target/release/osaima-schedd
+          if-no-files-found: ignore
+
+  schedd-ebpf:
+    name: Scheduler daemon (eBPF, root)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ai-core/schedd
+      - name: Build tools
+        run: |
+          sudo apt-get update
+          # Ubuntu's own bpftool is a stub that needs tools for the exact running kernel;
+          # the generic package's works on any
+          sudo apt-get install -y --no-install-recommends clang llvm libbpf-dev libelf-dev zlib1g-dev             linux-libc-dev linux-tools-common linux-tools-generic
+          tool=$(find /usr/lib -maxdepth 3 -name bpftool -type f | head -1)
+          echo "bpftool: ${tool:-not found}"
+          [ -n "$tool" ]
+          echo "BPFTOOL=$tool" >> "$GITHUB_ENV"
+      - name: Build the eBPF telemetry
+        working-directory: ai-core/schedd/bpf
+        run: |
+          make BPFTOOL="$BPFTOOL"
+          ls -l telemetry.bpf.o
+      - name: Telemetry and priority tests (as root)
+        working-directory: ai-core/schedd
+        run: |
+          mountpoint -q /sys/fs/bpf || sudo mount -t bpf bpf /sys/fs/bpf
+          uname -r
+          sudo -E env "PATH=$PATH" OSAIMA_BPFTOOL="$BPFTOOL" OSAIMA_BPF_OBJECT="$PWD/bpf/telemetry.bpf.o"             cargo test --locked --test privileged -- --ignored --nocapture --test-threads=1
+      - uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: schedd-telemetry
+          path: ai-core/schedd/bpf/telemetry.bpf.o
+          if-no-files-found: ignore
+
   shell-backend:
     name: Shell backend (Tauri)
     runs-on: ubuntu-24.04

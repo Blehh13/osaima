@@ -1,0 +1,47 @@
+name: Scheduler benchmark
+
+# Does the scheduler daemon keep a 60 fps style task on time while many programs
+# compete for the CPU? Writes the table to the job summary. See ai-core/schedd/bench/.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["feat/m4-sched"]
+    paths:
+      - "ai-core/schedd/bench/**"
+      - "ai-core/schedd/model/**"
+      - ".github/workflows/schedd-bench.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  bench:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: ai-core/schedd
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ai-core/schedd
+      - run: cargo build --locked --release
+      - name: Run the benchmark
+        run: |
+          set -o pipefail
+          model=""
+          [ -f model/model.json ] && model="$PWD/model/model.json"
+          sudo bash bench/run.sh "$PWD/target/release/osaima-schedd" $model 2>&1 | tee "$RUNNER_TEMP/bench.txt"
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## Scheduler benchmark"
+            echo
+            echo '```'
+            cat "$RUNNER_TEMP/bench.txt"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

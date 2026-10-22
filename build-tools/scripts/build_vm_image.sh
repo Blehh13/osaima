@@ -129,7 +129,7 @@ chroot "$ROOTFS" /bin/bash -e <<CHROOT
 	eselect profile set "$PROFILE"
 	emerge --noreplace --update \
 		sys-kernel/gentoo-kernel-bin \
-		sys-apps/bubblewrap \
+		sys-apps/bubblewrap 		dev-util/bpftool 		media-sound/alsa-utils \
 		net-misc/openssh \
 		gui-wm/sway gui-apps/swaybg gui-apps/foot media-fonts/dejavu \
 		gui-apps/waybar gui-apps/mako gui-apps/wl-clipboard gui-apps/grim x11-libs/libnotify \
@@ -281,6 +281,20 @@ Restart=on-failure
 WantedBy=default.target
 EOF
 
+# Scheduler daemon (optional): sets CPU priorities from what each program is doing.
+# Installed when it has been built (cargo build --release in ai-core/schedd, and make in
+# ai-core/schedd/bpf for the eBPF telemetry) and a trained model is committed.
+schedd_dir="$REPO_ROOT/ai-core/schedd"
+if [ -x "$schedd_dir/target/release/osaima-schedd" ] && [ -f "$schedd_dir/model/model.json" ]; then
+	log "Adding the scheduler daemon"
+	install -Dm755 "$schedd_dir/target/release/osaima-schedd" "$ROOTFS/usr/bin/osaima-schedd"
+	install -Dm644 "$schedd_dir/model/model.json" "$ROOTFS/usr/share/osaima/schedd/model.json"
+	if [ -f "$schedd_dir/bpf/telemetry.bpf.o" ]; then
+		install -Dm644 "$schedd_dir/bpf/telemetry.bpf.o" "$ROOTFS/usr/lib/osaima/schedd/telemetry.bpf.o"
+	fi
+	install -Dm644 "$REPO_ROOT/gentoo/overlay/sys-apps/osaima-schedd/files/osaima-schedd.service" 		"$ROOTFS/usr/lib/systemd/system/osaima-schedd.service"
+fi
+
 # ── 5. System setup: user, autologin into the shell, SSH for tests ──────────
 log "Configuring the system"
 hash="$(openssl passwd -6 osaima)"  # test-image password for osaima and root
@@ -298,6 +312,7 @@ chroot "$ROOTFS" /bin/bash -eu <<CHROOT
 $(cat "$OUT/id_osaima.pub")
 KEY
 	systemctl enable sshd systemd-networkd systemd-resolved >/dev/null 2>&1
+	[ -f /usr/lib/systemd/system/osaima-schedd.service ] && systemctl enable osaima-schedd.service >/dev/null 2>&1 || true
 	printf '[Match]\nName=en*\n[Network]\nDHCP=yes\n' > /etc/systemd/network/20-wired.network
 	# the web backend is only for browser-based development; the desktop apps talk to the daemon directly
 	systemctl --global enable osaima-llm.service osaima-router.service osaima-mcp-daemon.service osaima-voice.service
