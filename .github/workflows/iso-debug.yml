@@ -1,0 +1,84 @@
+name: Boot a built ISO (debug)
+
+# Boots an ISO that an earlier "Build the OS image" run kept (its interstellar-os-lite-iso
+# or interstellar-os-iso artifact), with every log line of the system forwarded to the
+# serial console, so a problem after boot can be seen without rebuilding the image
+# (minutes instead of hours). The serial log is uploaded.
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Run id of the image build that kept the ISO"
+        required: true
+      artifact:
+        description: "interstellar-os-lite-iso or interstellar-os-iso"
+        default: "interstellar-os-lite-iso"
+      minutes:
+        description: "How long to watch the system after boot"
+        default: "25"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  boot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: QEMU
+        timeout-minutes: 20
+        run: |
+          printf 'Acquire::Retries "5";\nAcquire::http::Timeout "30";\n' | sudo tee /etc/apt/apt.conf.d/80-retries > /dev/null
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends qemu-system-x86
+          sudo chmod a+rw /dev/kvm
+
+      - name: Fetch the ISO
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p iso && cd iso
+          gh run download "${{ inputs.run_id }}" -n "${{ inputs.artifact }}" --repo "$GITHUB_REPOSITORY"
+          ls -l
+          7z e -y "$(ls *.iso)" boot/vmlinuz boot/initramfs.img > /dev/null
+          ls -l vmlinuz initramfs.img
+
+      - name: Boot it and watch
+        run: |
+          cd iso
+          iso=$(ls *.iso)
+          # the ISO's own boot line, plus: every journal line (system and user services) to the serial console
+          qemu-system-x86_64 -enable-kvm -cpu host -m 8G -smp 2 \
+            -kernel vmlinuz -initrd initramfs.img \
+            -append "root=live:CDLABEL=INTERSTELLAR rd.live.image rd.live.overlay.overlayfs=1 console=ttyS0 systemd.journald.forward_to_console=1 systemd.log_level=info" \
+            -cdrom "$iso" -device virtio-vga -display none \
+            -nic user,model=virtio-net-pci \
+            -serial file:../serial.log > ../qemu.log 2>&1 &
+          end=$(( $(date +%s) + ${{ inputs.minutes }} * 60 ))
+          seen=0
+          while [ "$(date +%s)" -lt "$end" ]; do
+            sleep 20
+            lines=$(wc -l < ../serial.log)
+            # what the LLM service, the network and the disk say, as it happens
+            sed -n "$((seen + 1)),${lines}p" ../serial.log | tr '\r' '\n' \
+              | grep -aiE "OSAIMA LLM|start-llm|llama|curl|wget|No space|network|DHCP|resolv|Failed|overlay" | grep -av "^\s*[0-9.]*%" | tail -40 || true
+            seen=$lines
+            if grep -aq "server is listening" ../serial.log; then echo "== llama-server is up"; break; fi
+          done
+          echo "== tail of the console"
+          tail -60 ../serial.log | tr '\r' '\n' | tail -60
+          pkill -f qemu-system-x86_64 || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: debug-serial-log
+          path: |
+            serial.log
+            qemu.log
+          retention-days: 7
