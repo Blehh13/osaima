@@ -44,13 +44,29 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Host packages
+        # normally under a minute; a stalled mirror must not eat the whole run
+        timeout-minutes: 25
         run: |
+          # The runner's default Ubuntu mirror is sometimes very slow: use whichever answers fastest.
+          best=""; best_t=999
+          for m in http://azure.archive.ubuntu.com/ubuntu http://archive.ubuntu.com/ubuntu \
+                   http://mirrors.edge.kernel.org/ubuntu http://mirror.math.princeton.edu/pub/ubuntu; do
+            t=$(curl -o /dev/null -sf -m 20 -w '%{time_total}' "$m/dists/noble/main/binary-amd64/Packages.gz" || echo 999)
+            echo "mirror $m: ${t}s"
+            if awk -v a="$t" -v b="$best_t" 'BEGIN { exit !(a < b) }'; then best=$m; best_t=$t; fi
+          done
+          if [ -n "$best" ]; then
+            echo "using $best"
+            sudo sed -i "s#http://azure.archive.ubuntu.com/ubuntu#$best#g" /etc/apt/sources.list.d/ubuntu.sources 2> /dev/null || true
+          fi
+          printf 'Acquire::Retries "5";\nAcquire::http::Timeout "30";\n' | sudo tee /etc/apt/apt.conf.d/80-retries > /dev/null
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             libwebkit2gtk-4.1-dev libgtk-3-dev librsvg2-dev libayatana-appindicator3-dev \
             libsoup-3.0-dev libjavascriptcoregtk-4.1-dev \
             squashfs-tools xorriso mtools grub-pc-bin grub-efi-amd64-bin dosfstools \
-            qemu-system-x86 openssh-client openssl rsync curl xz-utils zstd python3-venv python3-pip             clang llvm libbpf-dev libelf-dev zlib1g-dev linux-tools-generic
+            qemu-system-x86 openssh-client openssl rsync curl xz-utils zstd python3-venv python3-pip \
+            clang llvm libbpf-dev libelf-dev zlib1g-dev linux-tools-generic
           df -h / | tail -1
 
       # ── 1. What the image script expects to find ───────────────────────────
@@ -133,6 +149,27 @@ jobs:
       - name: Build the live ISO
         if: env.STOP != 'inputs' && env.STOP != 'image'
         run: sudo env LITE=1 OUT="${{ github.workspace }}/out" bash build-tools/scripts/build_iso.sh 2>&1 | tee out/build_iso.log
+
+      # Keep the ISOs whatever happens next: a later test or the publish step may fail,
+      # and the runner's disk is gone when the job ends.
+      - name: Keep the lite ISO (7 days)
+        if: env.STOP != 'inputs' && env.STOP != 'image'
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: interstellar-os-lite-iso
+          path: out/interstellar-os-lite.iso
+          compression-level: 0
+          retention-days: 7
+      - name: Keep the full ISO (7 days)
+        if: env.STOP != 'inputs' && env.STOP != 'image'
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: interstellar-os-iso
+          path: out/interstellar-os.iso
+          compression-level: 0
+          retention-days: 7
 
       # ── 3. Does it boot? ───────────────────────────────────────────────────
       - name: Boot the ISO
