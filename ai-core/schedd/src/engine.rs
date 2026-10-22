@@ -3,7 +3,8 @@
 //! The safeguards, all of them on purpose:
 //!
 //! - only processes of ordinary users are touched (`min_uid`), never root's, never kernel
-//!   threads, never this daemon, never anything on the ignore list
+//!   threads, never this daemon, never the desktop's own plumbing ([`SESSION_PLUMBING`]),
+//!   never anything else on the ignore list
 //! - a process needs a baseline reading first, so its first window is never judged
 //! - a change needs the same verdict several windows in a row (`hysteresis`), so a process
 //!   that merely had one busy second is left alone
@@ -19,6 +20,34 @@ use crate::collector::{Collector, Sample};
 use crate::features::{Counters, Features};
 use crate::model::{Class, Classifier};
 use crate::policy::{Policy, Setting};
+
+/// Programs that hold the desktop together: they sleep almost all the time, so they look
+/// like background work, but everything else waits on their answers (the message bus,
+/// sound, the compositor, portals, the login and lock screens). Slowing one of them down
+/// would slow the whole desktop, so they are never touched. Names as the kernel keeps
+/// them: at most 15 characters.
+pub const SESSION_PLUMBING: &[&str] = &[
+    "dbus-daemon",
+    "dbus-broker",
+    "dbus-broker-lau",
+    "systemd",
+    "pipewire",
+    "pipewire-pulse",
+    "wireplumber",
+    "pulseaudio",
+    "sway",
+    "Xwayland",
+    "gnome-shell",
+    "kwin_wayland",
+    "xdg-desktop-por",
+    "xdg-document-po",
+    "xdg-permission-",
+    "at-spi-bus-laun",
+    "at-spi2-registr",
+    "swayidle",
+    "swaylock",
+    "greetd",
+];
 
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -40,7 +69,10 @@ impl Default for Config {
             min_uid: 1000,
             hysteresis: 3,
             min_confidence: 0.6,
-            ignore: vec!["osaima-schedd".to_string()],
+            ignore: std::iter::once("osaima-schedd")
+                .chain(SESSION_PLUMBING.iter().copied())
+                .map(String::from)
+                .collect(),
             dry_run: false,
         }
     }
@@ -423,6 +455,9 @@ mod tests {
         let mut system_user = batch(43, 0);
         system_user.uid = 999;
         let ordinary = batch(44, 0);
+        // the user's own session bus: slowing it would slow the whole desktop
+        let mut bus = batch(45, 0);
+        bus.comm = "dbus-daemon".into();
         let all = |n: u64| {
             [
                 &root,
@@ -432,6 +467,7 @@ mod tests {
                 &own,
                 &system_user,
                 &ordinary,
+                &bus,
             ]
             .into_iter()
             .map(|s| Sample {

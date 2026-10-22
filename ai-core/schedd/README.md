@@ -41,6 +41,10 @@ model makes the decision, and the kernel's own scheduler carries it out.
 
 - Only processes of ordinary users are touched (`--min-uid`, default 1000): never root's,
   never kernel threads, never the daemon itself, never anything given with `--ignore`.
+- Never the desktop's own plumbing either (the message bus, sound, the compositor, portals,
+  the lock screen; `SESSION_PLUMBING` in `src/engine.rs`). These sleep almost all the time
+  and look like background work, but the whole desktop waits on them; an early VM test
+  showed the session bus being given `SCHED_IDLE`, which under load would stall everything.
 - A process is judged only after it has a baseline reading, and a change needs the same
   verdict several windows in a row (`--hysteresis`, default 3): one busy second changes
   nothing.
