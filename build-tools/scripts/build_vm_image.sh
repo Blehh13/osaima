@@ -336,9 +336,14 @@ KEY
 	systemctl enable osaima-live-space.service >/dev/null 2>&1
 	# SSH: keys only. The test key never leaves the build machine; with passwords allowed,
 	# anyone on the same network could log in as osaima with the published password.
-	install -d /etc/ssh/sshd_config.d
-	grep -q '^Include' /etc/ssh/sshd_config || sed -i '1i Include /etc/ssh/sshd_config.d/*.conf' /etc/ssh/sshd_config
-	printf 'PasswordAuthentication no\nKbdInteractiveAuthentication no\nPermitRootLogin prohibit-password\n' > /etc/ssh/sshd_config.d/10-osaima.conf
+	# At the very top of the main file: sshd keeps the first value it reads for each
+	# setting, so these win whatever comes later or is included.
+	grep -q '^# OSAIMA: keys only' /etc/ssh/sshd_config || {
+		printf '# OSAIMA: keys only\nPasswordAuthentication no\nKbdInteractiveAuthentication no\nPermitRootLogin prohibit-password\n\n'
+		cat /etc/ssh/sshd_config
+	} > /etc/ssh/sshd_config.new
+	[ -s /etc/ssh/sshd_config.new ] && mv /etc/ssh/sshd_config.new /etc/ssh/sshd_config
+	rm -f /etc/ssh/sshd_config.new
 	[ -f /usr/lib/systemd/system/osaima-schedd.service ] && systemctl enable osaima-schedd.service >/dev/null 2>&1 || true
 	printf '[Match]\nName=en*\n[Network]\nDHCP=yes\n' > /etc/systemd/network/20-wired.network
 	# the web backend is only for browser-based development; the desktop apps talk to the daemon directly

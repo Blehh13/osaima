@@ -295,7 +295,7 @@ jobs:
             echo '```'
             echo "### VM smoke tests"
             echo '```'
-            grep -E "PASS|FAIL|^==|^==" out/test_vm.log 2>/dev/null | head -60 || true
+            grep -E "PASS|FAIL|WARN|^==" out/test_vm.log out/test_lite.log 2>/dev/null | head -60 || true
             echo '```'
             echo "### Last of the console"
             echo '```'
