@@ -6,7 +6,39 @@
 #                                                 the live ISO's medium, or /usr/share/osaima/models)
 #   OSAIMA_LLAMA_SERVER path to llama-server     (default: on PATH, else ~/.local/share/osaima/llama)
 #   OSAIMA_LLM_PORT     listen port              (default 8080, matches the daemon default)
+#   OSAIMA_LLM_DOWNLOAD 0 = never download a model (default: when there is none, fetch the
+#                       free default model once, into ~/.local/share/osaima/models)
 set -euo pipefail
+
+# The model the full ISO ships: free to download, no account. The lite ISO leaves it out
+# and fetches it here on first start.
+DEFAULT_MODEL_URL="${OSAIMA_LLM_MODEL_URL:-https://huggingface.co/bartowski/microsoft_Phi-4-mini-instruct-GGUF/resolve/main/microsoft_Phi-4-mini-instruct-Q4_K_M.gguf}"
+DEFAULT_MODEL_FILE="phi-4-mini-Q4_K_M.gguf"
+
+# Download the default model; retry until it arrives (at boot the network may not be up
+# yet). The file only gets its real name once it is complete and looks like a model.
+download_default_model() {
+	local dir="$HOME/.local/share/osaima/models" part
+	mkdir -p "$dir"
+	part="$dir/$DEFAULT_MODEL_FILE.part"
+	until [ -f "$dir/$DEFAULT_MODEL_FILE" ]; do
+		echo "OSAIMA LLM: no model on this computer; downloading $DEFAULT_MODEL_FILE (about 2.4 GB, once)" >&2
+		local fetched=0
+		if command -v curl >/dev/null; then
+			curl -fL --retry 3 -C - -o "$part" "$DEFAULT_MODEL_URL" && fetched=1
+		else
+			wget -c -O "$part" "$DEFAULT_MODEL_URL" && fetched=1
+		fi
+		# a broken-off download resumes next time (-C - / -c); only a finished one is used
+		if [ "$fetched" = 1 ] && [ "$(head -c 4 "$part")" = GGUF ] && [ "$(stat -c %s "$part")" -gt 100000000 ]; then
+			mv "$part" "$dir/$DEFAULT_MODEL_FILE"
+		else
+			echo "OSAIMA LLM: download did not finish; trying again in 30 s" >&2
+			sleep 30
+		fi
+	done
+	echo "$dir/$DEFAULT_MODEL_FILE"
+}
 
 MODELS_DIR="${OSAIMA_MODELS_DIR:-}"
 if [ -z "$MODELS_DIR" ]; then
@@ -43,6 +75,9 @@ else
 		[ -n "$MODEL" ] && break
 	done
 	[ -n "$MODEL" ] || MODEL="$(ls "$MODELS_DIR"/*.gguf 2>/dev/null | head -1 || true)"
+	if [ -z "$MODEL" ] && [ "${OSAIMA_LLM_DOWNLOAD:-1}" != 0 ]; then
+		MODEL="$(download_default_model)"
+	fi
 fi
 [ -f "$MODEL" ] || { echo "No .gguf model found in ${MODELS_DIR:-<none>}" >&2; exit 1; }
 

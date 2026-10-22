@@ -9,6 +9,10 @@
 # Layout: squashfs root + dracut dmsquash-live initramfs (writes go to a RAM
 # overlay), GRUB for BIOS and UEFI. Output: out/interstellar-os.iso
 #
+#   LITE=1  also write out/interstellar-os-lite.iso: the same system without the LLM
+#           weights (about 2.4 GB smaller); it downloads them on first start
+#           (ai-core/llm/start-llm.sh), so it needs the internet once.
+#
 # Host tools: squashfs-tools xorriso mtools grub-pc-bin grub-efi-amd64-bin
 
 set -euo pipefail
@@ -20,6 +24,7 @@ ISO_DIR="$WORK/iso"
 OUT="${OUT:-$REPO_ROOT/out}"
 VOLID="INTERSTELLAR"
 ISO="$OUT/interstellar-os.iso"
+LITE_ISO="$OUT/interstellar-os-lite.iso"
 
 log() { echo -e "\n==> $(date +%H:%M:%S) $*"; }
 [ "$(id -u)" = 0 ] || { echo "Run as root (sudo)." >&2; exit 1; }
@@ -101,5 +106,12 @@ GRUB
 log "Building the ISO (BIOS + UEFI)"
 grub-mkrescue -o "$ISO" "$ISO_DIR" -- -volid "$VOLID" 2>&1 | tail -2
 chown "${SUDO_USER:-root}" "$ISO"
+
+if [ -n "${LITE:-}" ]; then
+	log "Building the lite ISO (no LLM weights; downloaded on first start)"
+	rm -rf "$ISO_DIR/osaima/models"
+	grub-mkrescue -o "$LITE_ISO" "$ISO_DIR" -- -volid "$VOLID" 2>&1 | tail -2
+	chown "${SUDO_USER:-root}" "$LITE_ISO"
+fi
 log "Done"
-ls -lh "$ISO"
+ls -lh "$ISO" ${LITE:+"$LITE_ISO"}
