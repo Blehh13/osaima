@@ -297,6 +297,26 @@ if [ -x "$schedd_dir/target/release/osaima-schedd" ] && [ -f "$schedd_dir/model/
 fi
 
 # ── 5. System setup: user, autologin into the shell, SSH for tests ──────────
+# On the live ISO everything written goes to memory, into /run, which systemd caps at 20%
+# of RAM: too small for the 2.4 GB model the lite ISO downloads on first start. Memory is
+# only used as files are written, so a higher cap costs nothing until then.
+install -d "$ROOTFS/usr/lib/systemd/system"
+cat > "$ROOTFS/usr/lib/systemd/system/osaima-live-space.service" <<'EOF'
+[Unit]
+Description=Room for downloads on the live system (its writable layer is in memory)
+ConditionKernelCommandLine=rd.live.image
+DefaultDependencies=no
+After=local-fs.target
+Before=sysinit.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/mount -o remount,size=75%% /run
+
+[Install]
+WantedBy=sysinit.target
+EOF
+
 log "Configuring the system"
 hash="$(openssl passwd -6 osaima)"  # test-image password for osaima and root
 ssh-keygen -q -t ed25519 -N '' -f "$OUT/id_osaima" <<<y >/dev/null 2>&1 || true
@@ -313,6 +333,7 @@ chroot "$ROOTFS" /bin/bash -eu <<CHROOT
 $(cat "$OUT/id_osaima.pub")
 KEY
 	systemctl enable sshd systemd-networkd systemd-resolved >/dev/null 2>&1
+	systemctl enable osaima-live-space.service >/dev/null 2>&1
 	# SSH: keys only. The test key never leaves the build machine; with passwords allowed,
 	# anyone on the same network could log in as osaima with the published password.
 	install -d /etc/ssh/sshd_config.d

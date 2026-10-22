@@ -224,7 +224,7 @@ jobs:
             sleep 5
           done
           echo "  FAIL  lite ISO: no model server within 25 minutes" | tee out/test_lite.log
-          ssh_vm 'journalctl --user -M osaima@ -u osaima-llm --no-pager | tail -20' || true
+          ssh_vm 'journalctl _SYSTEMD_USER_UNIT=osaima-llm.service --no-pager | tail -20; df -h /run' || true
           exit 1
 
       - name: Publish the ISOs as a release
@@ -236,6 +236,8 @@ jobs:
           cd out
           rm -rf release && mkdir release
           sha256sum interstellar-os.iso interstellar-os-lite.iso > release/SHA256SUMS
+          full_size=$(numfmt --to=si --suffix=B "$(stat -c %s interstellar-os.iso)")
+          lite_size=$(numfmt --to=si --suffix=B "$(stat -c %s interstellar-os-lite.iso)")
           # a release file may be at most 2 GiB: split what is bigger, into parts to join
           for iso in interstellar-os.iso interstellar-os-lite.iso; do
             if [ "$(stat -c %s "$iso")" -gt 2000000000 ]; then
@@ -246,7 +248,6 @@ jobs:
           done
           (cd release && sha256sum *.part-* >> SHA256SUMS 2> /dev/null || true)
           ls -lh release
-          win=$(cd release && echo interstellar-os.iso.part-* | sed 's/ / + /g')
           {
             echo "Interstellar OS (OSAIMA), built and tested by the \`Build the OS image\` workflow (run ${{ github.run_id }}, commit ${GITHUB_SHA::7})."
             echo
@@ -254,24 +255,30 @@ jobs:
             echo
             echo "### Which one"
             echo
-            echo "- **interstellar-os.iso** (full, about 4.3 GB): works with no internet. Too big for one release file, so it is in parts; join them first."
-            echo "- **interstellar-os-lite.iso** (about 1.9 GB): the same system without the language model; it downloads the model (about 2.4 GB, free, no account) when it first starts, so it needs the internet. On the live system the download is kept in memory, so it is fetched again after each reboot."
+            echo "- **interstellar-os.iso** (full, $full_size): works with no internet."
+            echo "- **interstellar-os-lite.iso** ($lite_size): the same system without the language model; it downloads the model (about 2.4 GB, free, no account) when it first starts, so it needs the internet. On the live system the download is kept in memory, so it is fetched again after each reboot."
             echo
-            echo "8 GB of RAM is recommended. Boots on BIOS and UEFI; write it to a USB stick or boot it in a VM."
-            echo
-            echo "### Joining the full ISO"
-            echo
-            echo "Linux or macOS:"
-            echo '```'
-            echo "cat interstellar-os.iso.part-* > interstellar-os.iso"
-            echo "sha256sum -c --ignore-missing SHA256SUMS"
-            echo '```'
-            echo "Windows (Command Prompt):"
-            echo '```'
-            echo "copy /b $win interstellar-os.iso"
-            echo "certutil -hashfile interstellar-os.iso SHA256"
-            echo '```'
-            echo "and compare the result with the line for interstellar-os.iso in SHA256SUMS."
+            echo "8 GB of RAM is recommended. Boots on BIOS and UEFI; write it to a USB stick or boot it in a VM. Nothing is installed: the live system changes nothing on the computer's disk."
+            for iso in interstellar-os.iso interstellar-os-lite.iso; do
+              ls "release/$iso.part-"* > /dev/null 2>&1 || continue
+              win=$(cd release && echo "$iso".part-* | sed 's/ / + /g')
+              echo
+              echo "### Joining $iso"
+              echo
+              echo "A release file may be at most 2 GB, so this ISO is in parts. Download all of them into one folder, then join them."
+              echo
+              echo "Linux or macOS:"
+              echo '```'
+              echo "cat $iso.part-* > $iso"
+              echo "sha256sum -c --ignore-missing SHA256SUMS"
+              echo '```'
+              echo "Windows (Command Prompt, in that folder):"
+              echo '```'
+              echo "copy /b $win $iso"
+              echo "certutil -hashfile $iso SHA256"
+              echo '```'
+              echo "and compare the result with the line for $iso in SHA256SUMS."
+            done
           } > release-notes.md
           gh release create "$TAG" release/* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
             --title "Interstellar OS $TAG" --notes-file release-notes.md
