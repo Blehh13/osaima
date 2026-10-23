@@ -1,0 +1,29 @@
+{
+  "backend": "router",
+  "n": 510,
+  "intent_acc": 23.9,
+  "exact_acc": 23.9,
+  "valid_json": 29.0,
+  "p50_ms": 41.3,
+  "p90_ms": 47.2,
+  "by_source": {
+    "rule": {
+      "n": 177,
+      "intent_acc": 67.8,
+      "exact_acc": 67.8
+    },
+    "synthetic": {
+      "n": 114,
+      "intent_acc": 1.8,
+      "exact_acc": 1.8
+    },
+    "teacher": {
+      "n": 219,
+      "intent_acc": 0.0,
+      "exact_acc": 0.0
+    }
+  },
+  "answered": 29.0,
+  "intent_acc_when_answered": 82.4,
+  "exact_acc_when_answered": 82.4
+}

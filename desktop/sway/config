@@ -52,6 +52,7 @@ for_window [window_type="dialog"] floating enable
 # Ask from anywhere (the Ask bar), or bring up the assistant
 bindsym $mod+space exec osaima-open launcher
 bindsym $mod+a exec osaima-open assistant
+bindsym $mod+v exec osaima-voice
 # Lock
 bindsym $mod+l exec osaima-lock
 # Apps

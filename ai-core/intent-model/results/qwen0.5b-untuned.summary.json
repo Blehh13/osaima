@@ -1,0 +1,26 @@
+{
+  "backend": "qwen0.5b-untuned",
+  "n": 510,
+  "intent_acc": 27.3,
+  "exact_acc": 13.7,
+  "valid_json": 100.0,
+  "p50_ms": 1653.4,
+  "p90_ms": 2270.0,
+  "by_source": {
+    "rule": {
+      "n": 177,
+      "intent_acc": 41.2,
+      "exact_acc": 23.7
+    },
+    "synthetic": {
+      "n": 114,
+      "intent_acc": 18.4,
+      "exact_acc": 4.4
+    },
+    "teacher": {
+      "n": 219,
+      "intent_acc": 20.5,
+      "exact_acc": 10.5
+    }
+  }
+}

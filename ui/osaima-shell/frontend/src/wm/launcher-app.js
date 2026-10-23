@@ -4,6 +4,8 @@
  * assistant, which comes forward and handles it; the bar closes itself.
  * Up/Down pick one of your routines or frequent requests; Esc closes.
  */
+import { iconEl } from './icons.js';
+
 function el(tag, cls, text) {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
@@ -19,8 +21,8 @@ export function makeLauncher(services) {
       root.classList.add('app-launcher');
       const form = document.createElement('form');
       form.className = 'ln-bar';
-      const mark = el('span', 'ln-mark', '>_');
-      mark.setAttribute('aria-hidden', 'true');
+      const mark = el('span', 'ln-mark');
+      mark.append(iconEl('sparkles', 22));
       const input = document.createElement('input');
       input.className = 'ln-input';
       input.placeholder = 'Ask your computer to do something…';
@@ -28,7 +30,8 @@ export function makeLauncher(services) {
       input.setAttribute('aria-label', 'Request');
       form.append(mark, input);
       const list = el('ul', 'ln-list');
-      const hint = el('p', 'ln-hint', 'Enter to ask · ↑↓ to pick · Esc to close');
+      const hint = el('p', 'ln-hint');
+      for (const [k, t] of [['Enter', 'ask'], ['↑↓', 'pick'], ['Esc', 'close']]) hint.append(el('kbd', null, k), el('span', null, t));
       root.append(form, list, hint);
 
       let items = [];
@@ -36,7 +39,9 @@ export function makeLauncher(services) {
       const render = () => {
         list.replaceChildren(...items.map((it, i) => {
           const li = el('li', 'ln-item' + (i === sel ? ' is-sel' : ''));
-          li.append(el('span', 'ln-item-text', it.text), el('span', 'ln-item-kind', it.kind));
+          const ic = el('span', 'ln-item-icon');
+          ic.append(iconEl({ Routine: 'repeat', 'You often ask': 'history', Try: 'sparkles' }[it.kind] || 'sparkles', 16));
+          li.append(ic, el('span', 'ln-item-text', it.text), el('span', 'ln-item-kind', it.kind));
           li.addEventListener('mousedown', (e) => { e.preventDefault(); send(it.run); });
           return li;
         }));

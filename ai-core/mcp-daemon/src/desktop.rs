@@ -33,6 +33,8 @@ const APPS: &[(&str, &str, &[&str])] = &[
     ("behavior", "osaima-app behavior", &["osaima-behavior"]),
     ("about", "osaima-app about", &["osaima-about"]),
     ("history", "osaima-app history", &["osaima-history"]),
+    ("security", "osaima-app security", &["osaima-security"]),
+    ("onboarding", "osaima-app onboarding", &["osaima-onboarding"]),
 ];
 
 /// sway's IPC socket. The daemon runs as a user service, so SWAYSOCK is often
@@ -71,6 +73,11 @@ fn swaymsg(args: &[&str]) -> Result<Value, String> {
 
 fn command(cmd: &str) -> Result<Value, String> {
     swaymsg(&[cmd])
+}
+
+/// Start a program in the desktop session (sway's exec), e.g. a Flatpak app.
+pub fn exec(cmdline: &str) -> Result<Value, String> {
+    command(&format!("exec {}", cmdline))
 }
 
 /// Every application window: id, app, title, workspace, focused.

@@ -1,0 +1,26 @@
+{
+  "backend": "phi4-mini-full",
+  "n": 15,
+  "intent_acc": 40.0,
+  "exact_acc": 33.3,
+  "valid_json": 100.0,
+  "p50_ms": 47184.6,
+  "p90_ms": 243706.7,
+  "by_source": {
+    "rule": {
+      "n": 8,
+      "intent_acc": 50.0,
+      "exact_acc": 50.0
+    },
+    "synthetic": {
+      "n": 2,
+      "intent_acc": 50.0,
+      "exact_acc": 0.0
+    },
+    "teacher": {
+      "n": 5,
+      "intent_acc": 20.0,
+      "exact_acc": 20.0
+    }
+  }
+}

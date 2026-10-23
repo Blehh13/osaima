@@ -7,8 +7,6 @@ use std::sync::{Arc, Mutex};
 use portable_pty::{CommandBuilder, NativePtySystem, PtySize, PtySystem, MasterPty};
 use tauri::{AppHandle, Emitter, State};
 
-mod voice;
-
 struct PtyAppState {
     pty_writers: Mutex<HashMap<String, Box<dyn std::io::Write + Send>>>,
     pty_masters: Mutex<HashMap<String, Box<dyn MasterPty + Send>>>,
@@ -354,6 +352,8 @@ fn task_rpc(method: String, params: Value) -> Result<Value, String> {
     match method.as_str() {
         "system.task_start" | "system.task_status" | "system.task_decide" | "system.task_cancel" | "system.tasks"
         | "system.automations" | "system.automation_add" | "system.automation_remove" | "system.automation_cancel"
+        | "system.voice_status" | "system.voice_listen" | "system.voice_cancel" | "system.speak" | "system.speak_stop"
+        | "system.security_stats" | "system.sandbox_check" | "system.ui_flag" | "system.audit_verify" | "system.audit_chain"
         | "system.gpu_info" | "system.model_download" | "system.model_status" | "system.model_cancel" => mcp_result(&method, params),
         _ => Err("not a task method".to_string()),
     }
@@ -409,14 +409,16 @@ fn assess_command(command: String) -> Result<Value, String> {
 /// Unlike run_command (used for commands the user typed), this never runs
 /// anything the daemon has not approved for its tier.
 #[tauri::command]
-fn execute_ai_command(command: String, approved: bool, typed: Option<String>) -> Result<Value, String> {
-    mcp_result("system.execute_command", json!({ "command": command, "approved": approved, "typed": typed.unwrap_or_default() }))
+fn execute_ai_command(command: String, approved: bool, typed: Option<String>, dry_run: Option<bool>) -> Result<Value, String> {
+    mcp_result("system.execute_command", json!({ "command": command, "approved": approved, "typed": typed.unwrap_or_default(),
+                                                 "dry_run": dry_run.unwrap_or(false) }))
 }
 
 #[tauri::command]
-fn classify_intent(query: String, history: Option<Value>, selected: Option<Value>) -> Result<Value, String> {
+fn classify_intent(query: String, history: Option<Value>, selected: Option<Value>, context: Option<Value>, demo: Option<bool>) -> Result<Value, String> {
     match query_mcp_with_params("system.classify_intent", json!({"query": query, "history": history.unwrap_or(json!([])),
-                                                                 "selected": selected.unwrap_or(json!([]))})) {
+                                                                 "selected": selected.unwrap_or(json!([])),
+                                                                 "context": context.unwrap_or(json!([])), "demo": demo.unwrap_or(false)})) {
         Ok(response) => {
             if let Some(result) = response.get("result") {
                 Ok(result.clone())
@@ -725,8 +727,7 @@ fi
             clean_storage,
             fix_network,
             get_wifi_network,
-            shutdown_os,
-            voice::voice_call
+            shutdown_os
         ])
         .run(tauri::generate_context!())
         .expect("error while running osaima-shell");

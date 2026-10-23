@@ -1,0 +1,26 @@
+{
+  "backend": "gemini-flash-lite",
+  "n": 40,
+  "intent_acc": 72.5,
+  "exact_acc": 67.5,
+  "valid_json": 100.0,
+  "p50_ms": 4557.9,
+  "p90_ms": 7155.9,
+  "by_source": {
+    "rule": {
+      "n": 18,
+      "intent_acc": 66.7,
+      "exact_acc": 66.7
+    },
+    "synthetic": {
+      "n": 6,
+      "intent_acc": 83.3,
+      "exact_acc": 66.7
+    },
+    "teacher": {
+      "n": 16,
+      "intent_acc": 75.0,
+      "exact_acc": 68.8
+    }
+  }
+}

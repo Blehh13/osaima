@@ -10,10 +10,13 @@ import { invoke } from './bridge.js';
 import { registerApps } from './wm/apps.js';
 import { makeSettings } from './wm/settings-app.js';
 import { makeHistory } from './wm/history-app.js';
+import { makeSecurity } from './wm/security-app.js';
+import { makeOnboarding, onboardingDone } from './wm/onboarding-app.js';
 import { makeLauncher } from './wm/launcher-app.js';
 import { WidgetManager } from './wm/widget-manager.js';
 import { RagEngine, SEED_KNOWLEDGE } from './wm/rag.js';
 import { BehaviorStore } from './wm/behavior.js';
+import { icon, emptyState } from './wm/icons.js';
 
 const appId = new URLSearchParams(location.search).get('app') || 'assistant';
 
@@ -22,7 +25,10 @@ const toasts = document.getElementById('notifications');
 function notify(message, kind = 'info') {
   const t = document.createElement('div');
   t.className = 'toast toast-' + kind;
-  t.textContent = message;
+  t.setAttribute('role', kind === 'err' ? 'alert' : 'status');
+  t.innerHTML = icon(kind === 'err' ? 'alert-circle' : kind === 'ok' ? 'check-circle' : 'info', 18);
+  t.append(document.createElement('span'));
+  t.lastChild.textContent = message;
   toasts.append(t);
   requestAnimationFrame(() => t.classList.add('show'));
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3200);
@@ -71,6 +77,8 @@ registerApps({ registerApp: (a) => apps.set(a.id, a) }, services);
 apps.set('settings', makeSettings(services));
 apps.set('history', makeHistory(services));
 apps.set('launcher', makeLauncher(services));
+apps.set('security', makeSecurity(services));
+apps.set('onboarding', makeOnboarding(services));
 apps.set('config', apps.get('settings'));
 
 const app = apps.get(appId) || apps.get('assistant');
@@ -80,12 +88,15 @@ const root = document.getElementById('app-root');
 try {
   app.mount(root, { wm: desktop, win: { id: 1, setTitle: (t) => { document.title = `OSAIMA ${t}`; } } });
 } catch (err) {
-  root.textContent = `${app.title} failed to start: ${err.message}`;
+  root.replaceChildren(emptyState('alert-circle', `${app.title} couldn’t start: ${err.message}`));
 }
 
 // First start: the assistant opens Settings so the user picks Fast or Private.
+// First start: the welcome tour (which also covers the Fast / Private choice).
 if (app.id === 'assistant') {
-  let welcomed = false;
-  try { welcomed = !!localStorage.getItem('osaima_welcomed'); } catch {}
-  if (!welcomed) launch('settings');
+  onboardingDone(invoke).then((done) => {
+    let welcomed = false;
+    try { welcomed = !!localStorage.getItem('osaima_welcomed'); } catch {}
+    if (!done && !welcomed) launch('onboarding');
+  });
 }

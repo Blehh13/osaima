@@ -56,7 +56,14 @@ pub fn fast_intent(verdict: &Value, started: Instant) -> Option<Value> {
     fast["source"] = json!("fast");
     fast["confidence"] = verdict["confidence"].clone();
     fast["ms"] = json!(started.elapsed().as_secs_f64() * 1000.0);
+    fast["router"] = summary(verdict);
     Some(fast)
+}
+
+/// What the router decided, for the shell's pipeline trace (changes no behaviour).
+pub fn summary(verdict: &Value) -> Value {
+    json!({ "intent": verdict["intent"], "track": verdict["track"], "confidence": verdict["confidence"],
+            "scores": verdict["scores"], "ms": verdict["ms"] })
 }
 
 /// The router's top guesses, used to shorten the LLM prompt.

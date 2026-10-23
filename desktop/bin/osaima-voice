@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+"""osaima-voice — push to talk. Asks the daemon to listen (local whisper.cpp), then hands the
+transcript to the assistant the same way osaima-ask does (system.ask). Bound to Super+V."""
+import json, os, socket, subprocess, sys
+
+sock = os.path.join(os.environ.get("XDG_RUNTIME_DIR", "/tmp"), "osaima", "mcp.sock")
+
+
+def notify(msg):
+    subprocess.run(["notify-send", "-t", "3000", "-h", "string:x-canonical-private-synchronous:osaima-voice", "OSAIMA", msg])
+
+
+def rpc(method, params, timeout):
+    with socket.socket(socket.AF_UNIX) as s:
+        s.settimeout(timeout)
+        s.connect(sock)
+        s.sendall((json.dumps({"jsonrpc": "2.0", "id": "1", "method": method, "params": params}) + "\n").encode())
+        buf = b""
+        while not buf.endswith(b"\n"):
+            chunk = s.recv(65536)
+            if not chunk:
+                break
+            buf += chunk
+    return json.loads(buf)
+
+
+try:
+    if len(sys.argv) > 1 and sys.argv[1] == "cancel":
+        rpc("system.voice_cancel", {}, 5)
+        sys.exit(0)
+    notify("Listening…")
+    r = rpc("system.voice_listen", {}, 60)
+    if "error" in r:
+        notify(r["error"].get("message", "Voice isn't available."))
+        sys.exit(1)
+    text = (r.get("result") or {}).get("text", "").strip()
+    if not text:
+        notify("I didn't hear anything.")
+        sys.exit(0)
+    rpc("system.ask", {"query": text}, 5)
+except (OSError, ValueError) as e:
+    notify(f"The assistant isn't running ({e})")
+    sys.exit(1)
+os.execvp("osaima-open", ["osaima-open", "assistant"])

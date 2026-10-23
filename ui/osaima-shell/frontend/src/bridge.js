@@ -18,9 +18,7 @@ export async function invoke(cmd, args = {}) {
   // Tauri commands take named arguments; os_action takes the whole request,
   // and the task_* calls share one whitelisted command
   if (native) {
-    if (cmd === 'tasks' || cmd.startsWith('task_') || cmd.startsWith('automation') || cmd === 'gpu_info' || cmd.startsWith('model_')) return native('task_rpc', { method: 'system.' + cmd, params: args });
-    // voice_status, voice_listen, ... go to the voice service as voice.status, voice.listen, ...
-    if (cmd.startsWith('voice_')) return native('voice_call', { method: 'voice.' + cmd.slice(6), params: args });
+    if (cmd === 'tasks' || cmd.startsWith('task_') || cmd.startsWith('automation') || cmd === 'gpu_info' || cmd.startsWith('voice_') || cmd === 'speak' || cmd === 'speak_stop' || cmd.startsWith('model_') || ['security_stats', 'sandbox_check', 'ui_flag', 'audit_verify', 'audit_chain'].includes(cmd)) return native('task_rpc', { method: 'system.' + cmd, params: args });
     return native(cmd, cmd === 'os_action' ? { request: args } : args);
   }
   const resp = await fetch('/api/invoke', {

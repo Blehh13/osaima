@@ -12,6 +12,22 @@ const HEDGE_SECS: u64 = 5;
 const INTENT_PROMPT: &str = include_str!("prompts/intent.txt");
 const WRITER_PROMPT: &str = include_str!("prompts/writer.txt");
 const COMMAND_PROMPT: &str = include_str!("prompts/command.txt");
+/// Short prompt for the distilled intent model (ai-core/intent-model): it was
+/// fine-tuned on exactly this text, so it must not drift from fmt.py.
+const FAST_INTENT_PROMPT: &str = include_str!("prompts/intent_fast.txt");
+/// Every intent the distilled model may answer with; the JSON schema sent to
+/// llama-server restricts decoding to these names.
+pub const FAST_INTENTS: [&str; 39] = [
+    "open_app", "focus_app", "close_window", "close_all_windows", "minimize_all", "layout", "workspace",
+    "set_gaps", "os_action", "timer", "stop_timer", "reminder", "calendar", "schedule_event", "calculator",
+    "weather", "system_status", "optimize_cpu", "wake_apps", "clean_storage", "fix_network", "scratchpad",
+    "search_web", "files", "create_note", "edit_note", "delete_note", "view_note", "list_notes",
+    "search_notes", "execute_command", "task", "orchestrate", "automation", "generate_text", "greeting",
+    "help", "chat", "unknown",
+];
+/// Help text for the "help" intent, which the shell shows as a greeting.
+const HELP_REPLY: &str = "I can open apps, manage windows and workspaces, set timers and reminders, do quick maths, \
+search the web, manage notes and files, change settings, automate things, and run or plan tasks for you.";
 
 /// The job the LLM is given. The router decides the kind of request, so the
 /// LLM is only asked to do what it is good at: write text, or propose one
@@ -34,7 +50,7 @@ fn system_hint() -> String {
         .find(|(bin, _)| std::path::Path::new("/usr/bin").join(bin).exists())
         .map(|(_, desc)| *desc)
         .unwrap_or("unknown");
-    format!("\n\nThis system is {}. Its package manager is {}; use it in any install command.", name, pm)
+    format!("\n\nThis system is {}. Its system package manager is {}, which needs an administrator, so never propose it. To install, remove or find APPS use os_action action apps (Flathub, per user, no root).", name, pm)
 }
 
 /// One OpenAI-compatible chat endpoint. llama-server, Ollama, vLLM, llamafile,
@@ -58,6 +74,17 @@ impl Endpoint {
             base_url: env::var("OSAIMA_LLM_URL").unwrap_or_else(|_| "http://127.0.0.1:8080/v1".to_string()),
             model: env::var("OSAIMA_LLM_MODEL").unwrap_or_else(|_| "default".to_string()),
             api_key: env::var("OSAIMA_LLM_API_KEY").ok().filter(|k| !k.is_empty()),
+        }
+    }
+
+    /// The distilled intent model: a second llama-server (start-intent-llm.sh).
+    ///   OSAIMA_INTENT_URL  default http://127.0.0.1:8081/v1
+    fn intent_from_env() -> Self {
+        Self {
+            name: "local-intent".to_string(),
+            base_url: env::var("OSAIMA_INTENT_URL").unwrap_or_else(|_| "http://127.0.0.1:8081/v1".to_string()),
+            model: "osaima-intent".to_string(),
+            api_key: None,
         }
     }
 
@@ -142,13 +169,6 @@ pub enum Mode {
 }
 
 /// The mode at start-up: local, unless the cloud was asked for by name.
-fn initial_mode(requested: Option<&str>) -> Mode {
-    match requested {
-        Some("cloud") => Mode::Cloud,
-        _ => Mode::Local,
-    }
-}
-
 /// Chat client over the local model and any cloud endpoints the user has
 /// explicitly opted into by supplying a key. No keys are built in.
 pub struct LlmClient {
@@ -156,6 +176,9 @@ pub struct LlmClient {
     local: Endpoint,
     cloud: RwLock<Vec<Endpoint>>,
     mode: RwLock<Mode>,
+    /// The distilled on-device intent model, asked before any full-prompt LLM.
+    intent: Endpoint,
+    fast_intent: bool,
 }
 
 impl LlmClient {
@@ -188,9 +211,11 @@ impl LlmClient {
         if let Some(k) = env::var("GROQ_API_KEY").ok().filter(|k| !k.is_empty()) {
             cloud.push(Endpoint::groq(k));
         }
-        let mode = initial_mode(env::var("OSAIMA_LLM_MODE").ok().as_deref());
+        let fast_intent = fast_intent_setting(env::var("OSAIMA_FAST_INTENT").ok().as_deref());
+        let mode = default_mode(env::var("OSAIMA_LLM_MODE").ok().as_deref(), !cloud.is_empty());
 
-        Ok(Self { client, local: Endpoint::local_from_env(), cloud: RwLock::new(cloud), mode: RwLock::new(mode) })
+        Ok(Self { client, local: Endpoint::local_from_env(), cloud: RwLock::new(cloud), mode: RwLock::new(mode),
+                  intent: Endpoint::intent_from_env(), fast_intent })
     }
 
     pub async fn mode(&self) -> Mode {
@@ -199,6 +224,16 @@ impl LlmClient {
 
     pub async fn set_mode(&self, mode: Mode) {
         *self.mode.write().await = mode;
+        // remembered, so Fast mode stays the user's explicit choice across restarts
+        let text = match mode { Mode::Cloud => "cloud", Mode::Local => "local" };
+        if let Err(e) = save_env_key("OSAIMA_LLM_MODE", text) {
+            eprintln!("LLM: could not save the mode: {}", e);
+        }
+    }
+
+    /// Whether requests the router can't settle go to the distilled model first.
+    pub fn fast_intent_enabled(&self) -> bool {
+        self.fast_intent
     }
 
     /// Endpoints in the order they are tried for the current mode.
@@ -234,8 +269,9 @@ impl LlmClient {
             }
         }
         drop(cloud);
-        // Adding a key makes the cloud available; it does not make it the first
-        // choice. Removing the last key leaves nothing to prefer.
+        // Adding a key makes Fast mode available; it never makes the cloud the first
+        // choice (the user turns Fast mode on in Settings). Removing the last key
+        // leaves nothing to prefer.
         if self.cloud.read().await.is_empty() {
             self.set_mode(Mode::Local).await;
         }
@@ -277,7 +313,11 @@ impl LlmClient {
             Err(e) => json!({ "reachable": false, "error": e.to_string() }),
         };
         let mode = match self.mode().await { Mode::Cloud => "cloud", Mode::Local => "local" };
-        json!({ "url": self.local.base_url, "model": self.local.model, "local": local, "cloud_fallbacks": cloud, "mode": mode })
+        let reachable = matches!(self.client.get(self.intent.url("models")).timeout(Duration::from_secs(2)).send().await,
+                                 Ok(r) if r.status().is_success());
+        let intent = json!({ "enabled": self.fast_intent, "url": self.intent.base_url, "reachable": reachable });
+        json!({ "url": self.local.base_url, "model": self.local.model, "local": local, "cloud_fallbacks": cloud, "mode": mode,
+                "intent_model": intent })
     }
 
     /// One chat completion. Returns the assistant message object, which holds
@@ -418,6 +458,21 @@ impl LlmClient {
     /// Processes each system prompt once so the first real request is fast.
     /// The model can take a minute or more to load at boot (e.g. from a live
     /// ISO), so keep retrying for up to ~15 minutes instead of giving up.
+    /// Loads the distilled model and caches its prompt, retrying while it boots.
+    pub async fn warm_up_intent(&self) {
+        if !self.fast_intent {
+            return;
+        }
+        for _ in 0..90 {
+            if self.fast_intent("hello").await.is_ok() {
+                println!("LLM: intent model ready");
+                return;
+            }
+            tokio::time::sleep(Duration::from_secs(10)).await;
+        }
+        eprintln!("LLM: intent model never became ready; the full-prompt LLM answers instead");
+    }
+
     pub async fn warm_up(&self) {
         for attempt in 0..90 {
             let mut ok = true;
@@ -439,6 +494,105 @@ impl LlmClient {
             tokio::time::sleep(Duration::from_secs(10)).await;
         }
         eprintln!("LLM: warm-up skipped: model never became ready");
+    }
+
+    /// The distilled model's messages: the fixed short prompt (cached by
+    /// llama-server) and the request with the local time, exactly as in training
+    /// (ai-core/intent-model/fmt.py).
+    pub fn fast_intent_messages(query: &str, now: &str) -> Value {
+        json!([
+            { "role": "system", "content": FAST_INTENT_PROMPT.trim() },
+            { "role": "user", "content": format!("{}\n(Now: {})", query.trim(), now) }
+        ])
+    }
+
+    /// Output schema: llama-server turns it into a grammar, so every answer is
+    /// valid JSON with a known intent name. Keys are emitted in map order
+    /// (serde_json sorts them), which is the order the model was trained on.
+    pub fn fast_intent_schema() -> Value {
+        json!({
+            "type": "object",
+            "properties": {
+                "intent": { "type": "string", "enum": FAST_INTENTS.to_vec() },
+                "params": { "type": "object" },
+                "reply": { "type": "string" }
+            },
+            "required": ["intent", "params", "reply"],
+            "additionalProperties": false
+        })
+    }
+
+    pub fn fast_intent_body(model: &str, messages: &Value) -> Value {
+        json!({
+            "model": model,
+            "messages": messages,
+            "temperature": 0.0,
+            "max_tokens": 384,
+            "response_format": { "type": "json_schema", "json_schema": { "name": "intent", "schema": Self::fast_intent_schema() } }
+        })
+    }
+
+    /// Checks and normalises the distilled model's answer into a shell-ready intent.
+    pub fn parse_fast_intent(text: &str) -> Result<Value, String> {
+        let mut v: Value = serde_json::from_str(text.trim()).map_err(|e| format!("intent model JSON: {}: {}", e, text))?;
+        let intent = v["intent"].as_str().unwrap_or("").to_string();
+        if !FAST_INTENTS.contains(&intent.as_str()) {
+            return Err(format!("intent model gave an unknown intent: {}", intent));
+        }
+        if !v["params"].is_object() {
+            v["params"] = json!({});
+        }
+        if !v["reply"].is_string() {
+            v["reply"] = json!("");
+        }
+        let params = &v["params"];
+        let incomplete = match intent.as_str() {
+            "os_action" => params["action"].as_str().is_none(),
+            "automation" => !params["rule"].is_object(),
+            "orchestrate" => !params["steps"].is_array(),
+            "execute_command" => params["command"].as_str().map_or(true, |c| c.trim().is_empty()),
+            "open_app" | "focus_app" => params["app"].as_str().is_none(),
+            "files" => params["op"].as_str().is_none(),
+            _ => false,
+        };
+        if incomplete {
+            return Err(format!("intent model left out a required parameter: {}", v));
+        }
+        if intent == "help" {
+            // the shell has no help screen; the reply carries it (as on the router's path)
+            v["intent"] = json!("greeting");
+            v["reply"] = json!(HELP_REPLY);
+        }
+        if intent == "execute_command" && v["params"]["plan"].as_str().is_none() {
+            v["params"]["plan"] = v["reply"].clone();
+        }
+        Ok(v)
+    }
+
+    /// True when the answer still needs long-form text from the writer model:
+    /// generate_text (the distilled model only names it) or a note to compose.
+    pub fn needs_writing(intent: &Value) -> bool {
+        match intent["intent"].as_str() {
+            Some("generate_text") => intent["params"]["content"].as_str().map_or(true, |c| c.trim().is_empty()),
+            Some("create_note") | Some("edit_note") => intent["params"]["write"].as_bool().unwrap_or(false),
+            _ => false,
+        }
+    }
+
+    /// One request to the distilled intent model, with constrained decoding.
+    pub async fn fast_intent(&self, query: &str) -> Result<Value, String> {
+        let messages = Self::fast_intent_messages(query, &crate::automations::now_text());
+        let body = Self::fast_intent_body(&self.intent.model, &messages);
+        let response = self.client.post(self.intent.url("chat/completions")).json(&body)
+            .timeout(Duration::from_secs(30)).send().await.map_err(|e| format!("intent model: {}", e))?;
+        if !response.status().is_success() {
+            return Err(format!("intent model: HTTP {}", response.status()));
+        }
+        let resp: Value = response.json().await.map_err(|e| format!("intent model: {}", e))?;
+        let text = resp["choices"][0]["message"]["content"].as_str().unwrap_or("");
+        let mut v = Self::parse_fast_intent(text)?;
+        v["backend"] = json!(self.intent.name);
+        Ok(v)
     }
 
     /// Runs one LLM task with the injection guard, returning a shell-ready intent.
@@ -506,22 +660,100 @@ impl LlmClient {
     }
 }
 
+/// Whether the distilled intent model is used when OSAIMA_FAST_INTENT is unset.
+/// Off until a trained model has passed the bar in ai-core/intent-model/RESULTS.md
+/// (intent accuracy >= 90% on the held-out split, p50 < 2 s on CPU); then flip
+/// this to true to make the default routing local-first.
+const DEFAULT_FAST_INTENT: bool = false;
+
+/// OSAIMA_FAST_INTENT (env or llm.env): on/1/true/yes or off/0/false/no.
+fn fast_intent_setting(v: Option<&str>) -> bool {
+    match v.map(|s| s.trim().to_lowercase()).as_deref() {
+        Some("on") | Some("1") | Some("true") | Some("yes") => true,
+        Some("off") | Some("0") | Some("false") | Some("no") => false,
+        _ => DEFAULT_FAST_INTENT,
+    }
+}
+
+/// The starting mode: on the device (free, private) unless the user chose Fast
+/// mode (OSAIMA_LLM_MODE=cloud, written by set_mode) and a key is there for it.
+/// A key alone never sends requests to the cloud.
+fn default_mode(setting: Option<&str>, has_cloud: bool) -> Mode {
+    match setting {
+        Some("cloud") if has_cloud => Mode::Cloud,
+        _ => Mode::Local,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn fast_intent_request_is_short_and_constrained() {
+        let m = LlmClient::fast_intent_messages(" turn on night light ", "Thu 2026-10-22 14:05");
+        assert_eq!(m[0]["role"], "system");
+        assert_eq!(m[1]["content"], "turn on night light\n(Now: Thu 2026-10-22 14:05)");
+        // the short prompt is what makes CPU inference fast: keep it a few hundred tokens
+        assert!(m[0]["content"].as_str().unwrap().len() / 4 < 450);
+        let body = LlmClient::fast_intent_body("osaima-intent", &m);
+        assert_eq!(body["temperature"], 0.0);
+        assert_eq!(body["response_format"]["type"], "json_schema");
+        let schema = &body["response_format"]["json_schema"]["schema"];
+        assert_eq!(schema["properties"]["intent"]["enum"].as_array().unwrap().len(), FAST_INTENTS.len());
+        assert_eq!(schema["required"], json!(["intent", "params", "reply"]));
+        // the grammar emits keys in map order; training targets use intent, params, reply
+        let keys: Vec<&String> = schema["properties"].as_object().unwrap().keys().collect();
+        assert_eq!(keys, ["intent", "params", "reply"]);
+    }
+
+    #[test]
+    fn parses_and_normalises_fast_intents() {
+        let v = LlmClient::parse_fast_intent(r#"{"intent":"os_action","params":{"action":"volume","op":"set","value":30},"reply":"Volume 30%."}"#).unwrap();
+        assert_eq!(v["params"]["value"], 30);
+        let v = LlmClient::parse_fast_intent(r#"{"intent":"help","params":{},"reply":"x"}"#).unwrap();
+        assert_eq!(v["intent"], "greeting");
+        assert!(v["reply"].as_str().unwrap().starts_with("I can"));
+        let v = LlmClient::parse_fast_intent(r#"{"intent":"execute_command","params":{"command":"df -h"},"reply":"Showing disk space."}"#).unwrap();
+        assert_eq!(v["params"]["plan"], "Showing disk space.");
+        let v = LlmClient::parse_fast_intent(r#" {"intent":"list_notes","params":null} "#).unwrap();
+        assert_eq!(v["params"], json!({}));
+        assert!(LlmClient::parse_fast_intent(r#"{"intent":"rm_rf","params":{},"reply":""}"#).is_err());
+        assert!(LlmClient::parse_fast_intent(r#"{"intent":"os_action","params":{},"reply":""}"#).is_err());
+        assert!(LlmClient::parse_fast_intent(r#"{"intent":"execute_command","params":{"command":" "},"reply":""}"#).is_err());
+        assert!(LlmClient::parse_fast_intent("not json").is_err());
+    }
+
+    #[test]
+    fn knows_when_the_writer_is_needed() {
+        assert!(LlmClient::needs_writing(&json!({"intent":"generate_text","params":{"title":"DNS"}})));
+        assert!(!LlmClient::needs_writing(&json!({"intent":"generate_text","params":{"content":"done"}})));
+        assert!(LlmClient::needs_writing(&json!({"intent":"create_note","params":{"title":"Pancakes","write":true}})));
+        assert!(!LlmClient::needs_writing(&json!({"intent":"create_note","params":{"title":"Milk","content":"buy milk"}})));
+        assert!(!LlmClient::needs_writing(&json!({"intent":"timer","params":{"seconds":60}})));
+    }
+
+    #[test]
+    fn fast_intent_settings_and_mode() {
+        assert_eq!(fast_intent_setting(None), DEFAULT_FAST_INTENT);
+        assert_eq!(fast_intent_setting(Some("maybe")), DEFAULT_FAST_INTENT);
+        assert!(fast_intent_setting(Some("on")));
+        assert!(fast_intent_setting(Some("1")));
+        assert!(!fast_intent_setting(Some("off")));
+        assert!(!fast_intent_setting(Some(" FALSE ")));
+        // a key alone never sends requests to the cloud; only choosing Fast mode does
+        assert_eq!(default_mode(None, true), Mode::Local);
+        assert_eq!(default_mode(None, false), Mode::Local);
+        assert_eq!(default_mode(Some("cloud"), true), Mode::Cloud);
+        assert_eq!(default_mode(Some("cloud"), false), Mode::Local);
+        assert_eq!(default_mode(Some("local"), true), Mode::Local);
+        assert_eq!(default_mode(Some("anything else"), true), Mode::Local);
+    }
 
     /// The on-device engine runs with an 8192-token context (start-llm.sh); the
     /// fixed prompt must leave room for file listings, knowledge passages and the
     /// answer. About 4 characters per token (measured on Phi-4-mini: a 17.2k-char
     /// prompt was 4268 tokens, which overflowed the old 4096 context).
-    #[test]
-    fn the_local_model_is_the_default_even_when_a_key_is_saved() {
-        assert_eq!(initial_mode(None), Mode::Local);
-        assert_eq!(initial_mode(Some("local")), Mode::Local);
-        assert_eq!(initial_mode(Some("anything else")), Mode::Local);
-        assert_eq!(initial_mode(Some("cloud")), Mode::Cloud);
-    }
-
     #[test]
     fn system_prompts_fit_the_local_context() {
         for task in [Task::Classify, Task::Write, Task::Command] {

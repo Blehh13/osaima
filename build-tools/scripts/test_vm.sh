@@ -20,7 +20,7 @@ as_user() { runuser -u osaima -- env XDG_RUNTIME_DIR=/run/user/$uid "$@"; }
 echo "== System"
 grep PRETTY_NAME /etc/os-release
 check "identifies as Interstellar OS" "grep -qi interstellar /etc/os-release"
-for s in osaima-llm osaima-router osaima-mcp-daemon osaima-voice; do
+for s in osaima-llm osaima-router osaima-mcp-daemon; do
 	check "$s.service active" "as_user systemctl --user is-active $s"
 done
 echo "== Desktop (sway session, top bar, assistant window)"
@@ -73,13 +73,24 @@ def ok(c, name):
     print(("  PASS  " if c else "  FAIL  ") + name)
 
 print("== Voice (on the device)")
-try:
-    vs = rpc("voice.status", path=os.path.join(os.environ["XDG_RUNTIME_DIR"], "osaima", "voice.sock"))["result"]
-    ok(vs["enabled"], "voice service answers")
-    ok(vs["can_speak"], f"can speak with {vs['tts_voice']} ({'; '.join(vs['problems']) or 'no problems'})")
-    ok(vs["can_listen"], f"can listen with {vs['stt_model']}")
-except Exception as e:
-    ok(False, f"voice service answers ({e})")
+import subprocess, tempfile
+vs = rpc("system.voice_status").get("result") or {}
+ok(bool(vs.get("whisper", {}).get("binary")) and bool(vs.get("whisper", {}).get("model")),
+   f"speech recognizer installed ({vs.get('whisper', {}).get('model')})")
+ok(vs.get("can_speak") is True, f"can speak with {vs.get('piper', {}).get('voice')} ({'; '.join(vs.get('speak_reasons') or []) or 'no problems'})")
+# a VM usually has no microphone: report it, the engines are what the image ships
+print(f"  INFO  microphone: {'present' if vs.get('mic', {}).get('present') else vs.get('mic', {}).get('reason')}")
+# the whole chain with the shipped engines: Piper says it, whisper.cpp must hear it
+with tempfile.TemporaryDirectory() as d:
+    wav = os.path.join(d, "said.wav")
+    piper, w = vs.get("piper", {}), vs.get("whisper", {})
+    voice_file = os.path.join("/usr/share/osaima/piper", piper.get("voice") or "")
+    said = subprocess.run([piper.get("binary") or "piper", "--model", voice_file, "--output_file", wav],
+                          input=b"Open the terminal.", capture_output=True, timeout=120)
+    heard = subprocess.run([w.get("binary") or "whisper-cli", "-m", f"/usr/share/osaima/whisper/models/{w.get('model')}", "-f", wav, "-nt"],
+                           capture_output=True, timeout=300) if said.returncode == 0 else None
+    text = heard.stdout.decode(errors="replace").strip() if heard else said.stderr.decode(errors="replace")[-200:]
+    ok(heard is not None and "terminal" in text.lower(), f"Piper said 'Open the terminal', whisper.cpp heard {text!r}")
 
 print("== Local LLM (no cloud)")
 st = rpc("system.llm_status")["result"]

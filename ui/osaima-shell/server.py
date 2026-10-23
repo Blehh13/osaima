@@ -261,7 +261,9 @@ class OsaimaHandler(http.server.SimpleHTTPRequestHandler):
                 try:
                     result = daemon_rpc("system.classify_intent", {"query": args.get("query", ""),
                                                                    "history": args.get("history") or [],
-                                                                   "selected": args.get("selected") or []})
+                                                                   "selected": args.get("selected") or [],
+                                                                   "context": args.get("context") or [],
+                                                                   "demo": bool(args.get("demo"))})
                 except Exception:
                     # no keyword guessing: the assistant says plainly that the AI core is down
                     error = "The AI core isn't running"
@@ -295,11 +297,13 @@ class OsaimaHandler(http.server.SimpleHTTPRequestHandler):
                         "command": args.get("command", ""),
                         "approved": bool(args.get("approved")),
                         "typed": args.get("typed") or "",
+                        "dry_run": bool(args.get("dry_run")),
                     })
                 except Exception as ex:
                     error = str(ex)
             elif cmd in ("task_start", "task_status", "task_decide", "task_cancel", "tasks", "ask",
-                         "automations", "automation_add", "automation_remove", "automation_cancel", "gpu_info", "model_download", "model_status", "model_cancel"):
+                         "security_stats", "sandbox_check", "ui_flag", "audit_verify", "audit_chain",
+                         "automations", "automation_add", "automation_remove", "automation_cancel", "gpu_info", "voice_status", "voice_listen", "voice_cancel", "speak", "speak_stop", "model_download", "model_status", "model_cancel"):
                 try:
                     result = daemon_rpc("system." + cmd, args or {})
                 except Exception as ex:

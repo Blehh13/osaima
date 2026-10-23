@@ -11,11 +11,15 @@ use rusqlite::{params, Connection};
 use serde_json::{json, Value};
 use std::path::PathBuf;
 use std::sync::Mutex;
+use crate::predictor::{self, Predictor};
 
 const SCHEMA: &str = include_str!("../../behavior/schema.sql");
 
 pub struct Behavior {
     db: Mutex<Option<Connection>>,
+    /// The next-action model, trained from the interactions table on first use
+    /// and updated with every logged request (see predictor.rs).
+    predictor: Mutex<Option<Predictor>>,
 }
 
 fn db_path() -> PathBuf {
@@ -25,6 +29,10 @@ fn db_path() -> PathBuf {
     let data = std::env::var("XDG_DATA_HOME").map(PathBuf::from)
         .unwrap_or_else(|_| PathBuf::from(std::env::var("HOME").unwrap_or_else(|_| "/tmp".into())).join(".local/share"));
     data.join("osaima/behavior.db")
+}
+
+fn now_secs() -> i64 {
+    std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs() as i64).unwrap_or(0)
 }
 
 fn now_iso() -> String {
@@ -87,12 +95,36 @@ impl Behavior {
         if conn.is_none() {
             eprintln!("Behaviour store unavailable at {}", path.display());
         }
-        Self { db: Mutex::new(conn) }
+        Self { db: Mutex::new(conn), predictor: Mutex::new(None) }
     }
 
     fn with<T>(&self, f: impl FnOnce(&Connection) -> rusqlite::Result<T>) -> Option<T> {
         let guard = self.db.lock().unwrap();
         guard.as_ref().and_then(|c| f(c).map_err(|e| eprintln!("behaviour store: {}", e)).ok())
+    }
+
+    fn load_events(&self) -> Vec<predictor::Event> {
+        self.with(|c| {
+            let mut stmt = c.prepare("SELECT ts, utterance, intent, action_taken, outcome FROM interactions ORDER BY ts, id")?;
+            let rows = stmt.query_map([], |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?, r.get::<_, String>(2)?,
+                                                  r.get::<_, Option<String>>(3)?, r.get::<_, Option<String>>(4)?)))?;
+            let mut out = Vec::new();
+            for row in rows.flatten() {
+                let Some(t) = predictor::parse_iso(&row.0) else { continue };
+                let a: Value = row.3.as_deref().and_then(|s| serde_json::from_str(s).ok()).unwrap_or(Value::Null);
+                out.push(predictor::build_event(t, &row.1, &row.2, a["source"].as_str().unwrap_or(""), &a["params"], row.4.as_deref() == Some("success")));
+            }
+            Ok(out)
+        }).unwrap_or_default()
+    }
+
+    /// Run `f` on the predictor, training it from the stored history on first use.
+    fn with_predictor<T>(&self, f: impl FnOnce(&mut Predictor) -> T) -> T {
+        let mut g = self.predictor.lock().unwrap();
+        if g.is_none() {
+            *g = Some(Predictor::from_events(self.load_events()));
+        }
+        f(g.as_mut().unwrap())
     }
 
     /// One user request and how it was handled.
@@ -102,11 +134,15 @@ impl Behavior {
             _ => "CONTENT_GENERATION",
         });
         let action = json!({ "params": result["params"], "source": result["source"], "ms": result["ms"] }).to_string();
+        self.with_predictor(|_| ()); // load the history before this row is added to it
         self.with(|c| c.execute(
             "INSERT INTO interactions (ts, utterance, track, intent, action_taken, risk_tier, outcome) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
             params![now_iso(), utterance, track, result["intent"].as_str().unwrap_or("unknown"), action,
                     result["params"]["risk"]["tier"].as_str(), "success"],
         ));
+        let ev = predictor::build_event(now_secs(), utterance, result["intent"].as_str().unwrap_or("unknown"),
+                                        result["source"].as_str().unwrap_or(""), &result["params"], true);
+        self.with_predictor(|p| p.observe(ev));
         if result["intent"] == "open_app" {
             if let Some(app) = result["params"]["app"].as_str() {
                 let hour = now_iso()[11..13].parse::<i64>().unwrap_or(0);
@@ -143,6 +179,25 @@ impl Behavior {
     /// of day, and not in the last two hours. Only fast-path commands, never
     /// power actions, so acting on a prediction is as safe as typing it.
     pub fn predictions(&self, n: usize) -> Vec<Value> {
+        self.predictions_at(n, now_secs())
+    }
+
+    /// As `predictions`, for another moment (used to inspect the model).
+    pub fn predictions_at(&self, n: usize, t: i64) -> Vec<Value> {
+        let learned = self.with_predictor(|p| p.ready().then(|| p.predict(t, n, None)));
+        match learned {
+            Some(v) => v,
+            None => self.predictions_heuristic(n), // too little history to train on yet
+        }
+    }
+
+    /// What the learned model knows, for system.insights.
+    pub fn model_info(&self) -> Value {
+        self.with_predictor(|p| p.info())
+    }
+
+    /// The original SQL rule: kept as the cold-start fallback and as the evaluation baseline.
+    pub fn predictions_heuristic(&self, n: usize) -> Vec<Value> {
         self.with(|c| {
             let mut stmt = c.prepare(
                 "WITH recent AS (
@@ -164,7 +219,9 @@ impl Behavior {
                  ORDER BY days DESC LIMIT ?1")?;
             let rows = stmt.query_map(params![n as i64], |r| {
                 let (text, days, m): (String, i64, i64) = (r.get(0)?, r.get(1)?, r.get(2)?);
-                Ok(json!({ "text": text, "days": days, "usual_time": format!("{:02}:{:02}", m / 60, m % 60) }))
+                let usual = format!("{:02}:{:02}", m / 60, m % 60);
+                Ok(json!({ "text": text, "days": days, "usual_time": usual, "source": "heuristic",
+                           "reason": format!("around {} you usually \u{201c}{}\u{201d} (on {} of the last 28 days)", usual, text, days) }))
             })?;
             rows.collect()
         }).unwrap_or_default()

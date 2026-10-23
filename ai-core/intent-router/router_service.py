@@ -134,7 +134,10 @@ class Router:
             track_conf[t] = track_conf.get(t, 0.0) + float(probs[i])
         result = {"intent": intent, "track": taxonomy.track_of(intent), "confidence": round(conf, 4),
                   "track_confidence": {t: round(v, 4) for t, v in track_conf.items()},
-                  "candidates": candidates, "fast": None}
+                  "candidates": candidates, "fast": None,
+                  # top guesses with probabilities (shown in the shell's pipeline trace)
+                  "scores": [{"intent": taxonomy.SHELL_NAME.get(str(self.model.classes[i]), str(self.model.classes[i])),
+                              "confidence": round(float(probs[i]), 4)} for i in probs.argsort()[::-1][:3]]}
 
         floor = SLOT_CONFIRMED if intent in SLOT_INTENTS else STRICT.get(intent, THRESHOLD)
         if intent in SHELL_HANDLED and conf >= floor:

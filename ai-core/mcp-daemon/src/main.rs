@@ -12,11 +12,17 @@ mod behavior;
 mod security;
 mod desktop;
 mod files;
+mod apps;
 mod automations;
 mod health;
+mod forecast;
+mod predictor;
+#[cfg(test)]
+mod predictor_eval;
 mod syssettings;
 mod task;
 mod models;
+mod voice;
 
 use std::sync::Arc;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
@@ -78,7 +84,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let llm = Arc::clone(&llm_client);
         tokio::spawn(async move {
             if llm.mode().await == llm::Mode::Local {
-                llm.warm_up().await
+                tokio::join!(llm.warm_up_intent(), llm.warm_up());
+            } else {
+                llm.warm_up_intent().await
             }
         });
     }
@@ -218,6 +226,8 @@ async fn handle_client(
                             }
                         }
                         let started = std::time::Instant::now();
+                        // the Security Center's "try to trick me" runs are tagged so they can be told apart in the log
+                        let demo = req.params.as_ref().and_then(|p| p.get("demo")).and_then(|d| d.as_bool()).unwrap_or(false);
                         // Stated preferences are stored, not classified.
                         if let Some(rule) = behavior::stated_preference(query) {
                             behavior.remember(&rule);
@@ -282,6 +292,8 @@ async fn handle_client(
                             JsonRpcResponse::success(req.id.unwrap_or_else(|| "0".to_string()), fast)
                         } else {
                             let candidates = verdict.as_ref().and_then(nlu::candidates);
+                            // outside content (clipboard, page, selected files) needs the full prompt and its guard
+                            let outside = !context.is_empty();
                             // RAG (PDR §3.5): for requests that need knowledge rather than a
                             // device action, add the best-matching passages. They are fenced as
                             // untrusted like any outside text, since documents can be poisoned.
@@ -314,27 +326,42 @@ async fn handle_client(
                             }
                             let prefs = behavior.preferences(5);
                             let task = choose_task(query, verdict.as_ref());
-                            match llm.run_task(task, query, candidates.as_deref(), &context, &prefs, &history).await {
+                            // Local-first: the distilled intent model, then the full-prompt LLM
+                            // only if it is off, unreachable or gave an unusable answer.
+                            let local = local_first(&llm, task, query, outside, &context, &prefs, &history).await;
+                            let used_intent_model = local.is_some();
+                            let result = match local {
+                                Some(r) => r,
+                                None => llm.run_task(task, query, candidates.as_deref(), &context, &prefs, &history).await,
+                            };
+                            match result {
                                 Ok(mut intent_json) => {
                                     annotate_risk(&mut intent_json);
                                     if intent_json["tainted"].as_bool().unwrap_or(false) {
                                         mark_taint(&taint, &intent_json);
                                         audit.record("tainted_proposal", json!({ "query": query, "intent": intent_json["intent"],
-                                            "flags": intent_json["untrusted_flags"] }));
+                                            "flags": intent_json["untrusted_flags"], "demo": demo }));
                                     }
                                     if intent_json["injection_detected"].as_bool().unwrap_or(false) {
-                                        audit.record("injection_blocked", json!({ "query": query, "why": "canary leaked" }));
+                                        audit.record("injection_blocked", json!({ "query": query, "why": "canary leaked", "demo": demo }));
                                     }
                                     if let Some(why) = mismatched(query, &intent_json) {
                                         // a disruptive action the words never asked for: ask, don't act
                                         audit.record("mismatch_held", json!({ "query": query, "intent": intent_json["intent"] }));
                                         intent_json = json!({ "intent": "unknown", "params": {}, "reply": why });
                                     }
+                                    if let Some(app) = app_install_command(intent_json["params"]["command"].as_str().unwrap_or("")) {
+                                        // a package-manager command for an app: the typed, root-free Apps action instead
+                                        intent_json = json!({ "intent": "os_action", "params": app, "reply": intent_json["reply"] });
+                                    }
                                     if intent_json["intent"] == "automation" {
                                         automations::from_words(query, &mut intent_json["params"]["rule"]);
                                     }
                                     intent_json["source"] = json!("llm");
-                                    intent_json["llm_task"] = json!(format!("{:?}", task).to_lowercase());
+                                    intent_json["llm_task"] = json!(if used_intent_model { "fast_intent".to_string() } else { format!("{:?}", task).to_lowercase() });
+                                    // for the pipeline trace: what the router made of it, and how much outside text was fenced
+                                    intent_json["router"] = verdict.as_ref().map(nlu::summary).unwrap_or(json!(null));
+                                    intent_json["context_items"] = json!(context.len());
                                     if !sources.is_empty() {
                                         intent_json["sources"] = json!(sources);
                                     }
@@ -390,11 +417,12 @@ async fn handle_client(
                             let cmd = command.clone();
                             match tokio::task::spawn_blocking(move || SecureExecutor::run_sandboxed(&cmd, tier).map_err(|e| e.to_string())).await {
                                 Ok(Ok(res)) => {
-                                    audit.record("execute", json!({ "command": command, "tier": a.tier, "approved": approved,
+                                    let (hash, seq) = audit.record_n("execute", json!({ "command": command, "tier": a.tier, "approved": approved,
                                         "exit_code": res.exit_code, "sandbox": res.sandbox,
                                         "output_bytes": res.output.len() }));
                                     JsonRpcResponse::success(id, json!({ "tier": a.tier, "output": res.output,
-                                        "exit_code": res.exit_code, "sandbox": res.sandbox }))
+                                        "exit_code": res.exit_code, "sandbox": res.sandbox,
+                                        "audit": { "seq": seq, "hash": hash } }))
                                 }
                                 Ok(Err(e)) => {
                                     audit.record("execute_failed", json!({ "command": command, "error": e }));
@@ -436,16 +464,37 @@ async fn handle_client(
                         } else {
                             match os.perform(&action, &params).await {
                                 Ok(result) => {
-                                    audit.record("os_action", json!({ "action": action, "op": op, "app": params["app"], "path": params["path"],
+                                    let (hash, seq) = audit.record_n("os_action", json!({ "action": action, "op": op, "app": params["app"], "path": params["path"],
                                                                       "paths": params["paths"], "to": params["to"], "name": params["name"],
                                                                       "tier": tier, "result": result }));
-                                    JsonRpcResponse::success(id, json!({ "tier": tier, "result": result }))
+                                    JsonRpcResponse::success(id, json!({ "tier": tier, "result": result, "audit": { "seq": seq, "hash": hash } }))
                                 }
                                 Err(e) => {
                                     audit.record("os_failed", json!({ "action": action, "op": op, "app": params["app"], "error": e }));
                                     JsonRpcResponse::error(id, -32000, e)
                                 }
                             }
+                        }
+                    },
+                    // Local voice (see voice.rs): whisper.cpp in, Piper out
+                    "system.voice_status" => JsonRpcResponse::success(req.id.unwrap_or_else(|| "0".to_string()), voice::status()),
+                    "system.voice_cancel" => JsonRpcResponse::success(req.id.unwrap_or_else(|| "0".to_string()), voice::cancel()),
+                    "system.speak_stop" => JsonRpcResponse::success(req.id.unwrap_or_else(|| "0".to_string()), voice::stop()),
+                    "system.voice_listen" => {
+                        let rid = req.id.unwrap_or_else(|| "0".to_string());
+                        match tokio::task::spawn_blocking(voice::listen).await {
+                            Ok(Ok(v)) => { audit.record("voice_listen", json!({ "chars": v["text"].as_str().map(|t| t.len()).unwrap_or(0), "ms": v["ms"] })); JsonRpcResponse::success(rid, v) }
+                            Ok(Err(e)) => JsonRpcResponse::error(rid, -32000, e),
+                            Err(e) => JsonRpcResponse::error(rid, -32000, e.to_string()),
+                        }
+                    },
+                    "system.speak" => {
+                        let t = req.params.as_ref().and_then(|p| p.get("text")).and_then(|v| v.as_str()).unwrap_or("").to_string();
+                        let rid = req.id.unwrap_or_else(|| "0".to_string());
+                        match tokio::task::spawn_blocking(move || voice::speak(&t)).await {
+                            Ok(Ok(v)) => JsonRpcResponse::success(rid, v),
+                            Ok(Err(e)) => JsonRpcResponse::error(rid, -32000, e),
+                            Err(e) => JsonRpcResponse::error(rid, -32000, e.to_string()),
                         }
                     },
                     // Local model advice + download (see models.rs)
@@ -503,9 +552,18 @@ async fn handle_client(
                     },
                     "system.suggestions" => {
                         let n = req.params.as_ref().and_then(|p| p.get("n")).and_then(|v| v.as_u64()).unwrap_or(5) as usize;
+                        let (forecasts, anomalies, _) = forecast::insights();
                         JsonRpcResponse::success(req.id.unwrap_or_else(|| "0".to_string()),
                             json!({ "suggestions": behavior.suggestions(n), "preferences": behavior.preferences(10),
-                                    "predictions": behavior.predictions(2), "alerts": health::status()["alerts"] }))
+                                    "predictions": behavior.predictions(2), "alerts": health::status()["alerts"],
+                                    "forecasts": forecasts, "anomalies": anomalies }))
+                    },
+                    "system.insights" => {
+                        let n = req.params.as_ref().and_then(|p| p.get("n")).and_then(|v| v.as_u64()).unwrap_or(3) as usize;
+                        let (forecasts, anomalies, health_info) = forecast::insights();
+                        JsonRpcResponse::success(req.id.unwrap_or_else(|| "0".to_string()),
+                            json!({ "predictions": match req.params.as_ref().and_then(|p| p.get("at")).and_then(|v| v.as_i64()) { Some(t) => behavior.predictions_at(n, t), None => behavior.predictions(n) }, "forecasts": forecasts, "anomalies": anomalies,
+                                    "model_info": { "predictor": behavior.model_info(), "health": health_info } }))
                     },
                     "system.routine_save" => {
                         let id = req.id.unwrap_or_else(|| "0".to_string());
@@ -591,6 +649,41 @@ async fn handle_client(
                     "system.audit_verify" => {
                         JsonRpcResponse::success(req.id.unwrap_or_else(|| "0".to_string()), audit.verify())
                     },
+                    // Security Center: counters, the kernel self-check, and the first-run flag
+                    "system.security_stats" => {
+                        JsonRpcResponse::success(req.id.unwrap_or_else(|| "0".to_string()), audit.stats())
+                    },
+                    "system.audit_chain" => {
+                        let n = req.params.as_ref().and_then(|p| p.get("n")).and_then(|v| v.as_u64()).unwrap_or(8).clamp(1, 24) as usize;
+                        JsonRpcResponse::success(req.id.unwrap_or_else(|| "0".to_string()), json!({ "blocks": audit.chain_tail(n) }))
+                    },
+                    "system.sandbox_check" => {
+                        // The same probe test_vm.sh uses: a harmless command through the real sandbox,
+                        // reporting what the kernel actually enforced. Nothing user-visible runs.
+                        let id = req.id.unwrap_or_else(|| "0".to_string());
+                        match tokio::task::spawn_blocking(|| SecureExecutor::run_sandboxed("true", Tier::ReadOnly).map_err(|e| e.to_string())).await {
+                            Ok(Ok(res)) => {
+                                let s = res.sandbox.clone();
+                                JsonRpcResponse::success(id, json!({
+                                    "sandbox": s, "exit_code": res.exit_code,
+                                    "bubblewrap": s.contains("bubblewrap"),
+                                    "landlock": if s.contains("+landlock(partial)") { "partial" } else if s.contains("+landlock") { "full" } else { "off" },
+                                    "seccomp": s.contains("+seccomp"),
+                                    "fallback": s.contains("systemd") }))
+                            }
+                            Ok(Err(e)) => JsonRpcResponse::error(id, -32000, e),
+                            Err(e) => JsonRpcResponse::error(id, -32000, e.to_string()),
+                        }
+                    },
+                    "system.ui_flag" => {
+                        // a tiny per-user flag store (~/.config/osaima/ui.json): {name, value?}; no value = read
+                        let p = req.params.clone().unwrap_or(json!({}));
+                        let id = req.id.unwrap_or_else(|| "0".to_string());
+                        match ui_flag(p["name"].as_str().unwrap_or(""), p.get("value").and_then(|v| v.as_bool())) {
+                            Ok(v) => JsonRpcResponse::success(id, json!({ "value": v })),
+                            Err(e) => JsonRpcResponse::error(id, -32602, e),
+                        }
+                    },
                     "system.llm_status" => {
                         let mut status = llm.status().await;
                         status["router"] = json!({ "reachable": nlu::route("hello").await.is_some() });
@@ -638,6 +731,25 @@ async fn handle_client(
     }
 
     Ok(())
+}
+
+/// First-run style flags the shell keeps (onboarding shown, ...). Names are
+/// restricted so this can never be used as a general file write.
+fn ui_flag(name: &str, set: Option<bool>) -> Result<bool, String> {
+    if name.is_empty() || name.len() > 32 || !name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_') {
+        return Err("bad flag name".to_string());
+    }
+    let dir = std::env::var("XDG_CONFIG_HOME").unwrap_or_else(|_| format!("{}/.config", std::env::var("HOME").unwrap_or_default()));
+    let dir = std::path::PathBuf::from(dir).join("osaima");
+    let path = dir.join("ui.json");
+    let mut all: serde_json::Value = std::fs::read_to_string(&path).ok().and_then(|t| serde_json::from_str(&t).ok()).unwrap_or(json!({}));
+    if !all.is_object() { all = json!({}); }
+    if let Some(v) = set {
+        all[name] = json!(v);
+        std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+        std::fs::write(&path, all.to_string()).map_err(|e| e.to_string())?;
+    }
+    Ok(all[name].as_bool().unwrap_or(false))
 }
 
 fn param_str<'a>(params: &'a Option<serde_json::Value>, key: &str) -> &'a str {
@@ -692,6 +804,46 @@ async fn return_response(writer: &mut tokio::net::unix::WriteHalf<'_>, response:
     let mut res_str = serde_json::to_string(&response)?;
     res_str.push('\n');
     writer.write_all(res_str.as_bytes()).await
+}
+
+/// The distilled on-device intent model answers; only long-form text then goes
+/// to the writer (Gemini in Fast mode, else the on-device writer model). None
+/// when the intent model is off, unreachable or unsure, or the request carries
+/// outside content: the caller then uses the full-prompt LLM as before.
+async fn local_first(llm: &llm::LlmClient, task: llm::Task, query: &str, outside: bool, context: &[(String, String)],
+                     prefs: &[String], history: &[(String, String)]) -> Option<Result<serde_json::Value, String>> {
+    if !llm.fast_intent_enabled() || outside || task == llm::Task::Write {
+        return None;
+    }
+    let mut intent = match llm.fast_intent(query).await {
+        Ok(v) => v,
+        Err(e) => {
+            eprintln!("Intent model: {}; using the full prompt", e);
+            return None;
+        }
+    };
+    if llm::LlmClient::needs_writing(&intent) {
+        let written = match llm.run_task(llm::Task::Write, query, None, context, prefs, history).await {
+            Ok(w) => w,
+            Err(e) => return Some(Err(e)),
+        };
+        let classified_by = intent["backend"].clone();
+        if intent["intent"] == "generate_text" {
+            intent = written;
+        } else {
+            intent["params"]["content"] = written["params"]["content"].clone();
+            if let Some(p) = intent["params"].as_object_mut() {
+                p.remove("write");
+            }
+            for k in ["backend", "context_from", "tainted", "untrusted_flags"] {
+                if !written[k].is_null() {
+                    intent[k] = written[k].clone();
+                }
+            }
+        }
+        intent["classified_by"] = classified_by;
+    }
+    Some(Ok(intent))
 }
 
 fn how_to(query: &str) -> bool {
@@ -786,6 +938,23 @@ fn mismatched(query: &str, intent: &serde_json::Value) -> Option<String> {
     (!ok).then(|| format!("I want to be sure before doing anything: what should I do with \"{}\"? For files, say for example \"move ~/Downloads to the Trash\".", query.trim()))
 }
 
+/// "flatpak uninstall org.videolan.VLC", "sudo emerge gimp", "apt install vlc"
+/// -> the apps action (install/remove) for that app. Apps never come from a
+/// root package manager; that needs an administrator, not the AI.
+fn app_install_command(cmd: &str) -> Option<serde_json::Value> {
+    let words: Vec<&str> = cmd.split_whitespace().filter(|w| !w.starts_with('-') && *w != "sudo").collect();
+    let (tool, rest) = words.split_first()?;
+    if !["flatpak", "emerge", "apt", "apt-get", "dnf", "pacman", "zypper", "snap"].contains(tool) { return None; }
+    let (verb, names) = match rest.split_first() {
+        Some((v, n)) if ["install", "uninstall", "remove", "erase"].contains(v) => (*v, n.to_vec()),
+        _ if *tool == "emerge" && !rest.is_empty() => ("install", rest.to_vec()),
+        _ => return None,
+    };
+    let app = names.iter().find(|w| !["flathub", "--user", "-y"].contains(w))?;
+    let op = if verb == "install" { "install" } else { "remove" };
+    Some(serde_json::json!({ "action": "apps", "op": op, "value": app.rsplit('/').next().unwrap_or(app) }))
+}
+
 fn is_job(q: &str) -> bool {
     let re = regex::Regex::new(r"\b(set ?up|install|configure|scaffold|initiali[sz]e|bootstrap|build|compile|fix|repair|diagnose|troubleshoot|figure out|why is|why does|clean ?up|free up|back ?up|convert|migrate|deploy|create (a|an|my|new) [\w-]+ (project|app|environment|repo))\b").unwrap();
     re.is_match(q) && !how_to(q)
@@ -844,6 +1013,17 @@ mod tests {
         for q in ["set brightness to 40", "turn on night light", "mute", "lock the screen", "what is 12 plus 30"] {
             assert!(!super::is_scheduled(q), "{}", q);
         }
+    }
+
+    #[test]
+    fn package_commands_become_the_apps_action() {
+        let a = super::app_install_command("flatpak uninstall org.videolan.VLC").unwrap();
+        assert_eq!((a["op"].as_str(), a["value"].as_str()), (Some("remove"), Some("org.videolan.VLC")));
+        let b = super::app_install_command("sudo emerge --ask media-gfx/gimp").unwrap();
+        assert_eq!((b["op"].as_str(), b["value"].as_str()), (Some("install"), Some("gimp")));
+        assert_eq!(super::app_install_command("sudo apt install -y vlc").unwrap()["value"], "vlc");
+        assert!(super::app_install_command("uname -r").is_none());
+        assert!(super::app_install_command("flatpak list").is_none());
     }
 
     #[test]

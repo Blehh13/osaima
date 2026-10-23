@@ -133,7 +133,7 @@ chroot "$ROOTFS" /bin/bash -e <<CHROOT
 		net-misc/openssh \
 		gui-wm/sway gui-apps/swaybg gui-apps/foot media-fonts/dejavu \
 		gui-apps/waybar gui-apps/mako gui-apps/wl-clipboard gui-apps/grim x11-libs/libnotify \
-		gui-apps/swaylock gui-apps/swayidle x11-misc/gammastep sys-apps/xdg-desktop-portal-gtk net-wireless/wireless-tools \
+		gui-apps/swaylock gui-apps/swayidle x11-misc/gammastep media-sound/alsa-utils sys-apps/flatpak sys-apps/xdg-desktop-portal-gtk net-wireless/wireless-tools \
 		net-libs/webkit-gtk:4.1 \
 		xfce-base/thunar app-editors/mousepad media-gfx/imv \
 		app-text/zathura app-text/zathura-pdf-poppler app-text/poppler x11-misc/xdg-utils sys-process/htop \
@@ -149,6 +149,8 @@ log "Installing OSAIMA from $REPO_ROOT"
 install -Dm755 "$DAEMON_BIN" "$ROOTFS/usr/bin/osaima-mcp-daemon"
 # next to the daemon: it applies Landlock/seccomp/rlimits to AI-run commands
 install -Dm755 "$JAIL_BIN" "$ROOTFS/usr/bin/osaima-jail"
+# MCP server for outside clients (stdio), a thin client of the daemon
+install -Dm755 "$REPO_ROOT/ai-core/mcp-daemon/target/release/osaima-mcp" "$ROOTFS/usr/bin/osaima-mcp"
 # the OSAIMA apps (assistant, settings, notes, ...), one window each
 install -Dm755 "$SHELL_BIN" "$ROOTFS/usr/bin/osaima-shell"
 # the desktop session: sway, top bar, notifications, file manager actions
@@ -173,6 +175,26 @@ ln -sf /usr/lib/osaima/llama/llama-server "$ROOTFS/usr/bin/llama-server"
 rm -f "$ROOTFS"/usr/share/osaima/models/*.gguf
 for m in ${IMAGE_MODELS:-phi-4-mini*.gguf}; do cp "$MODELS_DIR"/$m "$ROOTFS/usr/share/osaima/models/"; done
 install -m755 "$REPO_ROOT/ai-core/llm/start-llm.sh" "$ROOTFS/usr/libexec/osaima/start-llm.sh"
+# Voice, fully on-device: whisper.cpp (speech to text) and Piper (text to speech),
+# where voice.rs looks for them. Skipped with a note when the host hasn't built them
+# (REQUIRE_VOICE=1, as in CI, makes that an error instead).
+VOICE_SRC="${VOICE_SRC:-$DEV_HOME/.local/share/osaima}"
+if [ -x "$VOICE_SRC/whisper/whisper-cli" ] && ls "$VOICE_SRC"/whisper/models/ggml-*.bin >/dev/null 2>&1; then
+	install -Dm755 "$VOICE_SRC/whisper/whisper-cli" "$ROOTFS/usr/share/osaima/whisper/whisper-cli"
+	install -d "$ROOTFS/usr/share/osaima/whisper/models"
+	install -m644 "$VOICE_SRC"/whisper/models/ggml-*.bin "$ROOTFS/usr/share/osaima/whisper/models/"
+else
+	echo "note: no whisper-cli/model in $VOICE_SRC/whisper; the image will have no speech input"
+	[ -z "${REQUIRE_VOICE:-}" ] || exit 1
+fi
+if [ -x "$VOICE_SRC/piper/piper/piper" ] && ls "$VOICE_SRC"/piper/*.onnx >/dev/null 2>&1; then
+	install -d "$ROOTFS/usr/share/osaima/piper"
+	cp -a "$VOICE_SRC/piper/piper" "$ROOTFS/usr/share/osaima/piper/"
+	install -m644 "$VOICE_SRC"/piper/*.onnx "$VOICE_SRC"/piper/*.onnx.json "$ROOTFS/usr/share/osaima/piper/"
+else
+	echo "note: no Piper in $VOICE_SRC/piper; the image will not read replies aloud"
+	[ -z "${REQUIRE_VOICE:-}" ] || exit 1
+fi
 rm -rf "$ROOTFS/usr/share/osaima-shell"
 install -d "$ROOTFS/usr/share/osaima-shell"
 cp -a "$REPO_ROOT/ui/osaima-shell/frontend" "$REPO_ROOT/ui/osaima-shell/server.py" "$ROOTFS/usr/share/osaima-shell/"
@@ -202,24 +224,6 @@ sudo -u "${SUDO_USER:-root}" env OSAIMA_KNOWLEDGE_DIR="$know" python3 "$router_s
 	"$REPO_ROOT/BUILD-DISTRO.md" "$REPO_ROOT/ui/osaima-shell/README.md" >/dev/null
 install -d "$ROOTFS/home/osaima/.local/share/osaima/knowledge"
 cp "$know"/{vectors.npy,chunks.json} "$ROOTFS/home/osaima/.local/share/osaima/knowledge/"
-
-# Voice (push to talk): faster-whisper listens, Piper speaks, both on the device.
-# The service is ai-core/agent's `osaima-voice`, in its own Python environment, with
-# the speech models downloaded now so the image needs no network to use them.
-voice_models=/usr/share/osaima/voice
-rm -rf "$ROOTFS/usr/lib/osaima/agent"
-install -d "$ROOTFS/usr/lib/osaima/agent" "$ROOTFS/etc/osaima"
-cp -a "$REPO_ROOT/ai-core/agent/pyproject.toml" "$REPO_ROOT/ai-core/agent/README.md" "$REPO_ROOT/ai-core/agent/src" "$ROOTFS/usr/lib/osaima/agent/"
-printf '[voice]\nmodels_dir = "%s"\n' "$voice_models" > "$ROOTFS/etc/osaima/agent.toml"
-mount_host
-chroot "$ROOTFS" /bin/bash -e <<CHROOT
-	[ -x /usr/lib/osaima/voice-venv/bin/python ] || python3 -m venv /usr/lib/osaima/voice-venv
-	/usr/lib/osaima/voice-venv/bin/pip install -q --disable-pip-version-check --no-cache-dir "/usr/lib/osaima/agent[voice]"
-	install -d $voice_models
-	/usr/lib/osaima/voice-venv/bin/python -m piper.download_voices en_US-lessac-medium --data-dir $voice_models
-	/usr/lib/osaima/voice-venv/bin/python -c "from faster_whisper import WhisperModel; WhisperModel('base.en', device='cpu', compute_type='int8', download_root='$voice_models')"
-CHROOT
-cleanup
 
 units="$ROOTFS/usr/lib/systemd/user"
 install -d "$units"
@@ -252,20 +256,6 @@ WantedBy=default.target
 EOF
 sed -e 's|^\[Unit\]|[Unit]\nAfter=osaima-llm.service osaima-router.service|' \
 	"$REPO_ROOT/gentoo/overlay/sys-apps/osaima-ai-core/files/osaima-mcp-daemon.service" > "$units/osaima-mcp-daemon.service"
-cat > "$units/osaima-voice.service" <<'EOF'
-[Unit]
-Description=OSAIMA voice (push-to-talk speech, on this computer)
-# The desktop user only: root's user manager (e.g. an SSH login) must not start a second copy.
-ConditionUser=!root
-
-[Service]
-Environment=OSAIMA_AGENT_CONFIG=/etc/osaima/agent.toml
-ExecStart=/usr/lib/osaima/voice-venv/bin/osaima-voice
-Restart=on-failure
-
-[Install]
-WantedBy=default.target
-EOF
 cat > "$units/osaima-shell-web.service" <<'EOF'
 [Unit]
 Description=OSAIMA desktop shell (web backend)
@@ -347,7 +337,7 @@ KEY
 	[ -f /usr/lib/systemd/system/osaima-schedd.service ] && systemctl enable osaima-schedd.service >/dev/null 2>&1 || true
 	printf '[Match]\nName=en*\n[Network]\nDHCP=yes\n' > /etc/systemd/network/20-wired.network
 	# the web backend is only for browser-based development; the desktop apps talk to the daemon directly
-	systemctl --global enable osaima-llm.service osaima-router.service osaima-mcp-daemon.service osaima-voice.service
+	systemctl --global enable osaima-llm.service osaima-router.service osaima-mcp-daemon.service
 	systemctl --global disable osaima-shell-web.service >/dev/null 2>&1 || true
 	# Autologin on tty1 straight into the OSAIMA desktop.
 	install -d /etc/systemd/system/getty@tty1.service.d

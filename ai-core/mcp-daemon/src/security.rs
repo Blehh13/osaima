@@ -9,6 +9,7 @@ use sha2::{Digest, Sha256};
 use std::fs::{self, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -258,6 +259,8 @@ pub fn assess(cmd: &str) -> Assessment {
 pub struct AuditLog {
     path: PathBuf,
     last_hash: Mutex<String>,
+    /// How many records the log holds (the next record's number is this + 1).
+    count: AtomicUsize,
 }
 
 const GENESIS: &str = "0000000000000000000000000000000000000000000000000000000000000000";
@@ -285,11 +288,17 @@ impl AuditLog {
             .and_then(|l| serde_json::from_str::<Value>(&l).ok())
             .and_then(|v| v["hash"].as_str().map(str::to_string))
             .unwrap_or_else(|| GENESIS.to_string());
-        Self { path, last_hash: Mutex::new(last) }
+        let count = fs::File::open(&path).map(|f| BufReader::new(f).lines().map_while(Result::ok).filter(|l| !l.trim().is_empty()).count()).unwrap_or(0);
+        Self { path, last_hash: Mutex::new(last), count: AtomicUsize::new(count) }
     }
 
     /// Appends one record and returns its hash.
     pub fn record(&self, event: &str, data: Value) -> String {
+        self.record_n(event, data).0
+    }
+
+    /// Like `record`, also returning the record's number in the log (1-based).
+    pub fn record_n(&self, event: &str, data: Value) -> (String, usize) {
         let mut last = self.last_hash.lock().unwrap();
         let ts = SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_millis()).unwrap_or(0);
         let body = json!({ "ts": ts, "event": event, "data": data, "prev": *last });
@@ -300,7 +309,49 @@ impl AuditLog {
             let _ = writeln!(f, "{}", rec);
         }
         *last = hash.clone();
-        hash
+        let seq = self.count.fetch_add(1, Ordering::SeqCst) + 1;
+        (hash, seq)
+    }
+
+    /// The newest `n` links of the hash chain, oldest first: number, time, event, and
+    /// the record's hash and the hash it chains to. Lets the Security Center draw the chain.
+    pub fn chain_tail(&self, n: usize) -> Vec<Value> {
+        let Ok(f) = fs::File::open(&self.path) else { return Vec::new() };
+        let mut out: std::collections::VecDeque<Value> = std::collections::VecDeque::with_capacity(n + 1);
+        let mut seq = 0usize;
+        for line in BufReader::new(f).lines().map_while(Result::ok) {
+            if line.trim().is_empty() { continue; }
+            seq += 1;
+            let Ok(rec) = serde_json::from_str::<Value>(&line) else { continue };
+            out.push_back(json!({ "seq": seq, "ts": rec["ts"], "event": rec["event"], "hash": rec["hash"], "prev": rec["prev"] }));
+            if out.len() > n { out.pop_front(); }
+        }
+        out.into()
+    }
+
+    /// Records per event kind, for the Security Center's counters; `sandboxed`
+    /// counts executed commands that ran inside bubblewrap. Records tagged
+    /// `demo` (the Security Center's own "try to trick me" runs) are also
+    /// counted separately so they can be told apart.
+    pub fn stats(&self) -> Value {
+        let mut counts: std::collections::BTreeMap<String, u64> = Default::default();
+        let mut demo: std::collections::BTreeMap<String, u64> = Default::default();
+        let (mut sandboxed, mut total) = (0u64, 0u64);
+        if let Ok(f) = fs::File::open(&self.path) {
+            for line in BufReader::new(f).lines().map_while(Result::ok) {
+                let Ok(rec) = serde_json::from_str::<Value>(&line) else { continue };
+                let ev = rec["event"].as_str().unwrap_or("").to_string();
+                total += 1;
+                if ev == "execute" && rec["data"]["sandbox"].as_str().map_or(false, |s| s.contains("bubblewrap")) {
+                    sandboxed += 1;
+                }
+                if rec["data"]["demo"].as_bool() == Some(true) {
+                    *demo.entry(ev.clone()).or_default() += 1;
+                }
+                *counts.entry(ev).or_default() += 1;
+            }
+        }
+        json!({ "total": total, "counts": counts, "demo": demo, "sandboxed": sandboxed })
     }
 
     /// The newest `n` records (oldest first) whose event is in `events`,
