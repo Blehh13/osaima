@@ -5,6 +5,8 @@
  * comes from os_action {action:'settings', op:'get'}; each change is one
  * os_action call, saved by the daemon and re-applied at login.
  */
+import { icon, iconEl, infoTip, chip, skeleton, emptyState, withIcon } from './icons.js';
+
 function el(tag, cls, text) {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
@@ -51,7 +53,7 @@ export function makeSettings(services) {
         const r = el('div', 'st-row');
         const left = el('div', 'st-row-label');
         left.append(el('span', 'st-row-name', label));
-        if (hint) left.append(el('span', 'st-row-hint', hint));
+        if (hint) left.append(infoTip(hint, `About ${label}`));
         const right = el('div', 'st-row-ctl');
         const msg = el('span', 'st-inline');
         msg.setAttribute('role', 'status');
@@ -60,12 +62,19 @@ export function makeSettings(services) {
         return { row: r, msg };
       };
       /** Disables the controls while fn runs and says "Saved" or the error beside them. */
+      const say = (msg, state, text) => {
+        msg.classList.remove('is-err', 'is-ok', 'is-busy');
+        clearTimeout(msg._fade);
+        if (!text) { msg.replaceChildren(); return; }
+        if (state) msg.classList.add('is-' + state);
+        msg.replaceChildren(iconEl({ busy: 'loader', ok: 'check', err: 'alert-circle' }[state] || 'info', 14), el('span', null, text));
+        if (state === 'ok') msg._fade = setTimeout(() => { if (msg.classList.contains('is-ok')) msg.replaceChildren(); }, 2500);
+      };
       const commit = async (controls, msg, fn) => {
         controls.forEach((c) => { c.disabled = true; });
-        msg.classList.remove('is-err');
-        msg.textContent = 'Saving…';
+        say(msg, 'busy', 'Saving…');
         let ok = false;
-        try { await fn(); msg.textContent = 'Saved'; ok = true; } catch (e) { msg.classList.add('is-err'); msg.textContent = errText(e); }
+        try { await fn(); say(msg, 'ok', 'Saved'); ok = true; } catch (e) { say(msg, 'err', errText(e)); }
         controls.forEach((c) => { c.disabled = false; });
         return ok;
       };
@@ -82,6 +91,7 @@ export function makeSettings(services) {
       const toggle = (on) => {
         const c = el('input', 'st-switch');
         c.type = 'checkbox';
+        c.setAttribute('role', 'switch');
         c.checked = !!on;
         return c;
       };
@@ -92,10 +102,10 @@ export function makeSettings(services) {
         return s;
       };
       const heading = (title, lede) => {
-        const f = document.createDocumentFragment();
-        f.append(el('h2', 'st-title', title));
-        if (lede) f.append(el('p', 'st-lede', lede));
-        return f;
+        const h = el('div', 'st-head');
+        h.append(el('h2', 'st-title', title));
+        if (lede) h.append(infoTip(lede, `About ${title}`));
+        return h;
       };
 
       // ── "Keep these settings?" (display changes that could leave the screen unreadable) ──
@@ -122,7 +132,7 @@ export function makeSettings(services) {
       /** Shows the bar; if nobody answers in 15 seconds the old value comes back. */
       const askKeep = (what, revert, done, fail) => {
         let left = KEEP_SECONDS;
-        const tick = () => { keepText.textContent = `Keep these ${what} settings? Going back in ${left} s.`; };
+        const tick = () => { keepText.textContent = `Keep this ${what}? Reverting in ${left} s`; };
         tick();
         keepBar.hidden = false;
         keepNo.focus();
@@ -137,33 +147,41 @@ export function makeSettings(services) {
       const loadState = async () => { state = await os('settings', 'get'); return state; };
 
       function aiPage(box) {
-        box.classList.add('welcome', 'st-ai');
+        box.classList.add('st-ai');
         box.innerHTML = `
-          <h2>AI</h2>
-          <p class="welcome-lede">Choose how OSAIMA thinks, and check that everything it needs is running.</p>
+          <div class="st-head"><h2 class="st-title">AI</h2><span class="st-ai-tip"></span></div>
+          <ul class="ai-status-list st-status" aria-label="What OSAIMA needs"></ul>
           <fieldset class="mode-pick">
-            <legend>How should OSAIMA think?</legend>
+            <legend class="st-sr">How should OSAIMA think?</legend>
             <label class="mode-option">
               <input type="radio" name="st-mode" value="local" />
-              <span class="mode-name">Private (free, the default)</span>
-              <span class="mode-desc">Uses a model on this computer. Free, needs no account, and nothing you type leaves the machine. Answers take longer.</span>
+              <span class="mode-icon">${icon('lock', 20)}</span>
+              <span class="mode-name">Private · free, the default</span>
+              <span class="mode-desc">Stays on this computer · no account · slower</span>
             </label>
             <label class="mode-option">
               <input type="radio" name="st-mode" value="cloud" />
-              <span class="mode-name">Fast (optional, needs your own key)</span>
-              <span class="mode-desc">Uses Google Gemini with a key you add. Answers in a few seconds. What you type is sent to Google; commands still run only on this computer, after you approve them.</span>
+              <span class="mode-icon">${icon('zap', 20)}</span>
+              <span class="mode-name">Fast · optional</span>
+              <span class="mode-desc">Gemini with your own key · your text goes to Google</span>
             </label>
           </fieldset>
           <div class="cloud-key st-key" hidden>
             <label for="st-key">Gemini API key</label>
-            <input type="password" id="st-key" placeholder="Paste your key" autocomplete="off" spellcheck="false" />
-            <p class="modal-hint">Saved privately on this computer. Get a free key at aistudio.google.com.</p>
+            <input type="password" id="st-key" placeholder="Paste your key…" autocomplete="off" spellcheck="false" />
+            <p class="modal-hint">Stored only on this computer · free at aistudio.google.com</p>
           </div>
-          <ul class="ai-status-list st-status"></ul>
-          <p class="st-msg" role="status"></p>
-          <div class="modal-footer"><button class="modal-btn primary st-save">Save</button></div>
-          <h3 class="st-h">Activity log</h3>
-          <p class="st-log">Checking…</p>`;
+          <div class="st-save-row"><p class="st-msg" role="status"></p><button class="st-btn primary st-save">Save</button></div>
+          <h3 class="st-h">Safety</h3>
+          <div class="st-links">
+            <span class="st-log"></span>
+            <button class="st-btn st-tour" type="button">${icon('sparkles', 16)}<span>Welcome tour</span></button>
+            <button class="st-btn st-sec" type="button">${icon('shield', 16)}<span>Security Center</span></button>
+          </div>`;
+        box.querySelector('.st-ai-tip').append(infoTip('Fast uses Google Gemini and answers in a few seconds; what you type is sent to Google. Private uses a model on this computer: nothing leaves the machine, but answers take longer. Either way, commands run only here, after you approve them.', 'About the AI modes'));
+        const openApp = (app) => services.invoke('os_action', { action: 'app', op: 'launch', app, approved: false }).catch(() => {});
+        box.querySelector('.st-tour').addEventListener('click', () => openApp('onboarding'));
+        box.querySelector('.st-sec').addEventListener('click', () => openApp('security'));
 
         const modes = [...box.querySelectorAll('input[name="st-mode"]')];
         const keyBox = box.querySelector('.st-key');
@@ -178,15 +196,22 @@ export function makeSettings(services) {
           const cloud = (status?.cloud_fallbacks || []).length > 0;
           keyBox.hidden = chosen() !== 'cloud' || cloud;
           const local = status?.local || {};
+          // [state, short label, the full sentence on hover]
           const rows = [
-            [status ? 'ok' : 'bad', status ? 'AI core is running' : "AI core isn't running"],
-            [status?.router?.reachable ? 'ok' : 'bad', status?.router?.reachable ? 'Instant commands are ready' : "Instant commands aren't available"],
+            [status ? 'ok' : 'bad', 'AI core', status ? 'AI core is running' : "AI core isn't running"],
+            [status?.router?.reachable ? 'ok' : 'bad', 'Instant commands', status?.router?.reachable ? 'Instant commands are ready' : "Instant commands aren't available"],
             chosen() === 'local'
-              ? [local.reachable ? 'ok' : 'wait', local.reachable ? 'On-device model is ready' : 'On-device model is starting (about a minute)']
-              : [cloud ? 'ok' : 'wait', cloud ? 'Gemini is connected' : 'Add a Gemini key to use Fast mode'],
-            [status?.desktop?.sway ? 'ok' : 'wait', status?.desktop?.sway ? 'Window control is on' : 'Window control needs the OSAIMA desktop session'],
+              ? [local.reachable ? 'ok' : 'wait', 'On-device model', local.reachable ? 'On-device model is ready' : 'On-device model is starting (about a minute)']
+              : [cloud ? 'ok' : 'wait', 'Gemini', cloud ? 'Gemini is connected' : 'Add a Gemini key to use Fast mode'],
+            [status?.desktop?.sway ? 'ok' : 'wait', 'Window control', status?.desktop?.sway ? 'Window control is on' : 'Window control needs the OSAIMA desktop session'],
           ];
-          statusList.replaceChildren(...rows.map(([s, label]) => el('li', s, label)));
+          statusList.replaceChildren(...rows.map(([s, label, full]) => {
+            const li = el('li', s);
+            li.append(iconEl(s === 'ok' ? 'check-circle' : s === 'bad' ? 'x-circle' : 'clock', 14), el('span', null, label));
+            li.title = full;
+            li.setAttribute('aria-label', full);
+            return li;
+          }));
         };
         const refresh = async (setMode) => {
           try { status = await services.invoke('ai_status'); } catch { status = null; }
@@ -200,9 +225,10 @@ export function makeSettings(services) {
         const clock = (s) => (s == null ? '' : s >= 3600 ? `${Math.floor(s / 3600)} h ${Math.round((s % 3600) / 60)} min` : s >= 60 ? `${Math.ceil(s / 60)} min` : `${s} s`);
         const pc = el('div', 'st-pc');
         pc.append(el('h3', 'st-h', 'This computer'));
-        const pcBody = el('div', 'st-pc-body', 'Looking for a graphics card…');
+        const pcBody = el('div', 'st-pc-body');
+        pcBody.append(skeleton(2));
         pc.append(pcBody);
-        box.querySelector('.st-status').before(pc);
+        box.querySelector('.st-save-row').after(pc);
         let pcTimer = null;
         const stopPoll = () => { if (pcTimer) { clearInterval(pcTimer); pcTimer = null; } };
         const showProgress = (rec) => {
@@ -249,15 +275,25 @@ export function makeSettings(services) {
           const nodes = [];
           if (problem) { const p = el('div', 'st-inline is-err st-block', problem); nodes.push(p); }
           const g = info.gpus || [];
-          nodes.push(el('div', 'st-row-name', g.length
-            ? g.map((x) => `${x.name}${x.integrated ? ' (built-in, shares system memory)' : x.vram_mb ? ` (${x.vram_estimated ? 'about ' : ''}${mb(x.vram_mb)} video memory)` : ''}`).join(' · ')
-            : 'No graphics card found'));
-          nodes.push(el('div', 'st-row-hint', `${mb(info.ram_mb || 0)} of memory` + (info.current_model ? `  ·  using ${info.current_model}` : '')));
+          const gpuList = el('div', 'st-gpus');
+          if (!g.length) gpuList.append(el('div', 'st-row-name', 'No graphics card found'));
+          for (const x of g) {
+            const line = el('div', 'st-gpu');
+            line.append(iconEl('cpu', 16), el('span', 'st-gpu-name', x.name),
+              chip(x.integrated ? 'Built-in' : x.vram_mb ? `${x.vram_estimated ? '~' : ''}${mb(x.vram_mb)}` : 'GPU'));
+            line.title = x.integrated ? `${x.name} (built-in, shares system memory)` : x.vram_mb ? `${x.name} (${x.vram_estimated ? 'about ' : ''}${mb(x.vram_mb)} video memory)` : x.name;
+            gpuList.append(line);
+          }
+          nodes.push(gpuList);
+          const facts = el('div', 'st-pc-facts');
+          facts.append(chip(`${mb(info.ram_mb || 0)} memory`, 'memory'));
+          if (info.current_model) facts.append(chip(info.current_model, 'sparkles', 'info'));
+          nodes.push(facts);
           const rec = info.recommendation;
           if (rec) {
             nodes.push(el('div', 'st-pc-rec', `${rec.name} (${mb(rec.size_mb)})`), el('div', 'st-row-hint', rec.why));
             if (info.offload_note) nodes.push(el('div', 'st-row-hint', info.offload_note));
-            const dl = el('button', 'st-btn primary', `Download (${mb(rec.size_mb)})`);
+            const dl = withIcon(el('button', 'st-btn primary'), 'arrow-right', `Download (${mb(rec.size_mb)})`);
             dl.type = 'button';
             const ask = el('div', 'st-pc-ask');
             ask.hidden = true;
@@ -283,9 +319,11 @@ export function makeSettings(services) {
             });
             nodes.push(dl, ask, msg2);
           } else {
-            nodes.push(el('div', 'st-row-hint st-block', g.length && info.no_recommendation_reason
-              ? info.no_recommendation_reason.replace(/paste a Gemini key.*$/, '') + 'Paste a Gemini key above (choose Fast) for quick answers.'
-              : 'Paste a Gemini key above (choose Fast) for quick answers.'));
+            const why = g.length && info.no_recommendation_reason ? info.no_recommendation_reason.replace(/;?\s*paste a Gemini key.*$/i, '') : '';
+            const hint = el('div', 'st-pc-note');
+            hint.append(el('span', null, 'No better on-device model fits · use Fast for quick answers'));
+            if (why) hint.append(infoTip(why + '.', 'Why'));
+            nodes.push(hint);
           }
           pcBody.replaceChildren(...nodes);
           // pick up a download that is already running (e.g. window reopened)
@@ -298,11 +336,11 @@ export function makeSettings(services) {
 
         save.addEventListener('click', async () => {
           save.disabled = true;
-          msg.textContent = '';
+          say(msg);
           try {
             const key = keyInput.value.trim();
             if (chosen() === 'cloud' && key) {
-              msg.textContent = 'Checking the key…';
+              say(msg, 'busy', 'Checking the key…');
               await services.invoke('validate_api_key', { key });
               await services.invoke('set_api_key', { key });
               keyInput.value = '';
@@ -310,13 +348,13 @@ export function makeSettings(services) {
             await services.invoke('set_llm_mode', { mode: chosen() });
             let firstStart = false;
             try { firstStart = !localStorage.getItem('osaima_welcomed'); localStorage.setItem('osaima_welcomed', '1'); } catch {}
-            msg.textContent = 'Saved.';
+            say(msg, 'ok', 'Saved');
             // First start: the choice is made, so get out of the way of the assistant.
             if (firstStart && services.desktopMode) {
               setTimeout(() => services.invoke('os_action', { action: 'window', op: 'close', app: 'settings' }).catch(() => {}), 600);
             }
           } catch (e) {
-            msg.textContent = "Couldn't save: " + errText(e);
+            say(msg, 'err', "Couldn't save: " + errText(e));
           }
           save.disabled = false;
           refresh(false);
@@ -326,10 +364,10 @@ export function makeSettings(services) {
           try {
             const r = await services.invoke('audit_tail', { n: 1 });
             const v = r?.verified || {};
-            box.querySelector('.st-log').textContent = v.ok
-              ? `Intact: all ${v.records} entries check out. Each entry carries a fingerprint of the one before it, so editing or deleting any entry would show here.`
-              : `The log was altered at entry ${v.line}.`;
-          } catch { box.querySelector('.st-log').textContent = "Can't read the activity log."; }
+            const c = v.ok ? chip(`Log intact · ${v.records} entries`, 'shield-check', 'ok') : chip(`Log altered at entry ${v.line}`, 'shield-alert', 'bad');
+            c.title = 'Each entry carries a fingerprint of the one before it, so editing or deleting any entry would show here.';
+            box.querySelector('.st-log').replaceChildren(c);
+          } catch { box.querySelector('.st-log').replaceChildren(chip("Can't read the log", 'alert-circle', 'bad')); }
         })();
 
         refresh(true);
@@ -337,7 +375,7 @@ export function makeSettings(services) {
       }
 
       function appearancePage(box) {
-        box.append(heading('Appearance', 'Pick the picture behind your windows.'));
+        box.append(heading('Appearance'));
         const group = el('div', 'st-cards');
         const msg = el('p', 'st-inline st-block');
         msg.setAttribute('role', 'status');
@@ -355,26 +393,26 @@ export function makeSettings(services) {
         }
         const own = el('input', 'st-text');
         own.type = 'text';
-        own.placeholder = '/home/you/Pictures/photo.jpg';
+        own.placeholder = '~/Pictures/photo.jpg…';
         own.setAttribute('aria-label', 'Path to your own image');
         own.spellcheck = false;
-        const apply = el('button', 'st-btn', 'Use this image');
+        const apply = el('button', 'st-btn', 'Use');
         apply.type = 'button';
         apply.addEventListener('click', async () => {
           const path = own.value.trim();
-          if (!path) { msg.classList.add('is-err'); msg.textContent = 'Type the path of a PNG, JPEG or WebP image first.'; return; }
+          if (!path) { say(msg, 'err', 'Type the path of a PNG, JPEG or WebP image first.'); return; }
           const ok = await commit([...cards.map((c) => c[1]), own, apply], msg, () => setting('wallpaper', path));
           if (ok) { state.wallpaper = path; mark(null); }
         });
         mark(state.wallpaper);
-        const r = row('Use my own image', 'An image in your home folder', own, apply);
+        const r = row('Own image', 'A PNG, JPEG or WebP image in your home folder', own, apply);
         box.append(group, r.row, msg);
         // the row has its own status slot; share it
         r.msg.remove();
       }
 
       function displayPage(box) {
-        box.append(heading('Display', 'Screen size and scale. Changes can be undone if the screen becomes hard to read.'));
+        box.append(heading('Display', 'If a change makes the screen hard to read, it reverts by itself after 15 seconds.'));
         const night = toggle(state.night_light);
         night.setAttribute('aria-label', 'Night light');
         const rn = row('Night light', 'Warmer colours, easier on the eyes at night', night);
@@ -385,7 +423,7 @@ export function makeSettings(services) {
         });
         box.append(rn.row);
         const outs = state.outputs || [];
-        if (!outs.length) box.append(el('p', 'st-empty', 'No screen was found. Display settings need the OSAIMA desktop session.'));
+        if (!outs.length) box.append(emptyState('monitor', 'No screen found · needs the OSAIMA desktop session'));
         const all = [];
         const lock = (on) => all.forEach((c) => { c.disabled = on; });
 
@@ -394,33 +432,31 @@ export function makeSettings(services) {
           const sel = select(modes.map((m) => [m, m.replace('x', ' × ')]), o.current);
           all.push(sel);
           const title = [o.make, o.model].filter(Boolean).join(' ').trim();
-          const r = row(`Resolution — ${o.name}`, title || undefined, sel);
+          const r = row(`Resolution · ${o.name}`, title || undefined, sel);
           let current = o.current;
           sel.addEventListener('change', async () => {
             const next = sel.value;
             const prev = current;
             if (next === prev) return;
             lock(true);
-            r.msg.classList.remove('is-err');
-            r.msg.textContent = 'Applying…';
+            say(r.msg, 'busy', 'Applying…');
             try {
               await setting('resolution', next, { output: o.name }, true);
             } catch (e) {
               sel.value = prev;
-              r.msg.classList.add('is-err');
-              r.msg.textContent = errText(e);
+              say(r.msg, 'err', errText(e));
               lock(false);
               return;
             }
             current = next;
-            r.msg.textContent = '';
+            say(r.msg);
             askKeep('resolution', async () => { await setting('resolution', prev, { output: o.name }, true); },
               (kept) => {
                 if (!kept) { current = prev; sel.value = prev; }
-                r.msg.textContent = kept ? 'Saved' : 'Reverted';
+                say(r.msg, 'ok', kept ? 'Saved' : 'Reverted');
                 lock(false);
               },
-              (err) => { r.msg.classList.add('is-err'); r.msg.textContent = "Couldn't revert: " + err; });
+              (err) => { say(r.msg, 'err', "Couldn't revert: " + err); });
           });
           box.append(r.row);
         });
@@ -436,7 +472,7 @@ export function makeSettings(services) {
             return b;
           });
           all.push(...btns);
-          const r = row('Scale', 'Make everything larger or smaller', ...btns);
+          const r = row('Scale', undefined, ...btns);
           let curScale = cur;
           const mark = (v) => btns.forEach((b) => { const on = Number(b.dataset.scale) === v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
           btns.forEach((b) => b.addEventListener('click', async () => {
@@ -444,17 +480,16 @@ export function makeSettings(services) {
             const prev = curScale;
             if (next === prev) return;
             lock(true);
-            r.msg.classList.remove('is-err');
-            r.msg.textContent = 'Applying…';
+            say(r.msg, 'busy', 'Applying…');
             try { await setting('scale', next); } catch (e) {
-              r.msg.classList.add('is-err'); r.msg.textContent = errText(e); lock(false); return;
+              say(r.msg, 'err', errText(e)); lock(false); return;
             }
             curScale = next;
             mark(next);
-            r.msg.textContent = '';
+            say(r.msg);
             askKeep('scale', async () => { await setting('scale', prev); },
-              (kept) => { if (!kept) { curScale = prev; mark(prev); } r.msg.textContent = kept ? 'Saved' : 'Reverted'; lock(false); },
-              (err) => { r.msg.classList.add('is-err'); r.msg.textContent = "Couldn't revert: " + err; });
+              (kept) => { if (!kept) { curScale = prev; mark(prev); } say(r.msg, 'ok', kept ? 'Saved' : 'Reverted'); lock(false); },
+              (err) => { say(r.msg, 'err', "Couldn't revert: " + err); });
           }));
           box.append(r.row);
         }
@@ -463,7 +498,7 @@ export function makeSettings(services) {
       async function soundPage(box) {
         box.append(heading('Sound'));
         let vol = { percent: 0, muted: false };
-        try { vol = await os('volume', 'get'); } catch (e) { box.append(el('p', 'st-inline is-err st-block', errText(e))); }
+        try { vol = await os('volume', 'get'); } catch (e) { box.append(chip(errText(e), 'alert-circle', 'bad', 'st-block')); }
         const level = Math.max(0, Math.min(100, Number(vol.percent) || 0));
         const sl = slider(0, 100, 1, level);
         sl.setAttribute('aria-label', 'Volume');
@@ -471,7 +506,7 @@ export function makeSettings(services) {
         const mute = toggle(vol.muted);
         mute.setAttribute('aria-label', 'Mute');
         const rv = row('Volume', undefined, sl, num);
-        const rm = row('Mute', 'Silence the sound output', mute);
+        const rm = row('Mute', undefined, mute);
         sl.addEventListener('input', () => { num.textContent = `${sl.value}%`; });
         sl.addEventListener('change', () => commit([sl, mute], rv.msg, () => os('volume', 'set', { value: Number(sl.value) })));
         mute.addEventListener('change', async () => {
@@ -497,19 +532,23 @@ export function makeSettings(services) {
           });
           box.append(r.row);
         } else {
-          box.append(el('p', 'st-empty', 'No sound output was found.'));
+          box.append(emptyState('volume', 'No sound output found'));
         }
       }
 
       async function networkPage(box) {
         box.append(heading('Network'));
         const net = state.network || {};
-        const line = net.online
-          ? `Connected${net.wifi ? ` to ${net.wifi}` : ''} through ${net.interface || 'the network'}${net.address ? ` (${net.address})` : ''}.`
-          : 'Not connected to a network.';
-        box.append(el('p', 'st-status-line ' + (net.online ? 'ok' : 'bad'), line));
+        const card = el('div', 'st-net ' + (net.online ? 'ok' : 'bad'));
+        const netIcon = el('span', 'st-net-icon');
+        netIcon.append(iconEl(net.online ? 'wifi' : 'wifi-off', 22));
+        const netText = el('div', 'st-net-text');
+        netText.append(el('span', 'st-net-name', net.online ? (net.wifi || 'Connected') : 'Offline'),
+          el('span', 'st-net-sub', net.online ? [net.interface, net.address].filter(Boolean).join(' · ') : 'Not connected to a network'));
+        card.append(netIcon, netText);
+        box.append(card);
         let wifi = null;
-        try { wifi = await os('wifi', 'get'); } catch (e) { box.append(el('p', 'st-empty', "Wi-Fi can't be controlled here: " + errText(e))); return; }
+        try { wifi = await os('wifi', 'get'); } catch (e) { box.append(emptyState('wifi-off', "Wi-Fi can't be controlled here"), chip(errText(e), 'info', 'muted', 'st-block')); return; }
         const sw = toggle(wifi.wifi_enabled);
         sw.setAttribute('aria-label', 'Wi-Fi');
         const r = row('Wi-Fi', 'Turning it off can disconnect you', sw);
@@ -519,6 +558,7 @@ export function makeSettings(services) {
         const no = el('button', 'st-btn', 'Cancel');
         yes.type = no.type = 'button';
         confirm.append(el('span', '', 'Turn Wi-Fi off? You may lose your connection.'), no, yes);
+        confirm.prepend(iconEl('alert', 16));
         const set = async (on) => {
           confirm.hidden = true;
           const ok = await commit([sw, yes, no], r.msg, () => os('wifi', on ? 'on' : 'off', {}, !on));
@@ -526,7 +566,7 @@ export function makeSettings(services) {
         };
         sw.addEventListener('change', () => {
           if (sw.checked) { set(true); return; }
-          r.msg.textContent = '';
+          say(r.msg);
           confirm.hidden = false;
           yes.focus();
         });
@@ -549,7 +589,7 @@ export function makeSettings(services) {
         const rate = slider(10, 60, 1, state.repeat_rate);
         rate.setAttribute('aria-label', 'Key repeat rate');
         const rateNum = el('span', 'st-value', `${state.repeat_rate}/s`);
-        const rr = row('Key repeat rate', 'Characters per second when a key is held', rate, rateNum);
+        const rr = row('Key repeat', 'Characters per second when a key is held', rate, rateNum);
         rate.addEventListener('input', () => { rateNum.textContent = `${rate.value}/s`; });
         rate.addEventListener('change', () => commit([rate], rr.msg, () => setting('repeat_rate', Number(rate.value))));
 
@@ -568,13 +608,13 @@ export function makeSettings(services) {
         const speed = slider(-1, 1, 0.1, state.pointer_speed);
         speed.setAttribute('aria-label', 'Pointer speed');
         const speedNum = el('span', 'st-value', Number(state.pointer_speed).toFixed(1));
-        const rs = row('Pointer speed', 'Slow to fast', speed, speedNum);
+        const rs = row('Pointer speed', undefined, speed, speedNum);
         speed.addEventListener('input', () => { speedNum.textContent = Number(speed.value).toFixed(1); });
         speed.addEventListener('change', () => commit([speed], rs.msg, () => setting('pointer_speed', Number(speed.value))));
 
         box.append(rl.row, rr.row, rs.row,
           flag('tap', 'Tap to click', 'Touchpad', state.tap),
-          flag('natural_scroll', 'Natural scrolling', 'Touchpad: content follows your fingers', state.natural_scroll));
+          flag('natural_scroll', 'Natural scrolling', 'Touchpad: the content follows your fingers', state.natural_scroll));
       }
 
       function notificationsPage(box) {
@@ -592,11 +632,13 @@ export function makeSettings(services) {
 
       function automationsPage(box) {
         box.append(heading('Automations', 'Things OSAIMA does on a schedule or when something happens. Ask the assistant to make one, e.g. "keep brightness at 40% on weekdays from 9 pm to 6 am".'));
+        const list0 = skeleton(3);
         const list = el('div', 'st-auto-list');
+        list.append(list0);
         box.append(list);
         const load = async () => {
           let d;
-          try { d = await services.invoke('automations', {}); } catch (e) { list.replaceChildren(el('p', 'st-empty is-err', errText(e))); return; }
+          try { d = await services.invoke('automations', {}); } catch (e) { list.replaceChildren(emptyState('alert-circle', errText(e))); return; }
           list.replaceChildren();
           for (const p of d.pending || []) {
             const stop = el('button', 'st-btn primary', 'Cancel');
@@ -606,7 +648,7 @@ export function makeSettings(services) {
             list.append(r.row);
           }
           const rules = d.automations || [];
-          if (!rules.length) list.append(el('p', 'st-empty', 'No automations yet.'));
+          if (!rules.length && !(d.pending || []).length) list.append(emptyState('zap', 'No automations yet · ask the assistant'));
           for (const a of rules) {
             const del = el('button', 'st-btn', 'Remove');
             del.type = 'button';
@@ -626,16 +668,16 @@ export function makeSettings(services) {
         if (!choices.some(([m]) => m === cur)) choices.push([cur, `${cur} minutes`]);
         choices.sort((a, b) => (a[0] || Infinity) - (b[0] || Infinity));
         const sel = select(choices, cur);
-        const r = row('Lock after', 'When the computer has been idle', sel);
+        const r = row('Lock after', 'How long the computer is idle before it locks', sel);
         let prev = sel.value;
         sel.addEventListener('change', async () => {
           const ok = await commit([sel], r.msg, () => setting('lock_minutes', Number(sel.value)));
           if (ok) prev = sel.value; else sel.value = prev;
         });
-        const lockBtn = el('button', 'st-btn', 'Lock now');
+        const lockBtn = withIcon(el('button', 'st-btn'), 'lock', 'Lock now');
         lockBtn.type = 'button';
         const rn = row('Lock the screen', 'You will need your password to come back', lockBtn);
-        lockBtn.addEventListener('click', () => commit([lockBtn], rn.msg, () => os('lock_screen', 'lock')).then(() => { rn.msg.textContent = ''; }));
+        lockBtn.addEventListener('click', () => commit([lockBtn], rn.msg, () => os('lock_screen', 'lock')).then(() => say(rn.msg)));
         box.append(r.row, rn.row);
       }
 
@@ -682,14 +724,18 @@ export function makeSettings(services) {
         const apply = el('button', 'st-btn', 'Change');
         apply.type = 'button';
         const r = row('Time zone', 'Region/City, for example Asia/Kolkata', input, apply, dl);
-        const now = el('p', 'st-lede');
-        const tick = () => { now.textContent = `Now: ${new Date().toLocaleString([], { dateStyle: 'full', timeStyle: 'short' })}`; };
+        const now = el('div', 'st-now');
+        const tick = () => {
+          const d = new Date();
+          now.replaceChildren(el('span', 'st-now-time', d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })),
+            el('span', 'st-now-date', d.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })));
+        };
         tick();
         const t = setInterval(() => { if (!now.isConnected) clearInterval(t); else tick(); }, 15000);
         let prev = input.value;
         const go = async () => {
           const zone = input.value.trim();
-          if (!zone) { r.msg.classList.add('is-err'); r.msg.textContent = 'Type a time zone, like Asia/Kolkata.'; return; }
+          if (!zone) { say(r.msg, 'err', 'Type a time zone, like Asia/Kolkata.'); return; }
           const ok = await commit([input, apply], r.msg, () => setting('timezone', zone, {}, true));
           if (ok) { prev = zone; tick(); } else input.value = prev;
         };
@@ -699,17 +745,17 @@ export function makeSettings(services) {
       }
 
       const PAGES = [
-        ['ai', 'AI', aiPage, false],
-        ['appearance', 'Appearance', appearancePage, true],
-        ['display', 'Display', displayPage, true],
-        ['sound', 'Sound', soundPage, true],
-        ['network', 'Network', networkPage, true],
-        ['input', 'Keyboard & mouse', inputPage, true],
-        ['notifications', 'Notifications', notificationsPage, true],
-        ['lock', 'Screen lock', lockPage, true],
-        ['automations', 'Automations', automationsPage, false],
-        ['defaults', 'Default apps', defaultsPage, true],
-        ['time', 'Date & time', timePage, true],
+        ['ai', 'AI', aiPage, false, 'sparkles'],
+        ['appearance', 'Appearance', appearancePage, true, 'image'],
+        ['display', 'Display', displayPage, true, 'monitor'],
+        ['sound', 'Sound', soundPage, true, 'volume'],
+        ['network', 'Network', networkPage, true, 'wifi'],
+        ['input', 'Keyboard & mouse', inputPage, true, 'keyboard'],
+        ['notifications', 'Notifications', notificationsPage, true, 'bell'],
+        ['lock', 'Screen lock', lockPage, true, 'lock'],
+        ['automations', 'Automations', automationsPage, false, 'zap'],
+        ['defaults', 'Default apps', defaultsPage, true, 'grid'],
+        ['time', 'Date & time', timePage, true, 'clock'],
       ];
       const navButtons = new Map();
       let shownToken = 0;
@@ -720,10 +766,10 @@ export function makeSettings(services) {
         const box = el('div', 'st-box');
         page.replaceChildren(box);
         if (needsState) {
-          box.append(el('p', 'st-empty', 'Loading…'));
+          box.append(skeleton(4, 'st-skel'));
           try { await loadState(); } catch (e) {
             if (mine !== shownToken) return;
-            box.replaceChildren(el('p', 'st-empty is-err', "Can't read the system settings: " + errText(e)));
+            box.replaceChildren(emptyState('alert-circle', "Can't read the system settings: " + errText(e)));
             return;
           }
           if (mine !== shownToken) return;
@@ -733,8 +779,8 @@ export function makeSettings(services) {
         page.scrollTop = 0;
         root.scrollTop = 0;
       }
-      for (const [id, label] of PAGES) {
-        const b = el('button', 'st-nav-item', label);
+      for (const [id, label, , , ic] of PAGES) {
+        const b = withIcon(el('button', 'st-nav-item'), ic, label);
         b.type = 'button';
         b.addEventListener('click', () => show(id));
         navButtons.set(id, b);

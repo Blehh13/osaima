@@ -75,6 +75,10 @@ pub fn policy(action: &str, op: &str) -> (Tier, bool) {
         ("window", "close_all") => (Tier::Reversible, true),
         ("files", "search") | ("files", "list") | ("files", "open") | ("files", "reveal") => (Tier::ReadOnly, false),
         ("settings", "get") | ("settings", "network") => (Tier::ReadOnly, false),
+        ("apps", "search") | ("apps", "list") => (Tier::ReadOnly, false),
+        // new software from Flathub, user-only and sandboxed; removing it undoes it
+        ("apps", "install") | ("apps", "remove") => (Tier::Reversible, true),
+        ("apps", "open") => (Tier::Reversible, false),
         // a wrong mode can blank the screen: ask first (the Settings app also reverts after 15 s)
         ("settings", "resolution") => (Tier::Reversible, true),
         // system-wide; the rest are the user's own preferences
@@ -133,6 +137,11 @@ impl OsControl {
                                   params["body"].as_str().unwrap_or(""), &[], &HashMap::new(), 5000)
                     .await.map_err(|e| e.to_string())?;
                 Ok(json!({ "id": id }))
+            }
+            "apps" => {
+                let params = params.clone();
+                tokio::task::spawn_blocking(move || crate::apps::perform(op_of(&params), &params))
+                    .await.map_err(|e| e.to_string())?
             }
             "settings" => {
                 let params = params.clone();

@@ -395,7 +395,62 @@ you what they did.
     only when the installed llama.cpp build lists a GPU device.
 - **Night light** uses gammastep (built with its Wayland backend), which is now in the image.
 
-### 2.11 Fixes found by testing like a real user
+### 2.11 Local-first AI: voice, our own predictive models, real MCP
+
+The aim is that the intelligence runs on the machine and the cloud is only an
+optional speed boost.
+
+- **Voice, fully offline** (`voice.rs`). Speech to text is whisper.cpp
+  (`ggml-base.en`, CPU). Text to speech is Piper (`en_US-lessac-medium`).
+  Recording uses PipeWire/ALSA with energy-based voice activity detection: it
+  stops after 0.9 s of silence, gives up after 6 s without speech, and caps at
+  15 s. The assistant has a mic button with an animated voice orb and a "Read
+  replies aloud" switch, and `Super+V` talks to the assistant from anywhere.
+  Measured: a 3 s clip transcribes in about 5 s on an 8-core CPU, with the
+  machine under load. RPCs: `system.voice_listen`, `voice_status`,
+  `voice_cancel`, `speak`, `speak_stop`.
+- **Next-action predictor, trained on the device** (`predictor.rs`). A stacked
+  mixture of time-of-day density, previous request, previous two requests and
+  open apps, refitted incrementally (a fit takes about 4 ms). Every prediction
+  carries a confidence and a reason ("after X you usually Y, n of m"). On a
+  time-ordered held-out split of synthetic multi-persona histories:
+  **top-1 41.8% / top-3 61.2%**, against 35.2% / 45.1% for the earlier rule (see
+  [ai-core/evaluation/PREDICTIVE.md](ai-core/evaluation/PREDICTIVE.md)).
+- **Health forecasting and anomaly detection** (`forecast.rs`). Theil–Sen trends
+  give "disk full in about N days", battery time left, and "likely to throttle
+  in about N minutes". Per-hour EWMA z-scores flag CPU, memory or temperature
+  that is unusual *for this machine at this time*. Both show in the side rail,
+  with the evidence numbers. RPC: `system.insights`.
+- **A real MCP server** (`src/bin/osaima-mcp.rs`). It speaks the Model Context
+  Protocol (2025-06-18, 2025-03-26, 2024-11-05) over stdio, so any MCP client
+  (Claude Desktop, MCP Inspector, local agents) can use OSAIMA. It has 13
+  tools: 8 read-only and 5 that change the computer. Every change needs
+  `confirmed_by_user` from the client, and actions that can't be undone also
+  need the typed phrase. All go through the daemon's gates and audit log and
+  show a desktop notification. It is verified with the official MCP Python
+  SDK (`tests/interop/osaima_mcp_sdk_client.py`); the protocol handling and the
+  interop test follow Banu's server on `feat/m1-foundation`. Client config:
+  command `osaima-mcp`, no arguments.
+
+### 2.12 Making the intelligence visible
+
+- **"How I handled this"** on every reply: an expandable, animated trace of the
+  real path the request took (router intent and confidence, model and time,
+  outside-content guard, risk tier, approval, kernel sandbox, result, audit
+  record number). A stage with no data says "not needed" rather than inventing
+  anything.
+- **Security Center** (`security-app.js`):
+  - live counters from the audit log (actions, held for approval, injections
+    blocked, tainted proposals, sandboxed commands)
+  - the kernel protections confirmed by a real sandbox self-check
+  - the audit chain drawn as linked hashed blocks and verified on demand
+  - **"Try to trick me"**: six real red-team injections sent through the real
+    classifier and guard as dry runs
+- **Welcome tour** (`onboarding-app.js`): what OSAIMA is, Fast or Private, a
+  first request, and how approvals and History work. It is shown once and can
+  be replayed from Settings.
+
+### 2.13 Fixes found by testing like a real user
 
 - A double-click sent a request twice. There is now a 1.5 s duplicate guard.
 - With the AI core down, the web bridge pretended to act. It now says so plainly.
@@ -405,7 +460,7 @@ you what they did.
 - Small talk now gets a real answer instead of "can't reach the AI core".
 - `find -exec` is judged by the command it runs, not by `find`.
 
-### 2.12 Testing without rebuilding the ISO
+### 2.14 Testing without rebuilding the ISO
 
 - `desktop/dev/run-nested.sh` runs the whole OSAIMA desktop nested in a window on
   your own Wayland session. It starts the router, the daemon and the shell server.
@@ -414,7 +469,7 @@ you what they did.
   desktop, the kernel jail, the isolation and window control inside the built image.
 - `ai-core/evaluation/run_eval.py` regenerates `RESULTS.md`.
 
-### 2.13 Review materials
+### 2.15 Review materials
 
 `docs/review/DEMO.md` is the demo runbook. It includes the Windows laptop +
 VirtualBox setup (Option A2). `CLAIMS.md` lists every claim with its evidence and

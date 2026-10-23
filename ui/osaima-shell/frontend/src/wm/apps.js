@@ -9,8 +9,8 @@
  * Apps kept intentionally lightweight and self-contained so the WM has real,
  * varied windows to tile, float, and move across workspaces during a demo.
  */
-
-import { createVoice } from './voice-ui.js';
+import { createTrace, fromExecute, fromOs } from './trace.js';
+import { icon, iconEl, withIcon, iconButton, chip, infoTip, emptyState } from './icons.js';
 
 /**
  * @param {import('./window-manager.js').WindowManager} engine
@@ -339,20 +339,20 @@ function makeMonitor(services) {
       root.classList.add('app-monitor');
       root.innerHTML = `
         <div class="mon-metric">
-          <div class="mon-head"><span>CPU</span><span class="mon-cpu-val">—</span></div>
+          <div class="mon-head"><span>${icon('cpu', 16)}Processor</span><span class="mon-cpu-val">—</span></div>
           <div class="mon-track"><div class="mon-fill mon-cpu-fill"></div></div>
         </div>
         <div class="mon-metric">
-          <div class="mon-head"><span>MEMORY</span><span class="mon-mem-val">—</span></div>
+          <div class="mon-head"><span>${icon('memory', 16)}Memory</span><span class="mon-mem-val">—</span></div>
           <div class="mon-track"><div class="mon-fill mon-mem-fill"></div></div>
         </div>
         <div class="mon-info">
-          <div><span>HOST</span><b class="mon-host">—</b></div>
-          <div><span>KERNEL</span><b class="mon-kernel">—</b></div>
-          <div><span>CORES</span><b class="mon-cores">—</b></div>
-          <div><span>AI CORE</span><b class="mon-daemon">—</b></div>
+          <div><span>Host</span><b class="mon-host">—</b></div>
+          <div><span>Kernel</span><b class="mon-kernel">—</b></div>
+          <div><span>Cores</span><b class="mon-cores">—</b></div>
+          <div><span>AI core</span><b class="mon-daemon">—</b></div>
         </div>
-        <canvas class="mon-graph" width="420" height="70"></canvas>`;
+        <div class="mon-graph-card"><span class="mon-graph-label">Processor · last 90 s</span><canvas class="mon-graph" width="420" height="70"></canvas></div>`;
 
       const cpuVal = root.querySelector('.mon-cpu-val');
       const cpuFill = root.querySelector('.mon-cpu-fill');
@@ -383,6 +383,8 @@ function makeMonitor(services) {
         } catch {}
       };
       const drawGraph = () => {
+        // draw at the canvas's real size so the line is never stretched
+        if (canvas.clientWidth && canvas.width !== canvas.clientWidth) { canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight || 70; }
         g.clearRect(0, 0, canvas.width, canvas.height);
         g.beginPath();
         samples.forEach((v, i) => {
@@ -390,13 +392,13 @@ function makeMonitor(services) {
           const y = canvas.height - (v / 100) * canvas.height;
           i === 0 ? g.moveTo(x, y) : g.lineTo(x, y);
         });
-        g.strokeStyle = '#5de4f0';
-        g.lineWidth = 1.5;
+        g.strokeStyle = '#3bb0a0';
+        g.lineWidth = 2;
         g.stroke();
         g.lineTo(canvas.width, canvas.height);
         g.lineTo(0, canvas.height);
         g.closePath();
-        g.fillStyle = 'rgba(93,228,240,0.08)';
+        g.fillStyle = 'rgba(59,176,160,0.12)';
         g.fill();
       };
 
@@ -448,14 +450,15 @@ function makeFiles(services) {
         }
         list.innerHTML = '';
         if (cwd !== '/') {
-          const up = el('div', 'files-item files-dir', '📁 ..');
+          const up = el('div', 'files-item files-dir');
+          up.append(iconEl('folder', 16), el('span', null, '..'));
           up.addEventListener('click', goUp);
           list.appendChild(up);
         }
         const entries = data.entries || [];
         for (const ent of entries) {
-          const item = el('div', 'files-item ' + (ent.is_dir ? 'files-dir' : 'files-file'),
-            (ent.is_dir ? '📁 ' : '📄 ') + ent.name);
+          const item = el('div', 'files-item ' + (ent.is_dir ? 'files-dir' : 'files-file'));
+          item.append(iconEl(ent.is_dir ? 'folder' : 'file', 16), el('span', null, ent.name));
           if (ent.is_dir) item.addEventListener('click', () => goInto(ent.name));
           list.appendChild(item);
         }
@@ -478,7 +481,7 @@ function makeConfigEditor(engine, services) {
       root.classList.add('app-config');
       const toolbar = el('div', 'cfg-toolbar');
       const reloadBtn = el('button', 'cfg-btn cfg-reload', '⟳ Reload');
-      const saveBtn = el('button', 'cfg-btn cfg-save', '💾 Save');
+      const saveBtn = el('button', 'cfg-btn cfg-save', 'Save');
       const resetBtn = el('button', 'cfg-btn cfg-reset', '↺ Reset');
       const status = el('span', 'cfg-status', 'Live Lua config — Reload previews, Save persists');
       toolbar.append(reloadBtn, saveBtn, resetBtn, status);
@@ -525,22 +528,20 @@ function makeAbout(engine) {
     floating: true,
     mount(root) {
       root.classList.add('app-about');
-      const binds = [...engine.bindings.entries()]
+      // the in-page window manager has live keybindings; a desktop window has none to show
+      const binds = engine.bindings ? [...engine.bindings.entries()]
         .map(([k, v]) => `<div class="ab-bind"><kbd>${escapeHtml(k)}</kbd><span>${escapeHtml(actionLabel(v))}</span></div>`)
-        .join('');
+        .join('') : '';
       root.innerHTML = `
         <div class="ab-header">
-          <div class="ab-logo">✦</div>
+          <div class="ab-logo">${icon('sparkles', 26)}</div>
           <div>
             <div class="ab-title">OSAIMA</div>
-            <div class="ab-sub">Lua-driven tiling window manager</div>
+            <div class="ab-sub">An AI-driven Linux desktop</div>
           </div>
         </div>
-        <p class="ab-desc">A dynamic, agentic desktop shell. The window manager's
-        layouts, gaps, workspaces and keybindings are all defined in a live Lua
-        configuration file.</p>
-        <div class="ab-section">KEYBINDINGS</div>
-        <div class="ab-binds">${binds || '<em>none configured</em>'}</div>`;
+        <p class="ab-desc">Say what you want; it shows the plan and acts only after you agree.</p>
+        ${binds ? `<div class="ab-section">Keybindings</div><div class="ab-binds">${binds}</div>` : ''}`;
     },
   };
 }
@@ -549,28 +550,34 @@ function makeAbout(engine) {
 // The home screen: the user says what they want, sees what will happen and how
 // risky it is, approves it here (never in a browser pop-up), and sees the result.
 // A side rail shows the computer's state, learned suggestions and the audit log.
-const SVG_SEND = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>';
-
-const SVG_MIC = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>';
-const SVG_STOP = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
-const SVG_SPEAKER = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>';
-
-// Examples of what the system is for, worded the way a person would say them.
+// Examples of what the system is for: a short chip label, and the request it
+// sends, worded the way a person would say it.
 const STARTERS = [
-  'Find PDFs bigger than 10 MB in my home folder',
-  'What is using the most memory right now?',
-  'Write an email to my guide asking for a one-week extension',
-  'How much space is left on my disk?',
-  'Turn the volume down a bit',
-  'How do I see which program is using port 8080?',
+  { icon: 'file', label: 'Find big PDFs', text: 'Find PDFs bigger than 10 MB in my home folder' },
+  { icon: 'memory', label: 'What’s using memory?', text: 'What is using the most memory right now?' },
+  { icon: 'mail', label: 'Draft an email', text: 'Write an email to my guide asking for a one-week extension' },
+  { icon: 'disk', label: 'Free disk space', text: 'How much space is left on my disk?' },
+  { icon: 'volume', label: 'Volume down', text: 'Turn the volume down a bit' },
+  { icon: 'plug', label: 'Who’s on port 8080?', text: 'How do I see which program is using port 8080?' },
 ];
 
 // What each risk tier means for the person, not for the code.
 const TIER_COPY = {
-  read_only: { label: 'Only looks', detail: 'Reads information. Nothing on your computer changes.' },
-  reversible: { label: 'Makes changes', detail: 'Changes files or settings. You can undo it.' },
-  irreversible: { label: "Can't be undone", detail: 'Deletes or overwrites something permanently.' },
+  read_only: { label: 'Only looks', icon: 'eye', tone: 'ok', detail: 'Reads information. Nothing on your computer changes.' },
+  reversible: { label: 'Makes changes', icon: 'undo', tone: 'warn', detail: 'Changes files or settings. You can undo it.' },
+  irreversible: { label: "Can't be undone", icon: 'alert', tone: 'bad', detail: 'Deletes or overwrites something permanently.' },
 };
+
+// A card's title row: icon + title.
+function cardTitle(text, iconName) {
+  const h = el('h3', 'as-card-title');
+  if (iconName) h.append(iconEl(iconName, 18, 'as-card-icon'));
+  h.append(el('span', null, text));
+  return h;
+}
+// A one-word outcome chip at the bottom of a card.
+const stateChip = (text, kind = 'muted') => chip(text,
+  { ok: 'check-circle', bad: 'alert-circle', warn: 'pause', muted: 'x-circle' }[kind], kind, 'as-card-state');
 
 function makeAssistant(engine, services) {
   return {
@@ -588,60 +595,48 @@ function makeAssistant(engine, services) {
       composer.className = 'as-composer';
       const input = document.createElement('input');
       input.className = 'as-input';
-      input.placeholder = 'Tell your computer what you need…';
+      input.placeholder = 'Ask or tell your computer anything…';
       input.spellcheck = false;
+      input.autocomplete = 'off';
       input.setAttribute('aria-label', 'Request');
       const send = el('button', 'as-send');
       send.type = 'submit';
-      send.innerHTML = SVG_SEND;
+      send.innerHTML = icon('arrow-up', 20);
       send.setAttribute('aria-label', 'Send');
-      const speaker = el('button', 'as-speak');
-      speaker.type = 'button';
-      speaker.innerHTML = SVG_SPEAKER;
+      send.title = 'Send (Enter)';
       const mic = el('button', 'as-mic');
       mic.type = 'button';
-      mic.innerHTML = SVG_MIC;
-      composer.append(input, speaker, mic, send);
-      const note = el('p', 'as-note', 'Nothing on this computer changes until you approve it.');
-
-      // ── Voice: push to talk, and (optionally) replies read aloud ──
-      const noteDefault = note.textContent;
-      let noteTimer = null;
-      const showNote = (message) => {
-        note.textContent = message;
-        clearTimeout(noteTimer);
-        noteTimer = setTimeout(() => { note.textContent = noteDefault; }, 6000);
-      };
-      const renderVoice = () => {
-        const s = voice.view;
-        const listening = s.state === 'listening';
-        mic.disabled = !s.canListen || s.state === 'transcribing';
-        mic.dataset.state = s.state;
-        mic.innerHTML = listening ? SVG_STOP : SVG_MIC;
-        mic.setAttribute('aria-label', listening ? 'Stop and send' : 'Talk to your computer');
-        mic.title = !s.canListen ? (s.why || 'Voice is not available') : listening ? 'Stop and send' : 'Talk to your computer';
-        speaker.disabled = !s.canSpeak;
-        speaker.setAttribute('aria-pressed', String(s.speakReplies));
-        speaker.setAttribute('aria-label', 'Read replies aloud');
-        speaker.title = !s.canSpeak ? (s.why || 'Voice is not available') : s.speakReplies ? 'Replies are read aloud (click to turn off)' : 'Read replies aloud';
-      };
-      const voice = createVoice({
-        invoke: services.invoke,
-        onText: (text) => run(text),
-        onNotice: showNote,
-        onChange: renderVoice,
-        alive: () => root.isConnected,
+      mic.innerHTML = icon('mic', 20);
+      mic.setAttribute('aria-label', 'Speak your request');
+      mic.setAttribute('aria-pressed', 'false');
+      mic.title = 'Speak (Super+V from anywhere)';
+      composer.append(iconEl('sparkles', 20, 'as-composer-mark'), input, mic, send);
+      // Listening orb + plain-language voice messages (also read out by screen readers)
+      const orb = el('div', 'as-orb');
+      orb.hidden = true;
+      orb.innerHTML = '<span class="as-orb-core"></span><span class="as-orb-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>';
+      const orbText = el('span', 'as-orb-text', 'Listening…');
+      orb.append(orbText);
+      const voiceMsg = el('p', 'as-voice-msg');
+      voiceMsg.setAttribute('role', 'status');
+      voiceMsg.hidden = true;
+      // under the box: the safety promise as one chip (the full sentence on hover), and read-aloud
+      const note = el('p', 'as-note');
+      note.append(iconEl('shield-check', 14), el('span', null, 'Asks before it changes anything'));
+      note.title = 'Nothing on this computer changes until you approve it.';
+      const readRow = el('label', 'as-read');
+      const readBox = document.createElement('input');
+      readBox.type = 'checkbox';
+      readBox.setAttribute('role', 'switch');
+      try { readBox.checked = localStorage.getItem('osaima-read-aloud') === '1'; } catch { /* storage blocked */ }
+      readBox.addEventListener('change', () => {
+        try { localStorage.setItem('osaima-read-aloud', readBox.checked ? '1' : '0'); } catch { /* ignore */ }
+        if (!readBox.checked) services.invoke('speak_stop', {}).catch(() => {});
       });
-      mic.addEventListener('click', () => voice.toggle());
-      speaker.addEventListener('click', () => voice.setSpeakReplies(!voice.view.speakReplies));
-      renderVoice();
-      voice.refresh();
-      // The voice service may start after the window opens; look again until it is there.
-      const voiceTimer = setInterval(() => {
-        if (!root.isConnected) { clearInterval(voiceTimer); voice.dispose(); return; }
-        if (!voice.view.canListen && voice.view.state === 'idle') voice.refresh();
-      }, 15000);
-      window.addEventListener('beforeunload', () => voice.dispose());
+      readRow.title = 'Read replies aloud';
+      readRow.append(readBox, iconEl('speaker', 14), el('span', '', 'Read aloud'));
+      const footRow = el('div', 'as-foot');
+      footRow.append(note, readRow);
       // Files handed over from the file manager ("Ask OSAIMA"); they go with
       // each request until the user removes them.
       let selected = [];
@@ -653,37 +648,38 @@ function makeAssistant(engine, services) {
         const names = selected.map((p) => p.split('/').pop());
         const label = el('span', 'as-attached-text', `About ${names.length > 2 ? `${names[0]} and ${names.length - 1} more` : names.join(' and ')}`);
         label.title = selected.join('\n');
-        const clear = el('button', 'as-attached-clear', '×');
-        clear.setAttribute('aria-label', 'Stop using these files');
+        label.prepend(iconEl('file', 14));
+        const clear = iconButton('x', 'Stop using these files', 'as-attached-clear', 14);
         clear.addEventListener('click', () => { selected = []; renderAttached(); input.focus(); });
         attachRow.replaceChildren(label, clear);
       };
-      main.append(log, attachRow, composer, note);
 
-      const rail = buildRail();
-      root.append(main, rail.el);
-
-      // ── Empty state: greeting and starters ──
+      // ── Empty state: a calm greeting, the input, and a few suggestion chips ──
       const intro = el('div', 'as-intro');
       const hour = new Date().getHours();
       const part = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
       const hello = el('h1', 'as-hello', `Good ${part}.`);
-      intro.append(
-        hello,
-        el('p', 'as-lede', "Tell me what you need in your own words. I'll show you exactly what I'm going to do before anything changes."),
-        el('h2', 'as-sub', 'Try one of these'),
-      );
+      const mark = el('div', 'as-mark');
+      mark.append(iconEl('sparkles', 26));
+      intro.append(mark, hello, el('p', 'as-lede', 'What can I do for you?'));
       const starters = el('ul', 'as-starters');
-      for (const s of STARTERS) {
+      starters.setAttribute('aria-label', 'Suggestions');
+      STARTERS.forEach((s, i) => {
         const li = document.createElement('li');
-        const b = el('button', 'as-starter', s);
+        li.style.setProperty('--i', i);
+        const b = withIcon(el('button', 'as-starter'), s.icon, s.label, 15);
         b.type = 'button';
-        b.addEventListener('click', () => run(s));
+        b.title = s.text;
+        b.addEventListener('click', () => run(s.text));
         li.append(b);
         starters.append(li);
-      }
-      intro.append(starters);
+      });
       log.append(intro);
+      main.classList.add('is-home');
+      main.append(log, attachRow, orb, voiceMsg, composer, footRow, starters);
+
+      const rail = buildRail();
+      root.append(main, rail.el);
       services.invoke('run_command', { cmd: 'whoami' }).then((u) => {
         const name = String(u || '').trim();
         if (/^[a-z_][a-z0-9_-]{0,31}$/i.test(name) && name !== 'root') hello.textContent = `Good ${part}, ${name}.`;
@@ -694,19 +690,23 @@ function makeAssistant(engine, services) {
 
       const scroll = () => { log.scrollTop = log.scrollHeight; };
       function addUser(text) {
-        intro.remove();
+        if (intro.isConnected) { intro.remove(); starters.remove(); main.classList.remove('is-home'); }
         const row = el('div', 'as-turn as-user');
         row.append(el('p', 'as-said', text));
         log.append(row);
         scroll();
       }
       function startTurn() {
-        const row = el('div', 'as-turn as-agent');
+        const outer = el('div', 'as-turn as-agent');
+        const avatar = el('span', 'as-avatar');
+        avatar.append(iconEl('sparkles', 16));
+        const row = el('div', 'as-agent-body');
         const text = el('p', 'as-text as-working', 'Working on it…');
         const cards = el('div', 'as-cards');
         const meta = el('p', 'as-meta');
         row.append(text, cards, meta);
-        log.append(row);
+        outer.append(avatar, row);
+        log.append(outer);
         scroll();
         return { row, text, cards, meta };
       }
@@ -718,11 +718,17 @@ function makeAssistant(engine, services) {
       // Approval asked inline. Resolves to { approved, typed }.
       function ask({ what, typed = false, phrase = 'confirm', untrusted = false }) {
         return new Promise((resolve) => {
+          const tr = turn && turn.trace;
           const card = el('div', 'as-card as-approve');
           card.dataset.tier = typed ? 'irreversible' : 'reversible';
-          card.append(el('h3', 'as-card-title', typed ? "This can't be undone" : 'Needs your OK'));
+          card.append(cardTitle(typed ? "This can't be undone" : 'Needs your OK', typed ? 'alert' : 'shield-alert'));
           card.append(el('p', 'as-card-what', what.charAt(0).toUpperCase() + what.slice(1) + '.'));
-          if (untrusted) card.append(el('p', 'as-card-warn', 'This was suggested by outside content (a page, file or message), not only by you.'));
+          if (untrusted) {
+            const w = el('div', 'as-card-flags');
+            w.append(chip('From outside content', 'alert', 'warn'),
+              infoTip('This was suggested by outside content (a page, file or message), not only by you.', 'Why this is flagged'));
+            card.append(w);
+          }
           let field = null;
           if (typed) {
             field = document.createElement('input');
@@ -732,15 +738,16 @@ function makeAssistant(engine, services) {
             card.append(field);
           }
           const actions = el('div', 'as-card-actions');
-          const allow = el('button', 'as-btn as-btn-go', 'Allow');
-          const cancel = el('button', 'as-btn', 'Cancel');
+          const allow = withIcon(el('button', 'as-btn as-btn-go'), 'check', 'Allow');
+          const cancel = withIcon(el('button', 'as-btn'), 'x', 'Cancel');
           allow.disabled = typed;
           if (field) field.addEventListener('input', () => { allow.disabled = field.value.trim().toLowerCase() !== phrase; });
           const done = (approved) => {
             allow.disabled = cancel.disabled = true;
             if (field) field.disabled = true;
             card.classList.add(approved ? 'is-approved' : 'is-cancelled');
-            actions.replaceChildren(el('span', 'as-card-state', approved ? 'Allowed' : 'Cancelled'));
+            actions.replaceChildren(stateChip(approved ? 'Allowed' : 'Cancelled', approved ? 'ok' : 'muted'));
+            if (tr) tr.approval(approved ? 'approved' : 'cancelled', field && approved);
             resolve({ approved, typed: field ? field.value.trim() : null });
           };
           allow.addEventListener('click', () => done(true));
@@ -756,34 +763,40 @@ function makeAssistant(engine, services) {
       // A proposed shell command: what it does, how risky it is, Run / Cancel,
       // then its output. The daemon decides the tier and re-checks it on run.
       function commandCard(plan, command) {
+        const tr = turn && turn.trace;
         const card = el('div', 'as-card as-command');
-        card.append(el('h3', 'as-card-title', plan || 'Run a command'));
+        // the risk chip sits in the title row; its explanation is one tap away
+        const head = el('div', 'as-card-head');
+        const risk = el('div', 'as-risk');
+        risk.append(chip('Checking…', 'loader', 'muted', 'is-busy'));
+        head.append(cardTitle(plan || 'Run a command', 'terminal'), risk);
         const line = el('pre', 'as-cmdline');
         line.textContent = command;
-        const risk = el('p', 'as-risk', 'Checking what this does…');
         const field = document.createElement('input');
         field.className = 'as-typed';
         field.spellcheck = false;
+        field.autocomplete = 'off';
         field.hidden = true;
         const out = el('pre', 'as-output');
         out.hidden = true;
         const actions = el('div', 'as-card-actions');
-        const runBtn = el('button', 'as-btn as-btn-go', 'Run');
-        const cancel = el('button', 'as-btn', 'Cancel');
+        const runBtn = withIcon(el('button', 'as-btn as-btn-go'), 'play', 'Run');
+        const cancel = withIcon(el('button', 'as-btn'), 'x', 'Cancel');
         runBtn.disabled = true;
         actions.append(runBtn, cancel);
-        card.append(line, risk, field, out, actions);
+        card.append(head, line, field, out, actions);
 
         let tier = null;
         let phrase = 'confirm';
         services.invoke('assess_command', { command }).then((a) => {
           if (!a || !TIER_COPY[a.tier]) throw new Error('no assessment');
           tier = a.tier;
+          if (tr) tr.update({ risk: { tier: a.tier, reasons: a.reasons } });
           phrase = a.confirm_phrase || phrase;
           card.dataset.tier = tier;
           const copy = TIER_COPY[tier];
-          risk.replaceChildren(el('strong', 'as-risk-label', copy.label), document.createTextNode(' ' + copy.detail));
-          if (a.reasons && a.reasons.length) risk.append(el('span', 'as-risk-why', ' ' + a.reasons.join('; ').replace(/`/g, '')));
+          const why = (a.reasons && a.reasons.length) ? ' ' + a.reasons.join('; ').replace(/`/g, '') + '.' : '';
+          risk.replaceChildren(chip(copy.label, copy.icon, copy.tone), infoTip(copy.detail + why, 'Why this rating', 'end'));
           if (tier === 'irreversible') {
             field.hidden = false;
             field.placeholder = `Type "${phrase}" to allow`;
@@ -794,34 +807,42 @@ function makeAssistant(engine, services) {
         }).catch(() => {
           // Fail closed: without the daemon there is no sandbox and no audit log.
           card.dataset.tier = 'irreversible';
-          risk.textContent = "The AI core isn't running, so this can't be run safely right now.";
+          risk.replaceChildren(chip('Can’t run safely', 'alert-circle', 'bad'),
+            infoTip("The AI core isn't running, so this can't be run safely right now.", 'Why', 'end'));
         });
 
         runBtn.addEventListener('click', async () => {
           runBtn.disabled = cancel.disabled = field.disabled = true;
-          runBtn.textContent = 'Running…';
+          withIcon(runBtn, 'loader', 'Running…');
+          runBtn.classList.add('is-busy');
           out.hidden = false;
+          out.classList.add('is-busy');
           out.textContent = 'Running in a sandbox…';
+          if (tr) { if (tier === 'read_only') tr.notNeeded(); else tr.approval('approved', tier === 'irreversible'); }
           try {
             const res = await services.invoke('execute_ai_command', {
               command, approved: true, typed: tier === 'irreversible' ? field.value : null,
             });
             if (!res) throw new Error('No answer from the AI core');
+            if (tr) tr.update(fromExecute(res));
             const text = (res.output || '').replace(/\x1b\[[0-9;?]*[a-zA-Z]/g, '').trim();
+            out.classList.remove('is-busy');
             out.textContent = text || '(no output)';
             const ok = (res.exit_code ?? 1) === 0;
-            actions.replaceChildren(el('span', 'as-card-state' + (ok ? '' : ' is-bad'),
-              `${ok ? 'Done' : 'Finished with errors'} · ran in a sandbox · recorded in Activity`));
+            actions.replaceChildren(stateChip(ok ? 'Done' : 'Finished with errors', ok ? 'ok' : 'bad'),
+              chip('Sandboxed', 'box'), chip('Logged', 'history'));
           } catch (e) {
+            out.classList.remove('is-busy');
             out.textContent = String(e && e.message ? e.message : e);
-            actions.replaceChildren(el('span', 'as-card-state is-bad', "Didn't run"));
+            actions.replaceChildren(stateChip("Didn't run", 'bad'));
           }
           rail.refreshActivity();
           scroll();
         });
         cancel.addEventListener('click', () => {
+          if (tr) tr.approval('cancelled');
           card.classList.add('is-cancelled');
-          actions.replaceChildren(el('span', 'as-card-state', 'Cancelled. Nothing ran.'));
+          actions.replaceChildren(stateChip('Cancelled · nothing ran'));
         });
         return card;
       }
@@ -830,22 +851,22 @@ function makeAssistant(engine, services) {
       // with textContent only: it comes from the model and must never be HTML.
       function contentCard({ title, text }) {
         const card = el('div', 'as-card as-content');
-        card.append(el('h3', 'as-card-title', title));
+        card.append(cardTitle(title, 'file-text'));
         const body = el('div', 'as-content-body');
         renderLightMarkdown(body, text);
         const actions = el('div', 'as-card-actions');
-        const copy = el('button', 'as-btn', 'Copy');
+        const copy = withIcon(el('button', 'as-btn'), 'copy', 'Copy');
         copy.addEventListener('click', async () => {
-          try { await navigator.clipboard.writeText(text); copy.textContent = 'Copied'; }
-          catch { copy.textContent = "Couldn't copy"; }
+          try { await navigator.clipboard.writeText(text); withIcon(copy, 'check', 'Copied'); }
+          catch { withIcon(copy, 'alert-circle', "Couldn't copy"); }
         });
-        const save = el('button', 'as-btn', 'Save as note');
+        const save = withIcon(el('button', 'as-btn'), 'note', 'Save as note');
         save.addEventListener('click', () => {
           const notes = JSON.parse(localStorage.getItem('osaima-notes') || '[]');
           notes.unshift({ id: Date.now().toString(36), title, content: text,
                           createdAt: Date.now(), updatedAt: Date.now(), pinned: false });
           localStorage.setItem('osaima-notes', JSON.stringify(notes));
-          save.textContent = 'Saved to Notes'; save.disabled = true;
+          withIcon(save, 'check', 'Saved to Notes'); save.disabled = true;
         });
         actions.append(copy, save);
         card.append(body, actions);
@@ -853,6 +874,7 @@ function makeAssistant(engine, services) {
       }
 
       // Shared with dispatchIntent: only while this window is on screen.
+      services.traceOs = (res) => { if (turn && turn.trace) turn.trace.update(fromOs(res)); };
       services.ask = (o) => (root.isConnected ? ask(o) : null);
       services.showCommand = (plan, command) => (root.isConnected ? (attach(commandCard(plan, command)), true) : false);
 
@@ -867,35 +889,41 @@ function makeAssistant(engine, services) {
         const d = (Date.now() / 1000 - secs) / 86400;
         return d < 1 ? 'today' : d < 2 ? 'yesterday' : d < 30 ? `${Math.floor(d)} days ago` : new Date(secs * 1000).toLocaleDateString();
       };
+      // icon buttons: a check (or an alert) for two seconds, then back to their icon
       function fileAction(op, path, button) {
+        const base = op === 'open' ? 'external' : 'folder';
         button.disabled = true;
         services.invoke('os_action', { action: 'files', op, path, approved: false })
-          .then(() => { button.textContent = op === 'open' ? 'Opened' : 'Shown'; })
-          .catch((e) => { button.textContent = "Couldn't"; button.title = String(e.message || e); })
-          .finally(() => setTimeout(() => { button.disabled = false; button.textContent = op === 'open' ? 'Open' : 'Show in Files'; }, 2000));
+          .then(() => { button.innerHTML = icon('check', 16); })
+          .catch((e) => { button.innerHTML = icon('alert-circle', 16); button.title = "Couldn't: " + String(e.message || e); })
+          .finally(() => setTimeout(() => { button.disabled = false; button.innerHTML = icon(base, 16); }, 2000));
       }
       function filesCard(result) {
         const files = result.files || [];
         const card = el('div', 'as-card as-files');
         card.dataset.tier = 'read_only';
-        card.append(el('h3', 'as-card-title', result.folder ? `In ${tilde(result.folder)}` : 'Files'));
+        const head = el('div', 'as-card-head');
+        head.append(cardTitle(result.folder ? `In ${tilde(result.folder)}` : 'Files', 'folder'), chip(`${files.length}`, 'file'));
+        card.append(head);
         const list = el('ul', 'as-file-list');
         const row = (f) => {
           const li = el('li', 'as-file');
+          const kind = el('span', 'as-file-icon');
+          kind.append(iconEl(f.is_dir ? 'folder' : 'file', 18));
           const info = el('div', 'as-file-info');
-          info.append(el('span', 'as-file-name', (f.is_dir ? '📁 ' : '') + f.name));
+          info.append(el('span', 'as-file-name', f.name));
           info.append(el('span', 'as-file-meta', [tilde(f.path.slice(0, f.path.length - f.name.length - 1)), f.is_dir ? '' : size(f.size), age(f.modified)].filter(Boolean).join(' · ')));
-          const open = el('button', 'as-btn as-btn-small', 'Open');
+          const open = iconButton('external', `Open ${f.name}`, 'as-btn as-btn-icon', 16);
           open.addEventListener('click', () => fileAction('open', f.path, open));
-          const show = el('button', 'as-btn as-btn-small', 'Show in Files');
+          const show = iconButton('folder', `Show ${f.name} in Files`, 'as-btn as-btn-icon', 16);
           show.addEventListener('click', () => fileAction('reveal', f.path, show));
-          li.append(info, open, show);
+          li.append(kind, info, open, show);
           return li;
         };
         files.slice(0, 8).forEach((f) => list.append(row(f)));
         card.append(list);
         if (files.length > 8) {
-          const more = el('button', 'as-btn as-btn-small', `Show ${files.length - 8} more`);
+          const more = withIcon(el('button', 'as-btn as-btn-small as-btn-ghost'), 'chevron-down', `Show ${files.length - 8} more`);
           more.addEventListener('click', () => { files.slice(8).forEach((f) => list.append(row(f))); more.remove(); });
           card.append(more);
         }
@@ -906,20 +934,22 @@ function makeAssistant(engine, services) {
         const card = el('div', 'as-card as-undo');
         card.dataset.tier = 'reversible';
         const actions = el('div', 'as-card-actions');
-        const undo = el('button', 'as-btn', count > 1 ? 'Undo the whole plan' : 'Undo');
+        const undo = withIcon(el('button', 'as-btn'), 'undo', count > 1 ? 'Undo the whole plan' : 'Undo');
         undo.addEventListener('click', async () => {
           undo.disabled = true;
           try {
             for (let k = 0; k < count; k++) {
               await services.invoke('os_action', { action: 'files', op: 'undo', approved: false });
             }
-            actions.replaceChildren(el('span', 'as-card-state', 'Undone. Everything is back where it was.'));
+            actions.replaceChildren(stateChip('Undone', 'ok'));
           } catch (e) {
-            actions.replaceChildren(el('span', 'as-card-state is-bad', "Couldn't undo: " + (e.message || e)));
+            const c = stateChip("Couldn't undo", 'bad');
+            c.title = String(e.message || e);
+            actions.replaceChildren(c, el('span', 'as-card-note', String(e.message || e)));
           }
           rail.refreshActivity();
         });
-        actions.append(el('span', 'as-card-state', text), undo);
+        actions.append(el('span', 'as-card-note', text), undo);
         card.append(actions);
         return card;
       }
@@ -930,7 +960,7 @@ function makeAssistant(engine, services) {
       async function runPlan(rawSteps, reply, query, w) {
         const steps = rawSteps.map((s) => planStep(s, services));
         const card = el('div', 'as-card as-plan');
-        card.append(el('h3', 'as-card-title', `Plan: ${steps.length} step${steps.length === 1 ? '' : 's'}`));
+        card.append(cardTitle(`Plan · ${steps.length} step${steps.length === 1 ? '' : 's'}`, 'list'));
         const list = el('ol', 'as-plan-steps');
         const rows = steps.map((st) => {
           const li = el('li', 'as-plan-step');
@@ -991,12 +1021,12 @@ function makeAssistant(engine, services) {
           const field = typedNeeded ? Object.assign(document.createElement('input'), {
             className: 'as-typed', placeholder: 'Type "confirm" to allow every step', spellcheck: false }) : null;
           const actions = el('div', 'as-card-actions');
-          const go = el('button', 'as-btn as-btn-go', 'Run plan');
-          const cancel = el('button', 'as-btn', 'Cancel');
+          const go = withIcon(el('button', 'as-btn as-btn-go'), 'play', 'Run plan');
+          const cancel = withIcon(el('button', 'as-btn'), 'x', 'Cancel');
           go.disabled = typedNeeded;
           if (field) field.addEventListener('input', () => { go.disabled = field.value.trim().toLowerCase() !== 'confirm'; });
           go.addEventListener('click', () => { actions.remove(); if (field) field.disabled = true; resolve({ ok: true, typed: field ? field.value.trim() : null }); });
-          cancel.addEventListener('click', () => { actions.replaceChildren(el('span', 'as-card-state', 'Cancelled. Nothing ran.')); card.classList.add('is-cancelled'); resolve({ ok: false }); });
+          cancel.addEventListener('click', () => { actions.replaceChildren(stateChip('Cancelled · nothing ran')); card.classList.add('is-cancelled'); resolve({ ok: false }); });
           actions.append(go, cancel);
           if (field) card.append(field);
           card.append(actions);
@@ -1069,7 +1099,7 @@ function makeAssistant(engine, services) {
         try { seen = (await services.invoke('routine_note', { steps: rawSteps })) || seen; } catch { return; }
         if (seen.saved || !root.isConnected) return;
         const card = el('div', 'as-card as-routine');
-        card.append(el('h3', 'as-card-title', 'Save as a routine'));
+        card.append(cardTitle('Save as a routine', 'repeat'));
         card.append(el('p', 'as-routine-note', seen.count >= 2
           ? `You've done this ${seen.count} times. Save it as a routine?`
           : 'Run these steps again later by name.'));
@@ -1081,8 +1111,8 @@ function makeAssistant(engine, services) {
         const field = Object.assign(document.createElement('input'), { className: 'as-typed', spellcheck: false, maxLength: 60 });
         field.value = String(query || '').trim().replace(/^(please|can you|could you)\s+/i, '').replace(/[.!?\s]+$/, '').slice(0, 40).trim();
         const actions = el('div', 'as-card-actions');
-        const save = el('button', 'as-btn as-btn-go', 'Save');
-        const state = el('span', 'as-card-state', '');
+        const save = withIcon(el('button', 'as-btn as-btn-go'), 'check', 'Save');
+        const state = el('span', 'as-card-note', '');
         save.addEventListener('click', async () => {
           const name = field.value.trim();
           if (!name) { state.textContent = 'Give it a name first.'; return; }
@@ -1090,7 +1120,7 @@ function makeAssistant(engine, services) {
           try {
             await services.invoke('routine_save', { name, request: String(query || ''), steps: rawSteps });
             field.disabled = true;
-            actions.replaceChildren(el('span', 'as-card-state', `Saved. Say "run my ${name} routine" any time.`));
+            actions.replaceChildren(stateChip('Saved', 'ok'), el('span', 'as-card-note', `Say "run my ${name} routine" any time.`));
             rail.refreshRoutines();
           } catch (e) {
             save.disabled = false;
@@ -1114,21 +1144,21 @@ function makeAssistant(engine, services) {
         planning: 'Planning…', awaiting_scope: 'Needs your OK to start', running: 'Working', awaiting_approval: 'Needs your OK',
         done: 'Done', failed: 'Stopped', cancelled: 'Cancelled',
       };
-      const STEP_ICON = { running: '…', done: '✓', failed: '✗', refused: '⊘', declined: '⊘', needs_approval: '?' };
+      const STEP_ICON = { running: 'loader', done: 'check', failed: 'x', refused: 'pause', declined: 'pause', needs_approval: 'shield-alert' };
       function taskCard(id, goal) {
         const card = el('div', 'as-card as-task');
         card.dataset.tier = 'read_only';
         const head = el('div', 'as-task-head');
-        const title = el('h3', 'as-card-title', goal.length > 90 ? goal.slice(0, 90) + '…' : goal);
-        const chip = el('span', 'as-task-status', 'Planning…');
-        head.append(title, chip);
+        const title = cardTitle(goal.length > 90 ? goal.slice(0, 90) + '…' : goal, 'layers');
+        const status = el('span', 'as-task-status ui-chip', 'Planning…');
+        head.append(title, status);
         const scope = el('div', 'as-task-scope');
         const list = el('ol', 'as-task-steps');
         const pending = el('div', 'as-task-pending');
         const summary = el('div', 'as-task-summary');
         const foot = el('div', 'as-card-actions');
-        const stop = el('button', 'as-btn', 'Stop');
-        const meta = el('span', 'as-card-state', '');
+        const stop = withIcon(el('button', 'as-btn'), 'stop', 'Stop');
+        const meta = el('span', 'as-card-note', '');
         foot.append(stop, meta);
         stop.hidden = true;   // until the task is running; the scope has its own Cancel
         card.append(head, scope, list, pending, summary, foot);
@@ -1139,10 +1169,10 @@ function makeAssistant(engine, services) {
         const decide = (approve, typed) => services.invoke('task_decide', { id, approve, typed: typed || '' }).catch(() => {});
 
         function render(st) {
-          chip.textContent = TASK_STATUS[st.status] || st.status;
+          status.textContent = TASK_STATUS[st.status] || st.status;
           stop.hidden = !['running', 'awaiting_approval'].includes(st.status);
           card.dataset.status = st.status;
-          if (st.title) title.textContent = st.title;
+          if (st.title) title.lastChild.textContent = st.title;
           // scope: shown once, answered once
           if (st.status === 'awaiting_scope' && !scopeShown) {
             scopeShown = true;
@@ -1153,13 +1183,13 @@ function makeAssistant(engine, services) {
             facts.append(el('li', null, 'Never runs as administrator (root)'));
             const outline = el('ol', 'as-task-outline');
             (st.outline || []).forEach((o) => outline.append(el('li', null, o)));
-            const go = el('button', 'as-btn as-btn-go', 'Start task');
-            const no = el('button', 'as-btn', 'Cancel');
+            const go = withIcon(el('button', 'as-btn as-btn-go'), 'play', 'Start task');
+            const no = withIcon(el('button', 'as-btn'), 'x', 'Cancel');
             const acts = el('div', 'as-card-actions');
-            go.addEventListener('click', () => { acts.replaceChildren(el('span', 'as-card-state', 'Started')); decide(true); });
-            no.addEventListener('click', () => { acts.replaceChildren(el('span', 'as-card-state', 'Cancelled')); decide(false); });
+            go.addEventListener('click', () => { acts.replaceChildren(stateChip('Started', 'ok')); decide(true); });
+            no.addEventListener('click', () => { acts.replaceChildren(stateChip('Cancelled')); decide(false); });
             acts.append(go, no);
-            scope.append(el('p', 'as-task-lede', 'Here is the plan. The computer itself (Linux kernel) holds the task to these limits:'), facts, outline, acts);
+            scope.append(el('p', 'as-task-lede', 'Limits, enforced by the Linux kernel:'), facts, outline, acts);
             go.focus();
           }
           if (st.status !== 'awaiting_scope' && scopeShown) scope.querySelector('.as-card-actions')?.remove();
@@ -1183,7 +1213,7 @@ function makeAssistant(engine, services) {
               rows.set(s.id, r);
             }
             r.li.dataset.state = s.state;
-            r.icon.textContent = STEP_ICON[s.state] || '•';
+            r.icon.innerHTML = icon(STEP_ICON[s.state] || 'more', 13);
             if (s.output) {
               r.out.hidden = false;
               r.out.querySelector('pre').textContent = s.output;
@@ -1195,8 +1225,8 @@ function makeAssistant(engine, services) {
             pendingFor = st.pending.step;
             card.dataset.tier = 'irreversible';
             const field = Object.assign(document.createElement('input'), { className: 'as-typed', placeholder: 'Type "confirm" to allow this step', spellcheck: false });
-            const allow = el('button', 'as-btn as-btn-go', 'Allow');
-            const skip = el('button', 'as-btn', 'Skip this step');
+            const allow = withIcon(el('button', 'as-btn as-btn-go'), 'check', 'Allow');
+            const skip = withIcon(el('button', 'as-btn'), 'chevron-right', 'Skip this step');
             allow.disabled = true;
             field.addEventListener('input', () => { allow.disabled = field.value.trim().toLowerCase() !== 'confirm'; });
             allow.addEventListener('click', () => { pending.replaceChildren(); decide(true, field.value); });
@@ -1257,13 +1287,14 @@ function makeAssistant(engine, services) {
       // How the reply was produced, in plain words.
       function describeSource(m) {
         const files = [...new Set((m.sources || []).map((s) => s.split('/').pop().replace(/\.md$/, '')))];
-        const cite = files.length ? ` · using ${files.join(', ')}` : '';
-        if (m.source === 'fast') return `Understood on this computer in ${Math.round(m.ms || 0)} ms`;
+        const cite = files.length ? ` · ${files.join(', ')}` : '';
+        if (m.source === 'fast') return `On this computer · ${Math.round(m.ms || 0)} ms`;
         if (m.source === 'llm') {
-          const who = /^gemini/.test(m.backend || '') ? 'Gemini' : 'the on-device model';
-          return `Answered by ${who} in ${((m.ms || 0) / 1000).toFixed(1)} s${cite}`;
+          const who = /^gemini/.test(m.backend || '') ? 'Gemini' : 'On-device model';
+          return `${who} · ${((m.ms || 0) / 1000).toFixed(1)} s${cite}`;
         }
-        return "The AI core didn't answer, so this is a basic offline reply";
+        if (m.source === 'routine') return 'Your routine';
+        return 'Offline reply';
       }
 
       // The conversation so far, sent with each request so follow-ups make sense.
@@ -1290,6 +1321,7 @@ function makeAssistant(engine, services) {
             const outside = (r.context_from || ['untrusted']).some((k) => k !== 'folder' && k !== 'knowledge');
             meta = { source: r.source || 'llm', ms: r.ms, sources: r.sources || [], backend: r.backend, tainted: !!r.tainted && outside,
                      usedFolderNames: !!r.tainted && (r.context_from || []).includes('folder') };
+            if (turn) { turn.trace = createTrace(r, meta); turn.trace.el.hidden = true; turn.row.append(turn.trace.el); }
             if (r.intent === 'generate_text' && params.content) {
               meta.content = { title: params.title || 'Answer', text: params.content };
               return r.reply && r.reply !== 'Here you go:' ? r.reply : 'Here it is.';
@@ -1316,6 +1348,7 @@ function makeAssistant(engine, services) {
 
         // Offline fallback: only when the AI core gave nothing.
         meta = { source: 'offline' };
+        if (turn && !turn.trace) { turn.trace = createTrace({}, meta); turn.trace.el.hidden = true; turn.row.append(turn.trace.el); }
         if (/^(hi|hello|hey)\b/.test(q)) return 'Hello. What would you like to do?';
         if (/^(help|\?)$|what can you do/.test(q)) return 'Try one of the examples, or describe a task: finding files, checking the system, writing a message, changing volume or Wi-Fi.';
         if (/(how|status|health|cpu|memory|ram).*(system|doing)|^(stats?|status)$/.test(q)) {
@@ -1342,7 +1375,6 @@ function makeAssistant(engine, services) {
         // a double click (or a double Enter) sends the same request once
         if (v === lastSent.text && Date.now() - lastSent.at < 1500) return;
         lastSent = { text: v, at: Date.now() };
-        voice.silence();
         if (busy) { queued.push(v); return; }
         busy = true;
         addUser(v);
@@ -1358,9 +1390,15 @@ function makeAssistant(engine, services) {
           reply = "Here's what I'd run. Check it, then choose Run.";
         }
         t.text.textContent = reply;
-        voice.speak(reply);
+        if (readBox.checked && reply && !/^Something went wrong/.test(reply)) {
+          services.invoke('speak', { text: String(reply) }).catch((e) => showVoiceMsg(String(e && e.message ? e.message : e)));
+        }
         if (meta && meta.content) t.cards.prepend(contentCard(meta.content));
-        if (meta) t.meta.textContent = describeSource(meta);
+        if (meta) {
+          t.meta.replaceChildren(iconEl({ fast: 'zap', llm: 'sparkles', routine: 'repeat' }[meta.source] || 'wifi-off', 14), el('span', null, describeSource(meta)));
+          if (meta.source === 'offline') t.meta.title = "The AI core didn't answer, so this is a basic offline reply.";
+        }
+        if (t.trace) t.trace.el.hidden = false;
         remember('user', v);
         remember('assistant', meta && meta.content ? `${reply}\n${meta.content.text}` : reply);
         turn = null;
@@ -1373,6 +1411,50 @@ function makeAssistant(engine, services) {
       }
 
       composer.addEventListener('submit', (e) => { e.preventDefault(); run(); });
+
+      // ── Voice: push to talk. The daemon records, detects the end of speech and transcribes locally. ──
+      let listening = false;
+      function showVoiceMsg(text) {
+        voiceMsg.textContent = text || '';
+        voiceMsg.hidden = !text;
+      }
+      function setListening(on, label) {
+        listening = on;
+        orb.hidden = !on;
+        orbText.textContent = label || 'Listening…';
+        orb.dataset.state = on ? (label === 'Transcribing…' ? 'thinking' : 'listening') : '';
+        mic.classList.toggle('is-on', on);
+        mic.setAttribute('aria-pressed', on ? 'true' : 'false');
+        mic.setAttribute('aria-label', on ? 'Stop listening' : 'Speak your request');
+      }
+      async function toggleMic() {
+        if (listening) { services.invoke('voice_cancel', {}).catch(() => {}); return; }
+        showVoiceMsg('');
+        services.invoke('speak_stop', {}).catch(() => {});
+        let st;
+        try { st = await services.invoke('voice_status', {}); }
+        catch { showVoiceMsg("Voice isn't available because the AI core isn't running."); return; }
+        if (!st || !st.can_listen) {
+          showVoiceMsg((st && st.reasons && st.reasons.join(' ')) || "Voice isn't set up on this computer yet.");
+          return;
+        }
+        setListening(true);
+        // the daemon returns after speech ends; swap the label once it starts transcribing (about when the call is slow)
+        const slow = setTimeout(() => { if (listening) setListening(true, 'Transcribing…'); }, 4000);
+        try {
+          const r = await services.invoke('voice_listen', {});
+          if (r && r.cancelled) { /* user stopped it */ }
+          else if (!r || !r.text) showVoiceMsg((r && r.message) || "I didn't catch that. Try again.");
+          else { input.value = r.text; run(); }
+        } catch (e) {
+          showVoiceMsg(String(e && e.message ? e.message : e));
+        } finally {
+          clearTimeout(slow);
+          setListening(false);
+          input.focus();
+        }
+      }
+      mic.addEventListener('click', toggleMic);
       window.addEventListener('osaima:ask', (e) => { if (root.isConnected) run(e.detail); });
       window.addEventListener('osaima:focus', () => { if (root.isConnected) input.focus(); });
       // pick up files sent from the file manager
@@ -1395,15 +1477,26 @@ function makeAssistant(engine, services) {
       // ── Side rail ──
       function buildRail() {
         const railEl = el('aside', 'as-rail');
+        railEl.setAttribute('aria-label', 'This computer and suggestions');
+        const panelHead = (text, extra) => {
+          const h = el('div', 'as-panel-head');
+          h.append(el('h2', 'as-panel-title', text));
+          if (extra) h.append(extra);
+          return h;
+        };
 
+        // 1. the computer at a glance
         const sys = el('section', 'as-panel');
-        sys.append(el('h2', 'as-panel-title', 'This computer'));
+        const host = el('span', 'as-panel-caption', '');
+        sys.append(panelHead('This computer', host));
         const meters = {};
-        for (const [key, label] of [['cpu', 'Processor'], ['mem', 'Memory'], ['disk', 'Disk']]) {
+        for (const [key, label, ic] of [['cpu', 'Processor', 'cpu'], ['mem', 'Memory', 'memory'], ['disk', 'Disk', 'disk']]) {
           const row = el('div', 'as-meter');
           const head = el('div', 'as-meter-head');
           const val = el('span', 'as-meter-val', '—');
-          head.append(el('span', 'as-meter-label', label), val);
+          const name = el('span', 'as-meter-label');
+          name.append(iconEl(ic, 15), el('span', null, label));
+          head.append(name, val);
           const track = el('div', 'as-meter-track');
           const fill = el('div', 'as-meter-fill');
           track.append(fill);
@@ -1411,33 +1504,45 @@ function makeAssistant(engine, services) {
           sys.append(row);
           meters[key] = { val, fill };
         }
-        // health watch warnings: overheating, throttling, low disk, failed services
-        const alertList = el('ul', 'as-alerts');
-        const host = el('p', 'as-panel-foot', '');
-        sys.append(alertList, host);
 
+        // 2. the one alert that matters most; the rest fold away
+        const alertSlot = el('section', 'as-alert-slot');
+        alertSlot.setAttribute('aria-label', 'Alerts');
+        alertSlot.hidden = true;
+
+        // 3. suggestions as chips
         const sug = el('section', 'as-panel');
-        sug.append(el('h2', 'as-panel-title', 'You often ask'));
+        sug.append(panelHead('Suggestions'));
         const sugList = el('ul', 'as-sug');
         sug.append(sugList);
 
-        const rou = el('section', 'as-panel');
-        rou.append(el('h2', 'as-panel-title', 'Your routines'));
-        const rouList = el('ul', 'as-sug');
-        rou.append(rouList);
-
-        const act = el('section', 'as-panel as-panel-grow');
-        act.append(el('h2', 'as-panel-title', 'Activity'));
+        // 4. folded: routines and recent activity
+        const fold = (title, ic) => {
+          const d = document.createElement('details');
+          d.className = 'as-fold';
+          const s = el('summary', 'as-fold-sum');
+          const count = el('span', 'as-fold-count', '');
+          s.append(iconEl(ic, 15), el('span', 'as-fold-title', title), count, iconEl('chevron-down', 14, 'as-fold-chev'));
+          d.append(s);
+          try { d.open = localStorage.getItem('osaima-rail-' + ic) === '1'; } catch { /* storage blocked */ }
+          d.addEventListener('toggle', () => { try { localStorage.setItem('osaima-rail-' + ic, d.open ? '1' : '0'); } catch { /* ignore */ } });
+          return { d, count };
+        };
+        const rou = fold('Routines', 'repeat');
+        const rouList = el('ul', 'as-routines');
+        rou.d.append(rouList);
+        const act = fold('Activity', 'activity');
         const actList = el('ol', 'as-act');
         const actFoot = el('p', 'as-panel-foot', '');
-        act.append(actList, actFoot);
+        act.d.append(actList, actFoot);
 
-        railEl.append(sys, rou, sug, act);
+        railEl.append(sys, alertSlot, sug, rou.d, act.d);
+        sugList.replaceChildren(el('li', 'as-skel-chips'));
 
         const gb = (b) => (b / 1073741824).toFixed(1) + ' GB';
         const setMeter = (m, pct, text) => {
           m.val.textContent = text;
-          m.fill.style.width = Math.max(0, Math.min(100, pct)).toFixed(1) + '%';
+          m.fill.style.transform = `scaleX(${(Math.max(0, Math.min(100, pct)) / 100).toFixed(3)})`;
           m.fill.dataset.level = pct >= 90 ? 'high' : pct >= 75 ? 'mid' : 'ok';
         };
         async function refreshStats() {
@@ -1445,32 +1550,32 @@ function makeAssistant(engine, services) {
             const s = await services.invoke('get_system_stats');
             setMeter(meters.cpu, s.cpu.usage_percent, `${s.cpu.usage_percent.toFixed(0)}%`);
             const mp = (s.memory.used_bytes / s.memory.total_bytes) * 100;
-            setMeter(meters.mem, mp, `${gb(s.memory.used_bytes)} of ${gb(s.memory.total_bytes)}`);
+            setMeter(meters.mem, mp, `${(s.memory.used_bytes / 1073741824).toFixed(1)} / ${gb(s.memory.total_bytes)}`);
             if (s.disk) {
               const dp = (s.disk.used_bytes / s.disk.total_bytes) * 100;
               setMeter(meters.disk, dp, `${gb(s.disk.total_bytes - s.disk.used_bytes)} free`);
             }
-            host.textContent = `${s.host} · ${s.os || 'Linux'}`;
-          } catch { host.textContent = "Can't read system stats."; }
+            host.textContent = s.host || '';
+            host.title = `${s.host} · ${s.os || 'Linux'}`;
+            host.classList.remove('is-bad');
+          } catch { host.textContent = 'Offline'; host.title = "Can't read system stats."; host.classList.add('is-bad'); }
         }
 
         async function refreshRoutines() {
           let mine = [];
           try { mine = ((await services.invoke('routines', {})) || {}).routines || []; } catch {}
+          rou.count.textContent = mine.length ? String(mine.length) : '';
           if (!mine.length) {
-            rouList.replaceChildren(el('li', 'as-empty', 'Finished plans you save appear here.'));
+            rouList.replaceChildren(el('li', 'as-empty', 'Save a finished plan to reuse it.'));
             return;
           }
           rouList.replaceChildren(...mine.map((r) => {
             const li = el('li', 'as-routine-item');
-            const b = el('button', 'as-sug-item', r.name);
+            const b = withIcon(el('button', 'as-chip'), 'play', r.name, 13);
             b.type = 'button';
-            b.title = `${r.steps} step${r.steps === 1 ? '' : 's'}`;
+            b.title = `Run · ${r.steps} step${r.steps === 1 ? '' : 's'}`;
             b.addEventListener('click', () => run(`run my ${r.name} routine`));
-            const x = el('button', 'as-routine-del', '\u00d7');
-            x.type = 'button';
-            x.title = 'Delete this routine';
-            x.setAttribute('aria-label', `Delete ${r.name}`);
+            const x = iconButton('trash', `Delete ${r.name}`, 'as-routine-del', 14);
             x.addEventListener('click', async () => {
               try { await services.invoke('routine_delete', { id: r.id }); } catch {}
               refreshRoutines();
@@ -1480,17 +1585,44 @@ function makeAssistant(engine, services) {
           }));
         }
 
+        // systemd unit names carry escapes and instance hashes: show them readably
+        const tidy = (t) => String(t || '').replace(/\\x2d/g, '-').replace(/@[0-9a-f]{12,}/g, '').replace(/\.service\b/g, '');
+        function alertCard(a) {
+          const li = el('div', 'as-alert');
+          li.dataset.level = a.level || 'warn';
+          const top = el('div', 'as-alert-top');
+          top.append(iconEl(a.level === 'bad' ? 'alert-circle' : a.source === 'model' ? 'activity' : 'alert', 16, 'as-alert-icon'));
+          const title = el('strong', 'as-alert-title', tidy(a.title));
+          title.title = tidy(a.title);
+          top.append(title);
+          const why = withIcon(el('button', 'as-chip as-chip-sm'), 'chat', 'Ask why', 13);
+          why.type = 'button';
+          why.addEventListener('click', () => run(`why ${a.title.toLowerCase()}?`));
+          const foot = el('div', 'as-alert-foot');
+          foot.append(why);
+          const more = a.source === 'model' ? a.advice : (a.advice || a.detail);
+          if (more) foot.append(infoTip(tidy(more), 'Details', 'end'));
+          li.append(top);
+          // forecasts and anomalies come from the on-device models: show the numbers behind them
+          if (a.source === 'model' && a.detail) li.append(el('span', 'as-evidence', a.detail));
+          li.append(foot);
+          return li;
+        }
         function showAlerts(alerts) {
-          alertList.replaceChildren(...(alerts || []).slice(0, 3).map((a) => {
-            const li = el('li', 'as-alert');
-            li.dataset.level = a.level || 'warn';
-            li.append(el('strong', null, a.title), el('span', null, a.advice || a.detail || ''));
-            const why = el('button', 'as-sug-item', 'Why is this happening?');
-            why.type = 'button';
-            why.addEventListener('click', () => run(`why ${a.title.toLowerCase()}?`));
-            li.append(why);
-            return li;
-          }));
+          const rank = { bad: 0, warn: 1, info: 2 };
+          const list = [...(alerts || [])].sort((x, y) => (rank[x.level] ?? 1) - (rank[y.level] ?? 1));
+          alertSlot.hidden = !list.length;
+          if (!list.length) { alertSlot.replaceChildren(); return; }
+          const nodes = [alertCard(list[0])];
+          if (list.length > 1) {
+            const more = document.createElement('details');
+            more.className = 'as-alert-more';
+            const s = el('summary', 'as-fold-sum');
+            s.append(el('span', 'as-fold-title', `${list.length - 1} more alert${list.length === 2 ? '' : 's'}`), iconEl('chevron-down', 14, 'as-fold-chev'));
+            more.append(s, ...list.slice(1, 4).map(alertCard));
+            nodes.push(more);
+          }
+          alertSlot.replaceChildren(...nodes);
         }
         async function refreshSuggestions() {
           let mine = [], usual = [];
@@ -1498,29 +1630,32 @@ function makeAssistant(engine, services) {
             const r = (await services.invoke('suggestions', { n: 4 })) || {};
             mine = r.suggestions || [];
             usual = r.predictions || [];
-            showAlerts(r.alerts);
+            showAlerts([...(r.alerts || []), ...(r.forecasts || []), ...(r.anomalies || [])]);
           } catch {}
           // "you usually do this around now": do it, or make it an automation (asks first)
           const predicted = usual.map((p) => {
             const li = el('li', 'as-usual');
-            li.append(el('span', 'as-usual-why', `Usually around ${p.usual_time}`));
-            const go = el('button', 'as-sug-item', p.text);
+            // the model's reason and confidence: confidence as a small badge, the reason on hover
+            const why = p.reason ? p.reason.charAt(0).toUpperCase() + p.reason.slice(1) : `Usually around ${p.usual_time}`;
+            const go = withIcon(el('button', 'as-chip as-chip-usual'), p.usual_time ? 'clock' : 'sparkles', p.text, 13);
+            if (p.confidence) go.append(el('span', 'as-chip-conf', `${Math.round(p.confidence * 100)}%`));
             go.type = 'button';
+            go.title = p.confidence ? `${why} (${Math.round(p.confidence * 100)}% confident)` : why;
             go.addEventListener('click', () => run(p.text));
-            const auto = el('button', 'as-usual-auto', `Do this every day at ${p.usual_time}`);
-            auto.type = 'button';
+            const auto = iconButton('repeat', `Do this every day at ${p.usual_time}`, 'as-usual-auto', 14);
             auto.addEventListener('click', () => run(`every day at ${p.usual_time} ${p.text}`));
-            li.append(go, auto);
+            li.append(go);
+            if (p.usual_time) li.append(auto); // only a time-of-day habit can become a daily automation
             return li;
           });
           mine = mine.filter((m) => !usual.some((p) => p.text === m.toLowerCase()));
           if (!mine.length && !predicted.length) {
-            sugList.replaceChildren(el('li', 'as-empty', "Nothing yet. Requests you make often will show up here."));
+            sugList.replaceChildren(el('li', 'as-empty', 'Frequent requests show up here.'));
             return;
           }
           sugList.replaceChildren(...predicted, ...mine.map((s) => {
             const li = document.createElement('li');
-            const b = el('button', 'as-sug-item', s);
+            const b = el('button', 'as-chip', s);
             b.type = 'button';
             b.addEventListener('click', () => run(s));
             li.append(b);
@@ -1555,11 +1690,12 @@ function makeAssistant(engine, services) {
         async function refreshActivity() {
           let res = null;
           try { res = await services.invoke('audit_tail', { n: 40 }); } catch {}
-          if (!res) { actFoot.textContent = "Can't read the activity log."; return; }
+          if (!res) { actList.replaceChildren(); actFoot.textContent = "Can't read the activity log."; return; }
           const rows = (res.entries || [])
             .filter((e) => !(e.event === 'os_action' && e.data && e.data.op === 'status'))
             .map((e) => [e, sentence(e)]).filter(([, s]) => s).slice(-6).reverse();
-          if (!rows.length) actList.replaceChildren(el('li', 'as-empty', 'Commands I run for you will be listed here.'));
+          act.count.textContent = rows.length ? String(rows.length) : '';
+          if (!rows.length) actList.replaceChildren(el('li', 'as-empty', 'Nothing done yet.'));
           else actList.replaceChildren(...rows.map(([e, [kind, text]]) => {
             const li = el('li', 'as-act-item');
             li.dataset.kind = kind;
@@ -1569,7 +1705,8 @@ function makeAssistant(engine, services) {
             return li;
           }));
           const v = res.verified || {};
-          actFoot.textContent = v.ok ? `Log intact · ${v.records} entries checked` : `Log was altered at entry ${v.line}`;
+          actFoot.replaceChildren(iconEl(v.ok ? 'shield-check' : 'shield-alert', 14),
+            el('span', null, v.ok ? `Log intact · ${v.records} checked` : `Log altered at entry ${v.line}`));
           actFoot.classList.toggle('is-bad', !v.ok);
         }
 
@@ -1601,8 +1738,8 @@ function makeTaskManager(services) {
       root.classList.add('app-tasks');
       root.innerHTML = `
         <div class="tk-toolbar">
-          <span class="tk-title">Processes — live from /proc</span>
-          <span class="tk-hint">click a row · Renice / Kill</span>
+          <span class="tk-title">Processes</span>
+          <span class="ui-chip ui-chip-ok tk-live" title="Read live from /proc every 2 seconds">${icon('activity', 14)}<span>Live</span></span>
         </div>
         <div class="tk-head">
           <span class="tk-c-pid">PID</span>
@@ -1613,13 +1750,15 @@ function makeTaskManager(services) {
         </div>
         <div class="tk-rows"></div>
         <div class="tk-actions">
-          <button class="tk-btn tk-boost" disabled>⬆ Renice (boost)</button>
-          <button class="tk-btn tk-kill" disabled>✕ Kill</button>
+          <span class="tk-sel">Select a process</span>
+          <button class="tk-btn tk-boost" disabled title="Renice: give it more CPU time">${icon('boost', 16)}<span>Boost</span></button>
+          <button class="tk-btn tk-kill" disabled>${icon('kill', 16)}<span>End</span></button>
         </div>`;
 
       const rowsEl = root.querySelector('.tk-rows');
       const boostBtn = root.querySelector('.tk-boost');
       const killBtn = root.querySelector('.tk-kill');
+      const selLabel = root.querySelector('.tk-sel');
 
       let procs = [];
       let selectedPid = null;
@@ -1640,6 +1779,7 @@ function makeTaskManager(services) {
           row.addEventListener('click', () => {
             selectedPid = p.pid;
             boostBtn.disabled = killBtn.disabled = false;
+            selLabel.textContent = `${p.name} · ${p.pid}`;
             render();
           });
           rowsEl.append(row);
@@ -1650,7 +1790,10 @@ function makeTaskManager(services) {
         try {
           const data = await services.invoke('list_processes');
           procs = data.processes || [];
-        } catch { return; }
+        } catch {
+          if (!procs.length) rowsEl.replaceChildren(emptyState('alert-circle', "Can't read the process list"));
+          return;
+        }
         render();
       };
 
@@ -1664,6 +1807,7 @@ function makeTaskManager(services) {
         try { await services.invoke('kill_process', { pid: selectedPid }); } catch {}
         selectedPid = null;
         boostBtn.disabled = killBtn.disabled = true;
+        selLabel.textContent = 'Select a process';
         load();
       });
 
@@ -1690,15 +1834,16 @@ function makeKnowledge(services) {
       const stats = services.rag ? services.rag.stats() : { docs: 0, chunks: 0 };
       root.innerHTML = `
         <div class="rag-bar">
-          <input class="rag-input" placeholder="Ask about OSAIMA, the WM, Linux…" spellcheck="false" />
+          <label class="rag-box">${icon('search', 18)}<input class="rag-input" placeholder="Ask about OSAIMA or Linux…" spellcheck="false" aria-label="Question" /></label>
           <button class="rag-ask">Search</button>
         </div>
-        <div class="rag-meta">Indexed: ${stats.docs} docs · ${stats.chunks} chunks (TF-IDF retrieval)</div>
+        <div class="rag-meta"><span class="ui-chip" title="TF-IDF retrieval over the built-in notes">${icon('book', 14)}<span>${stats.docs} docs · ${stats.chunks} passages</span></span></div>
         <div class="rag-results"></div>`;
 
       const input = root.querySelector('.rag-input');
       const askBtn = root.querySelector('.rag-ask');
       const results = root.querySelector('.rag-results');
+      results.append(emptyState('book', 'Ask a question to search the notes'));
 
       const run = () => {
         const q = input.value.trim();
@@ -1707,9 +1852,9 @@ function makeKnowledge(services) {
         results.innerHTML = '';
         const ans = el('div', 'rag-answer');
         ans.textContent = res.answer;
-        results.append(el('div', 'rag-label', 'ANSWER'), ans);
+        results.append(el('div', 'rag-label', 'Answer'), ans);
         if (res.sources.length) {
-          results.append(el('div', 'rag-label', 'RETRIEVED SOURCES'));
+          results.append(el('div', 'rag-label', 'Sources'));
           for (const s of res.sources) {
             const card = el('div', 'rag-source');
             card.innerHTML = `<div class="rag-src-head"><b>${escapeHtml(s.title)}</b>`
@@ -1744,31 +1889,31 @@ function makeBehavior(engine, services) {
         const b = services.behavior;
         if (!b) { root.innerHTML = '<div class="bh-empty">Behavior store unavailable.</div>'; return; }
         const s = b.summary();
-        const appName = (id) => (engine.appRegistry.get(id) || {}).title || id;
+        const appName = (id) => ((engine.appRegistry && engine.appRegistry.get(id)) || {}).title || id;
         const topApps = s.topApps.length
           ? s.topApps.map((a) => `<div class="bh-row"><span>${escapeHtml(appName(a.id))}</span><b>${a.count}×</b></div>`).join('')
-          : '<div class="bh-dim">nothing yet — use the desktop and come back</div>';
+          : '<div class="bh-dim">Nothing yet</div>';
         const accept = s.acceptanceRate === null ? '—' : (s.acceptanceRate * 100).toFixed(0) + '%';
         const queries = s.recentQueries.length
           ? s.recentQueries.map((q) => `<div class="bh-q">“${escapeHtml(q.q)}”</div>`).join('')
-          : '<div class="bh-dim">no questions asked yet</div>';
+          : '<div class="bh-dim">No questions yet</div>';
         root.innerHTML = `
           <div class="bh-head">
-            <div class="bh-logo">🧠</div>
+            <div class="bh-logo">${icon('bulb', 24)}</div>
             <div><div class="bh-title">What OSAIMA has learned</div>
-            <div class="bh-sub">${s.totalEvents} events observed · persists on-device</div></div>
+            <div class="bh-sub">${s.totalEvents} events · stays on this computer</div></div>
           </div>
           <div class="bh-grid">
             <div class="bh-card"><span class="bh-k">Preferred layout</span><span class="bh-v">${escapeHtml(s.preferredLayout || '—')}</span></div>
             <div class="bh-card"><span class="bh-k">Likely next app</span><span class="bh-v">${escapeHtml(appName(s.predictedNext) || '—')}</span></div>
-            <div class="bh-card"><span class="bh-k">Suggestion accept</span><span class="bh-v">${accept}</span></div>
+            <div class="bh-card"><span class="bh-k">Suggestions taken</span><span class="bh-v">${accept}</span></div>
             <div class="bh-card"><span class="bh-k">Peak hour</span><span class="bh-v">${s.peakHour === null ? '—' : s.peakHour + ':00'}</span></div>
           </div>
-          <div class="bh-section">MOST-USED APPS</div>
+          <div class="bh-section">Most-used apps</div>
           <div class="bh-list">${topApps}</div>
-          <div class="bh-section">RECENT QUESTIONS</div>
+          <div class="bh-section">Recent questions</div>
           <div class="bh-list">${queries}</div>
-          <div class="bh-actions"><button class="bh-btn bh-refresh">↻ Refresh</button><button class="bh-btn bh-reset">Reset learning</button></div>`;
+          <div class="bh-actions"><button class="bh-btn bh-refresh">${icon('refresh', 16)}<span>Refresh</span></button><button class="bh-btn bh-reset">${icon('trash', 16)}<span>Reset learning</span></button></div>`;
         root.querySelector('.bh-refresh').addEventListener('click', render);
         root.querySelector('.bh-reset').addEventListener('click', () => { b.reset(); render(); });
       };
@@ -1809,11 +1954,12 @@ function makeNotes(services) {
       const sidebarHeader = el('div', 'notes-sidebar-header');
       const titleRow = el('div', 'notes-sidebar-title');
       titleRow.innerHTML = '<span>Notes</span>';
-      const newBtn = el('button', 'notes-new-btn', '+ New');
+      const newBtn = withIcon(el('button', 'notes-new-btn'), 'plus', 'New');
       titleRow.appendChild(newBtn);
       const searchInput = document.createElement('input');
       searchInput.className = 'notes-search';
       searchInput.placeholder = 'Search notes…';
+      searchInput.setAttribute('aria-label', 'Search notes');
       searchInput.spellcheck = false;
       sidebarHeader.append(titleRow, searchInput);
       const listEl = el('div', 'notes-list');
@@ -1865,12 +2011,12 @@ function makeNotes(services) {
         const filtered = getFiltered();
         listEl.innerHTML = '';
         if (filtered.length === 0) {
-          listEl.innerHTML = '<div class="notes-empty-list">' + (searchQuery ? 'No matching notes.' : 'No notes yet.<br>Click + New to create one.') + '</div>';
+          listEl.replaceChildren(el('div', 'notes-empty-list', searchQuery ? 'No matches' : 'No notes yet'));
         } else {
           for (const n of filtered) {
             const item = el('div', 'notes-item' + (n.id === selectedId ? ' selected' : ''));
             const titleDiv = el('div', 'notes-item-title');
-            if (n.pinned) { const pin = el('span', 'notes-item-pin', '📌'); titleDiv.appendChild(pin); }
+            if (n.pinned) { const pin = el('span', 'notes-item-pin'); pin.append(iconEl('pin', 12)); pin.title = 'Pinned'; titleDiv.appendChild(pin); }
             const titleText = document.createTextNode(n.title || 'Untitled');
             titleDiv.appendChild(titleText);
             const preview = el('div', 'notes-item-preview', (n.content || '').slice(0, 60) || 'Empty note');
@@ -1888,19 +2034,22 @@ function makeNotes(services) {
         editorPane.innerHTML = '';
         const note = notes.find(n => n.id === selectedId);
         if (!note) {
-          editorPane.innerHTML = '<div class="notes-empty"><div class="notes-empty-icon">📝</div><div class="notes-empty-text">Select a note or create a new one</div><div class="notes-empty-hint">Tip: Ask the AI to "write a note about…"</div></div>';
+          const empty = emptyState('note', 'Pick a note, or ask the assistant to write one');
+          empty.classList.add('notes-empty');
+          editorPane.replaceChildren(empty);
           return;
         }
 
         // Toolbar
         const toolbar = el('div', 'notes-toolbar');
-        const pinBtn = el('button', 'notes-tool-btn' + (note.pinned ? ' active' : ''), note.pinned ? '📌 Pinned' : '📌 Pin');
-        const boldBtn = el('button', 'notes-tool-btn', '𝐁');
-        const italicBtn = el('button', 'notes-tool-btn', '𝑰');
-        const listBtn = el('button', 'notes-tool-btn', '• List');
+        const pinBtn = iconButton('pin', note.pinned ? 'Unpin' : 'Pin', 'notes-tool-btn' + (note.pinned ? ' active' : ''), 16);
+        pinBtn.setAttribute('aria-pressed', String(!!note.pinned));
+        const boldBtn = iconButton('bold', 'Bold', 'notes-tool-btn', 16);
+        const italicBtn = iconButton('italic', 'Italic', 'notes-tool-btn', 16);
+        const listBtn = iconButton('list', 'Bulleted list', 'notes-tool-btn', 16);
         const spacer = el('div', 'notes-tool-spacer');
-        const saveHint = el('span', 'notes-save-hint', 'Auto-saved');
-        const delBtn = el('button', 'notes-tool-btn danger', '🗑 Delete');
+        const saveHint = el('span', 'notes-save-hint', 'Saved');
+        const delBtn = iconButton('trash', 'Delete note', 'notes-tool-btn danger', 16);
         toolbar.append(pinBtn, boldBtn, italicBtn, listBtn, spacer, saveHint, delBtn);
 
         // Title input
@@ -1924,7 +2073,7 @@ function makeNotes(services) {
           note.updatedAt = Date.now();
           saveHint.textContent = 'Saving…';
           autoSave();
-          setTimeout(() => { saveHint.textContent = 'Auto-saved'; renderList(); }, 400);
+          setTimeout(() => { saveHint.textContent = 'Saved'; renderList(); }, 400);
         });
 
         contentArea.addEventListener('input', () => {
@@ -1932,7 +2081,7 @@ function makeNotes(services) {
           note.updatedAt = Date.now();
           saveHint.textContent = 'Saving…';
           autoSave();
-          setTimeout(() => { saveHint.textContent = 'Auto-saved'; }, 400);
+          setTimeout(() => { saveHint.textContent = 'Saved'; }, 400);
         });
 
         pinBtn.addEventListener('click', () => {
@@ -2182,7 +2331,9 @@ async function runOsAction(services, req) {
   } catch (e) {
     const msg = String(e && e.message ? e.message : e);
     if (!msg.includes('needs approval')) throw e;
-    const what = describeFileRequest(req) || OS_ACTION_WORDS[`${req.action} ${req.op}`.trim()]
+    const what = describeFileRequest(req)
+      || (req.action === 'apps' ? `${req.op === 'remove' ? 'remove' : 'install'} ${req.value || 'an app'} (from Flathub, just for you)` : null)
+      || OS_ACTION_WORDS[`${req.action} ${req.op}`.trim()]
       || `${req.action.replace('_', ' ')} ${req.op}`.trim();
     const phrase = (msg.match(/typed phrase '([^']+)'/) || [])[1];
     const answer = services.ask ? await services.ask({ what, typed: !!phrase, phrase: phrase || 'confirm' }) : null;
@@ -2209,6 +2360,15 @@ function describeOsResult(req, res) {
     case 'bluetooth': return `Bluetooth is ${r.bluetooth_on ? 'on' : 'off'}.`;
     case 'media': return `Media: ${req.op.replace('_', '/')}.`;
     case 'lock_screen': return 'Screen locked.';
+    case 'apps': {
+      if (r.installing) return `Installing ${r.installing} from Flathub. It downloads in the background; I'll notify you when it's ready.`;
+      if (r.already) return `${r.installed} is already installed.`;
+      if (r.removed) return `Removed ${r.removed}.`;
+      if (r.opened) return `Opened ${r.opened}.`;
+      const list = (r.apps || []).slice(0, 6);
+      if (req.op === 'list') return list.length ? `Installed apps: ${list.map((a) => a.name).join(', ')}.` : 'No apps installed from Flathub yet.';
+      return list.length ? `On Flathub: ${list.map((a) => `${a.name} (${a.summary})`).join('; ')}. Say "install" and the name to get one.` : 'Nothing on Flathub matched that.';
+    }
     case 'power': return `Power: ${req.op}.`;
     case 'app': return r.launched ? `Opened ${req.app}.` : r.focused ? `${req.app} was already open, so I brought it forward.` : null;
     case 'window':
@@ -2495,6 +2655,7 @@ export async function dispatchIntent(intent, params, reply, query, w, services, 
       const req = { ...params, action: params.action, op: params.op || '', value: params.value ?? null };
       try {
         const res = await runOsAction(services, req);
+        if (services.traceOs) services.traceOs(res);
         // file results and undoable changes get a card with buttons
         if (req.action === 'files' && services.showFileResult) services.showFileResult(req, res && res.result);
         return describeOsResult(req, res) || reply;
@@ -2644,11 +2805,11 @@ function makeCalendar(services) {
   return {
     id: 'calendar',
     title: 'Calendar',
-    icon: '📅',
+    icon: icon('calendar', 14),
     width: 700, height: 480,
     mount(root) {
       root.classList.add('app-calendar');
-      root.style.cssText = 'background:#0a0d14; color:#fff; padding:24px; display:flex; flex-direction:column; overflow:hidden; font-family:inherit;';
+
 
       let viewYear, viewMonth, selYear, selMonth, selDay;
       const now = new Date();
@@ -2687,49 +2848,45 @@ function makeCalendar(services) {
           const isSel = (d === selDay && viewMonth === selMonth && viewYear === selYear);
           const isToday = (d === today.getDate() && viewMonth === today.getMonth() && viewYear === today.getFullYear());
           const hasEv = events[dk] && events[dk].length > 0;
-          let bg = '#1a202c';
-          if (isSel) bg = '#3b82f6';
-          else if (isToday) bg = '#2d3748';
-          const bord = isToday && !isSel ? 'border:1px solid #3b82f6;' : '';
-          const dot = hasEv ? '<div style="width:5px;height:5px;background:#f43f5e;border-radius:50%;margin:3px auto 0;"></div>' : '';
-          grid += `<div class="cd" data-d="${d}" style="background:${bg};${bord}padding:6px 0;border-radius:6px;cursor:pointer;text-align:center;min-height:36px;transition:background .15s;">${d}${dot}</div>`;
+          const cls = 'cd' + (isSel ? ' is-sel' : '') + (isToday ? ' is-today' : '') + (hasEv ? ' has-ev' : '');
+          grid += `<button type="button" class="${cls}" data-d="${d}" aria-pressed="${isSel}" aria-label="${MONTHS[viewMonth]} ${d}${hasEv ? ', has events' : ''}">${d}</button>`;
         }
 
         // Build event list with delete buttons
         let evList = '';
         if (selEvents.length) {
           selEvents.forEach((ev, idx) => {
-            evList += `<div style="display:flex;align-items:center;gap:8px;background:#1a202c;padding:10px 12px;margin-bottom:6px;border-radius:6px;border-left:3px solid #3b82f6;">
-              <div style="flex:1;font-size:13px;"><b style="color:#60a5fa;margin-right:6px;">${ev.time}</b>${escapeHtml(ev.title)}</div>
-              <button class="ev-del" data-key="${selKey}" data-idx="${idx}" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;transition:background .15s;" title="Delete event">✕</button>
+            evList += `<div class="cal-ev">
+              <span class="cal-ev-time">${escapeHtml(ev.time)}</span><span class="cal-ev-title">${escapeHtml(ev.title)}</span>
+              <button class="ev-del" type="button" data-key="${selKey}" data-idx="${idx}" title="Delete event" aria-label="Delete ${escapeHtml(ev.title)}">${icon('trash', 15)}</button>
             </div>`;
           });
         } else {
-          evList = '<div style="opacity:0.4;padding:8px;font-size:13px;">No events for this day.</div>';
+          evList = `<div class="ui-empty"><span class="ui-empty-icon">${icon('calendar', 22)}</span><p class="ui-empty-text">No events</p></div>`;
         }
 
         const selLabel = new Date(selYear, selMonth, selDay).toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric', year:'numeric'});
 
         root.innerHTML = `
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-            <div style="display:flex;align-items:center;gap:6px;">
-              <button class="mp" style="background:#1e293b;border:none;color:#fff;width:28px;height:28px;border-radius:4px;cursor:pointer;font-size:14px;">◀</button>
-              <span style="min-width:160px;text-align:center;font-size:16px;font-weight:500;">${MONTHS[viewMonth]} ${viewYear}</span>
-              <button class="mn" style="background:#1e293b;border:none;color:#fff;width:28px;height:28px;border-radius:4px;cursor:pointer;font-size:14px;">▶</button>
+          <div class="cal-head">
+            <div class="cal-nav">
+              <button class="mp cal-iconbtn" type="button" aria-label="Previous month">${icon('chevron-left', 18)}</button>
+              <h2 class="cal-month">${MONTHS[viewMonth]} ${viewYear}</h2>
+              <button class="mn cal-iconbtn" type="button" aria-label="Next month">${icon('chevron-right', 18)}</button>
             </div>
-            <button class="ct" style="background:#1e293b;border:none;color:#60a5fa;padding:5px 14px;border-radius:4px;cursor:pointer;font-size:13px;">Today</button>
+            <button class="ct cal-today" type="button">Today</button>
           </div>
-          <div style="display:flex;gap:20px;flex:1;min-height:0;">
-            <div style="flex:1.2;">
-              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;">
-                ${['S','M','T','W','T','F','S'].map(h=>`<div style="opacity:0.4;font-size:11px;padding-bottom:6px;">${h}</div>`).join('')}
+          <div class="cal-body">
+            <div class="cal-grid-wrap">
+              <div class="cal-grid">
+                ${['S','M','T','W','T','F','S'].map(h=>`<div class="cal-dow">${h}</div>`).join('')}
                 ${grid}
               </div>
             </div>
-            <div style="flex:1;border-left:1px solid rgba(255,255,255,0.08);padding-left:20px;display:flex;flex-direction:column;min-height:0;">
-              <div style="font-size:14px;font-weight:500;margin-bottom:12px;color:#94a3b8;">${selLabel}</div>
-              <div style="flex:1;overflow-y:auto;">${evList}</div>
-              <div style="font-size:11px;color:#4b5563;padding-top:8px;">✨ Say "schedule meeting on May 25 at 3pm"</div>
+            <div class="cal-side">
+              <div class="cal-sel">${selLabel}</div>
+              <div class="cal-events">${evList}</div>
+              <div class="cal-hint" title='Say "schedule meeting on May 25 at 3pm"'>${icon('sparkles', 14)}<span>Ask the assistant to add events</span></div>
             </div>
           </div>`;
 
@@ -2740,15 +2897,11 @@ function makeCalendar(services) {
 
         // Wire up day clicks
         root.querySelectorAll('.cd').forEach(el => {
-          el.onmouseenter = () => { if(el.style.background!=='rgb(59, 130, 246)') el.style.background='#2d3748'; };
-          el.onmouseleave = () => { const d=parseInt(el.dataset.d); const isSel=(d===selDay&&viewMonth===selMonth&&viewYear===selYear); if(!isSel) el.style.background='#1a202c'; };
           el.onclick = () => { selDay=parseInt(el.dataset.d); selMonth=viewMonth; selYear=viewYear; render(); };
         });
 
         // Wire up delete buttons
         root.querySelectorAll('.ev-del').forEach(btn => {
-          btn.onmouseenter = () => btn.style.background = 'rgba(239,68,68,0.15)';
-          btn.onmouseleave = () => btn.style.background = 'none';
           btn.onclick = () => {
             const key = btn.dataset.key;
             const idx = parseInt(btn.dataset.idx);

@@ -141,6 +141,21 @@ fn top_processes() -> (Option<(String, f64)>, Option<(String, f64)>) {
     (cpu, mem)
 }
 
+/// "app-google\x2dchrome@2bee4a8a….service (user)" → "Google Chrome": the
+/// name a person knows, for titles. systemd escapes '-' as \x2d and adds an
+/// instance id after '@' for apps started from the desktop.
+fn friendly_unit(unit: &str) -> String {
+    let u = unit.trim_end_matches(" (user)");
+    let u = u.rsplit_once('.').filter(|(_, ext)| ["service", "scope", "socket", "timer", "mount"].contains(ext)).map_or(u, |(n, _)| n);
+    let u = u.split('@').next().unwrap_or(u);
+    let u = u.strip_prefix("app-").unwrap_or(u).replace("\\x2d", "-");
+    // a trailing random id ("-2bee4a8a") from the launcher
+    let u = match u.rsplit_once('-') { Some((head, tail)) if tail.len() >= 6 && tail.chars().all(|c| c.is_ascii_hexdigit()) => head.to_string(), _ => u };
+    let words: Vec<String> = u.split(['-', '_', '.']).filter(|w| !w.is_empty())
+        .map(|w| { let mut c = w.chars(); c.next().map(|f| f.to_uppercase().collect::<String>() + c.as_str()).unwrap_or_default() }).collect();
+    if words.is_empty() { unit.to_string() } else { words.join(" ") }
+}
+
 fn failed_units() -> Vec<String> {
     let mut out = Vec::new();
     for user in [true, false] {
@@ -223,8 +238,9 @@ fn check(st: &mut State) -> (Value, Vec<Value>) {
         }
     }
     for u in &failed {
-        alerts.push(alert(&format!("failed:{}", u), "bad", format!("{} stopped working", u),
-            "A background service has failed.".into(), format!("Ask me \"why did {} fail?\" and I'll look at its log.", u.trim_end_matches(" (user)"))));
+        let name = friendly_unit(u);
+        alerts.push(alert(&format!("failed:{}", u), "bad", format!("{} stopped working", name),
+            format!("Service {} failed.", u.trim_end_matches(" (user)")), format!("Ask me \"why did {} fail?\" and I'll look at its log.", name)));
     }
     let readings = json!({
         "cpu_temp_c": temp, "cpu_speed_ratio": freq, "throttled": throttled,
@@ -254,6 +270,7 @@ pub fn spawn() {
                 st.notified.insert(id, Instant::now());
             }
         }
+        crate::forecast::record(&readings);
         st.readings = readings;
         st.alerts = alerts;
         drop(guard);
@@ -299,4 +316,14 @@ pub fn evidence(about: &str) -> String {
     out.push_str(&format!("\n--- recent system errors ---\n{}\n",
         cmd_text("journalctl", &["-p", "err", "-b", "-n", "25", "--no-pager", "-o", "short"], 25)));
     out.chars().take(9000).collect()
+}
+
+#[cfg(test)]
+mod unit_names {
+    #[test]
+    fn friendly_unit_names() {
+        assert_eq!(super::friendly_unit("app-google\\x2dchrome@2bee4a8ae0f1470e9e.service (user)"), "Google Chrome");
+        assert_eq!(super::friendly_unit("NetworkManager.service"), "NetworkManager");
+        assert_eq!(super::friendly_unit("osaima-router.service (user)"), "Osaima Router");
+    }
 }

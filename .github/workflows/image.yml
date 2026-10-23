@@ -47,31 +47,7 @@ jobs:
         # normally under a minute; a stalled mirror must not eat the whole run
         timeout-minutes: 25
         run: |
-          # Some runners get a very slow route to the default Ubuntu mirror: the package index
-          # loads at once, but every package file takes seconds. Time a real package file from
-          # each mirror and put the fastest first in the runner's mirror list.
-          printf 'Acquire::Retries "5";\nAcquire::http::Timeout "30";\n' | sudo tee /etc/apt/apt.conf.d/80-retries > /dev/null
-          sudo apt-get update
-          file=$(apt-cache show --no-all-versions libxinerama-dev | awk '/^Filename:/ { print $2; exit }')
-          best=""; best_t=999
-          for m in http://azure.archive.ubuntu.com/ubuntu http://archive.ubuntu.com/ubuntu \
-                   http://mirrors.edge.kernel.org/ubuntu http://mirror.math.princeton.edu/pub/ubuntu; do
-            t=999
-            for _ in 1 2 3; do  # three fetches: one fast reply can be luck
-              t1=$(curl -o /dev/null -sf -m 20 -w '%{time_total}' "$m/$file" || echo 999)
-              t=$(awk -v a="$t" -v b="$t1" 'BEGIN { print (a == 999 ? b : a + b) }')
-            done
-            echo "mirror $m: ${t}s for 3 fetches of $file"
-            if awk -v a="$t" -v b="$best_t" 'BEGIN { exit !(a < b) }'; then best=$m; best_t=$t; fi
-          done
-          if [ -n "$best" ]; then
-            echo "using $best"
-            # the runner's sources name a mirror list file; name the chosen mirror instead
-            sudo sed -i -E "s#^URIs: (mirror\+file:/etc/apt/apt-mirrors.txt|http://azure.archive.ubuntu.com/ubuntu/?)\$#URIs: $best#" \
-              /etc/apt/sources.list.d/ubuntu.sources
-            grep '^URIs' /etc/apt/sources.list.d/ubuntu.sources
-            sudo apt-get update
-          fi
+          sudo bash build-tools/ci/apt-fast-mirror.sh
           sudo apt-get install -y --no-install-recommends \
             libwebkit2gtk-4.1-dev libgtk-3-dev librsvg2-dev libayatana-appindicator3-dev \
             libsoup-3.0-dev libjavascriptcoregtk-4.1-dev \
@@ -125,6 +101,32 @@ jobs:
           echo "found $server"
           "$server" --version 2>&1 | head -3 || true
 
+      - name: Voice engines (whisper.cpp and Piper, on the device)
+        run: |
+          # where ai-core/mcp-daemon/src/voice.rs looks for them, and build_vm_image.sh copies them from
+          base="$HOME/.local/share/osaima"
+          mkdir -p "$base/whisper/models" "$base/piper"
+          # whisper.cpp, static and for any x86-64 CPU (not tuned to this runner's)
+          git clone -q --depth 1 --branch v1.7.6 https://github.com/ggml-org/whisper.cpp "$RUNNER_TEMP/whisper.cpp"
+          cmake -S "$RUNNER_TEMP/whisper.cpp" -B "$RUNNER_TEMP/whisper-build" -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_SHARED_LIBS=OFF -DGGML_NATIVE=OFF -DWHISPER_BUILD_TESTS=OFF > /dev/null
+          cmake --build "$RUNNER_TEMP/whisper-build" --target whisper-cli -j "$(nproc)" > /dev/null
+          install -m755 "$RUNNER_TEMP/whisper-build/bin/whisper-cli" "$base/whisper/whisper-cli"
+          curl -fL --retry 3 -o "$base/whisper/models/ggml-base.en.bin" \
+            https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin
+          # Piper: its Linux release (binary, libraries, espeak-ng data) and one English voice
+          curl -fL --retry 3 https://github.com/rhasspy/piper/releases/download/2023.11.14-2/piper_linux_x86_64.tar.gz \
+            | tar -xz -C "$base/piper"
+          for f in en_US-lessac-medium.onnx en_US-lessac-medium.onnx.json; do
+            curl -fL --retry 3 -o "$base/piper/$f" \
+              "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/$f"
+          done
+          # they must actually run here: a transcript of the sample, and a spoken sentence
+          "$base/whisper/whisper-cli" -m "$base/whisper/models/ggml-base.en.bin" -f "$RUNNER_TEMP/whisper.cpp/samples/jfk.wav" -nt 2> /dev/null | tee /dev/stderr | grep -qi "country"
+          echo "Your computer is ready." | "$base/piper/piper/piper" --model "$base/piper/en_US-lessac-medium.onnx" --output_file "$RUNNER_TEMP/hello.wav"
+          test "$(stat -c %s "$RUNNER_TEMP/hello.wav")" -gt 10000
+          du -sh "$base/whisper" "$base/piper"
+
       - name: Download the language model (Phi-4 mini, free)
         run: |
           dest="$HOME/.local/share/osaima/models"
@@ -155,7 +157,7 @@ jobs:
         if: env.STOP != 'inputs'
         run: |
           mkdir -p out
-          sudo env SKIP_DISK=1 OUT="$OUT_VM" bash build-tools/scripts/build_vm_image.sh 2>&1 | tee out/build_vm_image.log
+          sudo env SKIP_DISK=1 REQUIRE_VOICE=1 OUT="$OUT_VM" bash build-tools/scripts/build_vm_image.sh 2>&1 | tee out/build_vm_image.log
 
       - name: Build the live ISO
         if: env.STOP != 'inputs' && env.STOP != 'image'
@@ -295,7 +297,7 @@ jobs:
             echo '```'
             echo "### VM smoke tests"
             echo '```'
-            grep -E "PASS|FAIL|WARN|^==" out/test_vm.log out/test_lite.log 2>/dev/null | head -60 || true
+            grep -E "PASS|FAIL|WARN|INFO|^==" out/test_vm.log out/test_lite.log 2>/dev/null | head -60 || true
             echo '```'
             echo "### Last of the console"
             echo '```'

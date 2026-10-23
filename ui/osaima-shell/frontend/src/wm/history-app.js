@@ -2,6 +2,8 @@
  * history-app.js — the History window: everything OSAIMA has done or held
  * back, from the tamper-evident activity log, newest first.
  */
+import { iconEl, chip, skeleton, emptyState, withIcon } from './icons.js';
+
 function el(tag, cls, text) {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
@@ -80,6 +82,7 @@ function sentence(e) {
 }
 
 const BADGE = { ok: 'Done', held: 'Held back', bad: 'Problem', info: 'Note' };
+const KIND_ICON = { ok: 'check', held: 'pause', bad: 'alert-circle', info: 'info' };
 
 function dayLabel(ts) {
   const d = new Date(ts);
@@ -97,22 +100,27 @@ export function makeHistory(services) {
     mount(root) {
       root.classList.add('app-history');
       const head = el('div', 'hi-head');
-      head.append(el('h2', '', 'History'));
-      const integrity = el('p', 'hi-integrity', 'Checking the log…');
+      const titleRow = el('div', 'hi-title');
+      const integrity = el('span', 'hi-integrity');
+      integrity.append(chip('Checking…', 'loader', 'muted', 'is-busy'));
+      titleRow.append(el('h2', '', 'History'), integrity);
+      head.append(titleRow);
+      const searchBox = el('label', 'hi-searchbox');
       const search = el('input', 'hi-search');
       search.type = 'search';
-      search.placeholder = 'Search what happened';
+      search.placeholder = 'Search what happened…';
       search.setAttribute('aria-label', 'Search history');
       search.autocomplete = 'off';
       search.spellcheck = false;
       const chipRow = el('div', 'hi-chips');
       chipRow.setAttribute('role', 'group');
       const list = el('div', 'hi-list');
-      const more = el('button', 'hi-more', 'Load more');
+      const more = withIcon(el('button', 'hi-more'), 'chevron-down', 'Load more');
       more.type = 'button';
       more.hidden = true;
       const foot = el('p', 'hi-foot');
-      head.append(integrity, search, chipRow);
+      searchBox.append(iconEl('search', 16), search);
+      head.append(searchBox, chipRow);
       root.replaceChildren(head, list, foot, more);
 
       let filter = FILTERS[0];
@@ -141,10 +149,14 @@ export function makeHistory(services) {
         const top = el('button', 'hi-line');
         top.type = 'button';
         top.setAttribute('aria-expanded', 'false');
+        const badge = el('span', 'hi-badge');
+        badge.title = BADGE[kind];
+        badge.append(iconEl(KIND_ICON[kind], 14), el('span', 'hi-sr', BADGE[kind]));
         top.append(
-          el('time', 'hi-time', new Date(e.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })),
+          badge,
           el('span', 'hi-text', text),
-          el('span', 'hi-badge', BADGE[kind]));
+          el('time', 'hi-time', new Date(e.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })),
+          iconEl('chevron-down', 14, 'hi-chev'));
         let pre = null;
         top.addEventListener('click', () => {
           if (pre) { pre.remove(); pre = null; top.setAttribute('aria-expanded', 'false'); return; }
@@ -160,7 +172,7 @@ export function makeHistory(services) {
         if (busy && !reset) return;
         const mine = ++token;
         busy = true;
-        if (reset) { shown = 0; offset = 0; total = 0; lastDay = null; list.replaceChildren(); more.hidden = true; foot.textContent = 'Loading…'; }
+        if (reset) { shown = 0; offset = 0; total = 0; lastDay = null; list.replaceChildren(skeleton(5, 'hi-skel')); more.hidden = true; foot.textContent = ''; }
         more.disabled = true;
         const text = search.value.trim();
         const added = [];
@@ -176,16 +188,16 @@ export function makeHistory(services) {
             for (const e of got) if (!filter.match || filter.match(e)) added.push(e);
             if (!got.length || offset >= total) break;
           }
+          if (reset || !shown) list.querySelector('.hi-skel')?.remove();
           added.forEach(addRow);
           shown += added.length;
           const done = offset >= total;
           more.hidden = done;
-          foot.textContent = shown
-            ? (done ? `${shown} ${shown === 1 ? 'entry' : 'entries'}` : `Showing ${shown}`)
-            : (text || filter.id !== 'all' ? 'Nothing matches.' : 'Nothing has been recorded yet.');
+          foot.textContent = shown ? (done ? `${shown} ${shown === 1 ? 'entry' : 'entries'}` : `Showing ${shown}`) : '';
+          if (!shown) list.replaceChildren(text || filter.id !== 'all' ? emptyState('search', 'Nothing matches') : emptyState('history', 'Nothing recorded yet'));
         } catch (err) {
           if (mine !== token) return;
-          foot.textContent = "Can't read the activity log" + (err && err.message ? ': ' + err.message : '.');
+          list.replaceChildren(emptyState('alert-circle', "Can't read the activity log" + (err && err.message ? ': ' + err.message : '')));
         }
         busy = false;
         more.disabled = false;
@@ -198,11 +210,11 @@ export function makeHistory(services) {
       (async () => {
         try {
           const v = (await services.invoke('audit_tail', { n: 1 }))?.verified || {};
-          integrity.textContent = v.ok
-            ? `Log intact: all ${v.records} entries check out. Each carries a fingerprint of the one before it, so editing or deleting any entry would show here.`
+          const c = v.ok ? chip(`Verified · ${v.records}`, 'shield-check', 'ok') : chip(`Altered at entry ${v.line}`, 'shield-alert', 'bad');
+          c.title = v.ok ? `Log intact: all ${v.records} entries check out. Each carries a fingerprint of the one before it, so editing or deleting any entry would show here.`
             : `The log was altered at entry ${v.line}.`;
-          integrity.classList.toggle('is-bad', !v.ok);
-        } catch { integrity.textContent = "Can't check the log's integrity."; }
+          integrity.replaceChildren(c);
+        } catch { integrity.replaceChildren(chip("Can't verify", 'alert-circle', 'bad')); }
       })();
 
       paint();
